@@ -29,6 +29,8 @@ jobs:
             ${{ runner.OS }}-npm-cache
       - name: Install Dependencies
         run: npm install
+      - name: Install Hexo Theme Fluid
+        run: npm install --save hexo-theme-fluid
       - name: Build
         run: npm run build
       - name: Upload Pages artifact
