@@ -176,6 +176,7 @@ tags: Linux
 官方网站：https://aosc.io/
 基于发行版：Debian
 桌面环境：KDE Plasma
+最新版本：？？？（2025年4月14日）
 基本介绍：内建由该社区开发的 APT 软件包管理界面“小熊猫包管理 (oma)"，可通用于多个内建 APT 包管理的发行版。
 
 ### GXDE OS
@@ -184,7 +185,16 @@ tags: Linux
 官方网站：https://www.gxde.top/
 基于发行版：Debian
 桌面环境：GXDE/DDE KWin 15
+最新版本：2025（2025年5月8日）
 基本介绍：该团队接手维护了Deepin 15.x版本采用的DDE KWin桌面环境，内置星火应用商店与Wine运行器，并借由KMRE实现了安卓应用支持。
+
+### AnduinOS
+主导方：Anduin Xue
+官方网站：https://www.anduinos.com/
+基于发行版：Ubuntu
+最新版本：1.1/1.3
+桌面环境：GNOME
+基本介绍：AnduinOS是基于Ubuntu的发行，它提供一份主题样式像Windows 11的GNOME桌面。该项目将各支持语言单独拆分到单独的ISO镜像中从而提供比父系更小的ISO镜像。原本Ubuntu带有的Snap支持被从AnduinOS中剔除掉。(from DistroWatch)
 
 ## 已停止维护的发行版
 
