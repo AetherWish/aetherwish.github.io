@@ -3,11 +3,9 @@ title: 国产Linux系统官网合集
 date: 2025-05-10 16:43:13
 tags: Linux
 ---
-
 本文收录由国内团队主导开发的Linux发行版。
 
 <!-- more -->
-
 
 ## 仍在活跃开发的发行版
 
@@ -112,6 +110,7 @@ tags: Linux
 最新版本： **5.1.0** （2025年4月30日）
 官方网站：https://www.openharmony.cn/
 基本介绍及鸿蒙相关说明：
+
 - HarmonyOS：提供部分openHarmony特性与HMS的Android固件包。
 - HarmonyOS Next：面向消费者设备与开发者的“纯血鸿蒙”。
 - openHarmony：华为家的跨平台和万物互联试验区，提供给其它公司开发商业产品。
@@ -181,11 +180,11 @@ tags: Linux
 
 ### GXDE OS
 
-主导方：gfgfd_xi/神末shenmo/星火应用商店
+主导方：gfdgd_xi/神末shenmo/星火应用商店
 官方网站：https://www.gxde.top/
 基于发行版：Debian
 桌面环境：GXDE/DDE KWin 15
-基本介绍：该团队接手维护了Deepin 15.x使用的DDE。
+基本介绍：该团队接手维护了Deepin 15.x版本采用的DDE KWin桌面环境，内置星火应用商店与Wine运行器，并借由KMRE实现了安卓应用支持。
 
 ## 已停止维护的发行版
 
@@ -228,11 +227,9 @@ tags: Linux
 
 ---
 
-2021年1月28日初版于 Deepin 20（哔哩哔哩创作中心） | 2025年5月10日更新于 Debian trixie/sid
+2021年1月28日初版于 Deepin 20（哔哩哔哩创作中心） | 2025年5月10日更新于 Debian trixie/sid（GitHub Pages)
 
 ---
-
-
 
 [^5]: 申威具有自主知识产权架构的指令集，基于Alpha架构
     
