@@ -8,7 +8,6 @@ tags: Linux
 
 <!-- more -->
 
-**注：本文当前所有的“最新版本”信息已经过时，请勿参考。**
 
 ## 仍在活跃开发的发行版
 
@@ -16,9 +15,9 @@ tags: Linux
 
 主导方：开放原子开源基金会
 基于发行版：根社区（CentOS）
-支持架构：x86_64/ARM64[^1]/ARM32/龙架构[^2]/RISC-V（后三者仅限24.03）
+支持架构：x86_64/ARM64[^1]/ARM32/龙架构[^2]/RISC-V
 桌面环境：无，可自行安装
-最新版本： **24.03 LTS** （2024年6月18日）|22.03 LTS SP4（2024年6月）
+最新版本： **25.03** （2025年3月）| 24.03 LTS SP1（2024年12月）
 官方网站：https://www.openeuler.org/
 基本介绍：华为捐赠，开放原子开源基金会孵化及运营，主要开发面向服务器用的操作系统。多家公司基于openEuler开发商业发行版。
 
@@ -59,7 +58,7 @@ tags: Linux
 支持架构：x86_64（家庭版唯一支持架构）/ARM64/龙架构/SW64[^5]/MIPS64el（仅专业版）
 桌面环境：DDE（KWin）
 最新版本：22.0（家庭版，2023年5月31日）| V20-1070u3（ 专业版，2024年5月11日发布/2025年3月5日更新）
-官方网站：https://www.uniontech.com/（生态社区：https://www.chinauos.com/）
+官方网站：[https://www.uniontech.com/](https://www.uniontech.com/)（生态社区：[https://www.chinauos.com/](https://www.chinauos.com/)）
 基本介绍：Deepin的商业版本，面向政企机关以及商业客户的Linux发行版。
 **使用说明：本系统默认不开放超级管理员权限、不支持非商店签名应用安装，需要登录账号打开开发者模式操作。家庭版需通过加入社群获取相关下载链接。**
 **许可证说明：所有版本均需要激活。家庭版可通过官方问卷星链接免费自助获取激活码。服务器版可使用不包含增值服务的免费授权，可通过购买授权或订阅升级到商业版。专业版需另行购买。**
@@ -81,7 +80,7 @@ tags: Linux
 支持架构：x86_64/ARM64/mips64el
 桌面环境：KDE Plasma
 最新版本：11（桌面版）|8.1（Asianux服务器）|8.0（InWise）
-官方网站：https://www.chinaredflag.cn/（原www.linuxsir.cn重新演变为社区）
+官方网站：[https://www.chinaredflag.cn/](https://www.chinaredflag.cn/)（原[www.linuxsir.cn](https://www.linuxsir.cn)重新演变为社区）
 基本介绍：名字历史悠久，但现在的版本是别家接盘后挂名开发，本家已于2014年前后破产。**官网疑似不再提供镜像下载。**
 
 ### 铜豌豆 Linux（AtzLinux）
@@ -229,6 +228,10 @@ tags: Linux
 
 ---
 
+2021年1月28日初版于 Deepin 20（哔哩哔哩创作中心） | 2025年5月10日更新于 Debian trixie/sid
+
+---
+
 
 
 [^5]: 申威具有自主知识产权架构的指令集，基于Alpha架构
@@ -239,4 +242,4 @@ tags: Linux
     
 [^2]: 即LoongArch（Loongson Architecture），龙芯开发的自主指令系统架构（指令集），支持虚拟化与二进制翻译扩展。据**龙芯中科**官网，其**从 2020 年起新研的 CPU（如3A5000） 均支持LoongArch。**
     
-[^1]: 即AArch64。请注意，部分发行版支持ARM架构，但并未写明支持ARM32还是ARM64，您可通过下载得到的镜像文件名称判读。（如：openkylin-0.9.5-raspi- **arm64** .img.tar.gz）
+[^1]: 即AArch64。请注意，部分发行版支持ARM架构，但并未写明支持ARM32还是ARM64，您可通过下载得到的镜像文件名称判读。（如：openkylin-0.9.5-raspi- **arm64**.img.tar.gz）
