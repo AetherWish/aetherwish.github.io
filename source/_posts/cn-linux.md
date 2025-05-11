@@ -189,6 +189,7 @@ tags: Linux
 基本介绍：该团队接手维护了Deepin 15.x版本采用的DDE KWin桌面环境，内置星火应用商店与Wine运行器，并借由KMRE实现了安卓应用支持。
 
 ### AnduinOS
+
 主导方：Anduin Xue
 官方网站：https://www.anduinos.com/
 基于发行版：Ubuntu
@@ -240,6 +241,8 @@ tags: Linux
 2021年1月28日初版于 Deepin 20（哔哩哔哩创作中心） | 2025年5月10日更新于 Debian trixie/sid（GitHub Pages)
 
 ---
+
+## 注释
 
 [^5]: 申威具有自主知识产权架构的指令集，基于Alpha架构。
     
