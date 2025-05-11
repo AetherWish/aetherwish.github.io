@@ -194,7 +194,7 @@ tags: Linux
 官方网站：https://www.anduinos.com/
 基于发行版：Ubuntu
 最新版本：1.1/1.3
-桌面环境：GNOME
+桌面环境：GNOME2
 基本介绍：AnduinOS是基于Ubuntu的发行，它提供一份主题样式像Windows 11的GNOME桌面。该项目将各支持语言单独拆分到单独的ISO镜像中从而提供比父系更小的ISO镜像。原本Ubuntu带有的Snap支持被从AnduinOS中剔除掉。(from DistroWatch)
 
 ## 已停止维护的发行版
