@@ -34,7 +34,7 @@ tags: Linux
 基于发行版：Ubuntu
 支持架构：x86_64
 桌面环境：UKUI（基于MATE）
-最新版本：V10 SP1（桌面版）|V10 SP3（服务器版）
+最新版本：**V10 SP1**（桌面版）|V10 SP3（服务器版）
 官方网站：https://www.kylinos.cn/
 基本介绍：主要针对政企用户以及国家重大发展项目开发的操作系统。
 许可证说明：需要激活；可以通过提交试用申请来获得镜像。
@@ -55,11 +55,11 @@ tags: Linux
 基于发行版：Debian
 支持架构：x86_64（家庭版唯一支持架构）/ARM64/龙架构/SW64[^5]/MIPS64el（仅专业版）
 桌面环境：DDE（KWin）
-最新版本：22.0（家庭版，2023年5月31日）| V20-1070u3（ 专业版，2024年5月11日发布/2025年3月5日更新）
+最新版本：**V20-1070u3**（ 专业版，2024年5月11日发布/2025年3月5日更新）| ~~22.0（家庭版，2023年5月31日）~~
 官方网站：[https://www.uniontech.com/](https://www.uniontech.com/)（生态社区：[https://www.chinauos.com/](https://www.chinauos.com/)）
 基本介绍：Deepin的商业版本，面向政企机关以及商业客户的Linux发行版。
-**使用说明：本系统默认不开放超级管理员权限、不支持非商店签名应用安装，需要登录账号打开开发者模式操作。家庭版需通过加入社群获取相关下载链接。**
-**许可证说明：所有版本均需要激活。家庭版可通过官方问卷星链接免费自助获取激活码。服务器版可使用不包含增值服务的免费授权，可通过购买授权或订阅升级到商业版。专业版需另行购买。**
+**使用说明：本系统默认不开放超级管理员权限、不支持非商店签名应用安装，需要登录账号打开开发者模式操作。家庭版已不再提供下载。**
+**许可证说明：所有版本均需要激活。服务器版可使用不包含增值服务的免费授权，可通过购买授权或订阅升级到商业版。专业版需另行购买。**
 
 ### 深度操作系统（Deepin）
 
@@ -67,7 +67,7 @@ tags: Linux
 基于发行版：根社区（dpkg+玲珑双包管）
 支持架构：x86_64/ARM/龙架构[^2]/RISC-V（后两者仅23）
 桌面环境：DDE（X11+Treeland<开发中>）
-最新版本： **23.1** （2025年4月16日）| **25 Alpha** （2025年3月19日）
+最新版本：**23.1** （2025年4月16日）| **25 Alpha** （2025年3月19日）
 官方网站：https://www.deepin.org/
 基本介绍：在国内外均有一定名气的Linux发行版，其桌面环境被移植到许多发行版上，部分被官方所接纳成为官方flavor之一（尤见于15.x时期）。Deepin开发商还主导了武汉Linux用户组的建立。从23版本开始，Deepin开始自行建立并维护软件源，并开始建立基于容器技术的“如意玲珑（Linyaps）”应用生态。从25版本开始，Deepin引入磐石系统与类Timeshift的系统还原特性。
 
@@ -77,8 +77,8 @@ tags: Linux
 基于发行版：Debian（桌面版）/openEuler（服务器）
 支持架构：x86_64/ARM64/mips64el
 桌面环境：KDE Plasma
-最新版本：11（桌面版）|8.1（Asianux服务器）|8.0（InWise）
-官方网站：[https://www.chinaredflag.cn/](https://www.chinaredflag.cn/)（原[www.linuxsir.cn](https://www.linuxsir.cn)重新演变为社区）
+最新版本：**11**（桌面版）|8.1（Asianux服务器）|8.0（InWise）
+官方网站：[https://www.chinaredflag.cn/](https://www.chinaredflag.cn/)~~（原[www.linuxsir.cn](https://www.linuxsir.cn)重新演变为社区）~~
 基本介绍：名字历史悠久，但现在的版本是别家接盘后挂名开发，本家已于2014年前后破产。**官网疑似不再提供镜像下载。**
 
 ### 铜豌豆 Linux（AtzLinux）
@@ -107,13 +107,13 @@ tags: Linux
 基于内核：Hongmeng Kernel/Linux
 支持架构：多架构，需自行编译
 桌面环境：openHarmony
-最新版本： **5.1.0** （2025年4月30日）
+最新版本：**5.1.0** （2025年4月30日）
 官方网站：https://www.openharmony.cn/
 基本介绍及鸿蒙相关说明：
 
 - HarmonyOS：提供部分openHarmony特性与HMS的Android固件包。
 - HarmonyOS Next：面向消费者设备与开发者的“纯血鸿蒙”。
-- openHarmony：华为家的跨平台和万物互联试验区，提供给其它公司开发商业产品。
+- openHarmony：华为主导的跨平台和万物互联试验发行，提供给其它公司开发商业产品。
 
 ### 龙蜥（Anolis）
 
@@ -121,7 +121,7 @@ tags: Linux
 基于发行版：CentOS
 支持架构：x86_64/ARM64/RISCV/龙架构
 桌面环境：未知
-最新版本： **8.10GA** （2025年4月16日）|23.2 GA（2025年1月7日）
+最新版本：**8.10GA** （2025年4月16日）|23.2 GA（2025年1月7日）
 官方网站：https://openanolis.cn/
 基本介绍：面向服务器的操作系统，国内CentOS替代品/分生社区之一。
 
@@ -131,9 +131,9 @@ tags: Linux
 基于发行版：根社区（dpkg单包管）
 支持架构：x86_64/RISC-V/ARM64/龙架构[^2]
 桌面环境：UKUI
-最新版本： 2.0 SP1（2024年12月20日）
+最新版本：**2.0 SP1**（2024年12月20日）
 官方网站：https://openkylin.top
-基本介绍：宣传“中国首个桌面操作系统根社区”（但比deepin晚），其桌面环境支持Wayland协议；2.0引入“不可变操作系统”特性；提供部分开源的安卓轻量虚拟机KMRE，被[GXDE OS](#gxde-os)移植到多个发行版。
+基本介绍：宣传“中国首个桌面操作系统根社区”（但比deepin晚），其桌面环境支持Wayland协议；2.0引入“不可变操作系统”特性；提供部分开源的安卓轻量虚拟机KMRE，被[GXDE OS](#GXDE-OS)移植到多个发行版。
 
 ### NOI Linux/Ubuntu-NOI
 
@@ -150,7 +150,7 @@ tags: Linux
 主导方：鸥栖社区（腾讯云为重要成员 [^4] ），由开放原子开源基金会托管
 基于发行版：根社区（9/Stream 23）/CentOS（8/7）
 支持架构：x86_64/ARM64
-最新版本： 9.2 | Stream 23
+最新版本： **9.2** | Stream 23
 官方网站：https://www.opencloudos.org/
 基本介绍：面向服务器的操作系统，官方称社区立志“提供安全可靠、高性能的下一代云原生操作系统”。
 
@@ -160,7 +160,7 @@ tags: Linux
 基于发行版：Debian/CutefishOS
 支持架构：x86_64
 桌面环境：FishUI
-最新版本：3.0-rc10 （2025年4月5日）
+最新版本：**3.0-rc10** （2025年4月5日）
 官方网站：https://lingmo.org/
 基本介绍：CutefishOS分支，曾用名“CuteOS”/“SwiftOS”。集成常用软件及社区应用商店“星火应用商店”。
 
@@ -185,7 +185,7 @@ tags: Linux
 官方网站：https://www.gxde.top/
 基于发行版：Debian
 桌面环境：GXDE/DDE KWin 15
-最新版本：2025（2025年5月8日）
+最新版本：**2025**（2025年5月8日）
 基本介绍：该团队接手维护了Deepin 15.x版本采用的DDE KWin桌面环境，内置星火应用商店与Wine运行器，并借由KMRE实现了安卓应用支持。
 
 ### AnduinOS
@@ -193,8 +193,8 @@ tags: Linux
 主导方：Anduin Xue
 官方网站：https://www.anduinos.com/
 基于发行版：Ubuntu
-最新版本：1.1/1.3
-桌面环境：GNOME2
+最新版本：**1.1/1.3**
+桌面环境：GNOME
 基本介绍：AnduinOS是基于Ubuntu的发行，它提供一份主题样式像Windows 11的GNOME桌面。该项目将各支持语言单独拆分到单独的ISO镜像中从而提供比父系更小的ISO镜像。原本Ubuntu带有的Snap支持被从AnduinOS中剔除掉。(from DistroWatch)
 
 ## 已停止维护的发行版
@@ -223,7 +223,7 @@ tags: Linux
 基于发行版：未知（可能为Debian）
 支持架构：x86_64/ARM64
 桌面环境：未知
-终版：0.9 beta（x86，2021年5月31日，原官网版本）|1.1.1（ARM64，2021年12月16日，面向JingPad版本）
+终版：**0.9 beta**（x86，2021年5月31日，原官网版本）|1.1.1（ARM64，2021年12月16日，面向JingPad版本）
 基本介绍：面向平板的操作系统，与自家产品JingPad深度绑定
 
 ### Yoyo OS
@@ -232,13 +232,13 @@ tags: Linux
 基于发行版：Ubuntu/CutefishOS
 支持架构：x86_64
 桌面环境：FishUI（又称CutefishDE）
-终版：Alpha 2 Fixed（“Kokomi”）/0.9
+终版：**Alpha 2 Fixed**（“Kokomi”）/0.9
 官方网站：https://www.yzzi.icu
 作者间歇性维护。本发行版版本号体系较为混乱，此处取二。
 
 ---
 
-2021年1月28日初版于 Deepin 20（哔哩哔哩创作中心） | 2025年5月10日更新于 Debian trixie/sid（GitHub Pages)
+2021年1月28日初版于 Deepin 20（哔哩哔哩创作中心） | 2025年5月10日更新于 Debian trixie/sid（GitHub Pages）
 
 ---
 
