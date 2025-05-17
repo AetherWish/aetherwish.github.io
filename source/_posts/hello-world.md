@@ -1,11 +1,10 @@
 ---
 title: Hello World / 你好，世界
+date: 1970-10-13 18:24:16
 ---
 欢迎来到 [Hexo](https://hexo.io/)！这是你的第一篇文章（废话，Hexo 自带的）。
 
-
 <!-- more -->
-
 
 欲获取更多详情，请参阅[文档](https://hexo.io/docs/)。如你在使用 Hexo 时遇到任何问题，你可以在[问题排查页](https://hexo.io/docs/troubleshooting.html)找到答案。你也可以在 [GitHub](https://github.com/hexojs/hexo/issues) 上求助。
 
