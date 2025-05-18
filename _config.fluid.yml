@@ -808,7 +808,7 @@ gitalk:
   # The default proxy may be invalid, refer to the links for solutions
   # https://github.com/gitalk/gitalk/issues/429
   # https://github.com/Zibri/cloudflare-cors-anywhere
-  proxy: https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token
+  proxy: https://github.com/login/oauth/access_token
 
 # Valine
 # 基于 LeanCloud
