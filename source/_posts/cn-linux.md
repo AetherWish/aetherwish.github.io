@@ -45,7 +45,7 @@ tags: Linux
 基于发行版：Ubuntu
 支持架构：x86_64
 桌面环境：UKUI（基于MATE）
-最新版本：**25.04** （2025年4月18日）
+最新版本：**25.10** （2025年10月8日）
 官方网站：<https://www.ubuntukylin.com/>
 基本介绍：为中国用户设计的Ubuntu Flavor，社区目前发展中心转向openKylin。
 
