@@ -13,7 +13,7 @@ timezone: ''
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: http://aetherwish.github.io/
+url: https://cyrene.icu/
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
@@ -28,8 +28,6 @@ archive_dir: archives
 category_dir: categories
 code_dir: downloads/code
 i18n_dir: :lang
-
-# stop render
 skip_render:
 
 # Writing
@@ -99,7 +97,6 @@ ignore:
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-remote_theme: fluid-dev/hexo-theme-fluid
 theme: fluid
 
 # Deployment
