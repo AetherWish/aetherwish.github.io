@@ -371,7 +371,7 @@ navbar:
     - { key: "archive", link: "/archives/", icon: "iconfont icon-archive-fill" }
     - { key: "category", link: "/categories/", icon: "iconfont icon-category-fill" }
     - { key: "tag", link: "/tags/", icon: "iconfont icon-tags-fill" }
-    - { key: "cyrene", name: "昔涟", link: "/cyrene/", icon: "iconfont icon-brush" }
+    - { key: "philia093", name: "昔涟", link: "/philia093/", icon: "iconfont icon-brush" }
     - { key: "about", link: "/about/", icon: "iconfont icon-user-fill" }
     #- { key: "links", link: "/links/", icon: "iconfont icon-link-fill" }
 

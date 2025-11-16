@@ -10,3 +10,5 @@ date: 2025-11-16 11:58:23
 昔涟是。每一句最后的。一直咯咯笑的。像是小尾巴的。
 昔涟是。哭着诞生的。脆弱的。透明的。像是水晶的。
 昔涟是。笑着道别的。柔软的。粉色的。像是花的。
+
+<iframe src="//player.bilibili.com/player.html?isOutside=true&aid=115490043266137&bvid=BV14G1kB5Evp&cid=33708180019&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
