@@ -15,9 +15,9 @@ tags: Linux
 然后在终端中执行如下命令：
 
 ```bash
-sudo deepin-immutable-ctl disable-system-protect enable //关闭磐石系统（系统保护）
-sudo apt install cmake cargo //安装编译依赖项
-sudo apt install gedit //习惯vim、nano的忽略
+sudo deepin-immutable-ctl disable-system-protect enable  # 关闭磐石系统（系统保护）
+sudo apt install cmake cargo  # 安装编译依赖项
+sudo apt install gedit  # 习惯vim、nano的忽略
 ```
 
 ## Part 2：编译安装
@@ -25,10 +25,10 @@ sudo apt install gedit //习惯vim、nano的忽略
 在终端中执行如下命令：
 
 ```bash
-cd ~/fish_src //记得把"～/fish_src"换成fish源码实际存放的路径
+cd ~/fish_src  # 记得把"～/fish_src"换成fish源码实际存放的路径
 cmake .
 make
-sudo make install //默认安装到"/usr/local/bin/fish"
+sudo make install  # 默认安装到"/usr/local/bin/fish"
 ```
 
 ## Part 3：基础配置
@@ -37,7 +37,7 @@ sudo make install //默认安装到"/usr/local/bin/fish"
 
 ```bash
 fish //进入fish
-set -Ua fish_features no-keyboard-protocols //直接Ctrl+Shift+V粘贴然后打回车
+set -Ua fish_features no-keyboard-protocols  # 直接Ctrl+Shift+V粘贴然后打回车
 ```
 
 解决了这个问题以后把fish设置成当前用户的默认Shell（设成登录Shell也可以，但风险太大）：
@@ -53,12 +53,12 @@ sudo chsh --shell /usr/local/bin/fish <你的用户名>
 
 ## Part 4：进阶配置
 
-默认配置下的fish只会在deepin终端标题栏上显示当前路径，如果要改成和bash下一致的 `用户名@主机名: 当前路径`那就需要修改 ` ~/.config/fish/`路径下的 `config.fish`文件：
+默认配置下的fish只会在deepin终端标题栏上显示当前路径，如果要改成和bash下一致的 `用户名@主机名: 当前路径`那就需要修改 `~/.config/fish/`路径下的 `config.fish`文件：
 
 首先打开这个文件：
 
 ```bash
-sudo gedit ~/.config/fish/config.fish //gedit可以换成其他的文本编辑器
+sudo gedit ~/.config/fish/config.fish  # gedit可以换成其他的文本编辑器
 ```
 
 然后在文件后面换行增补以下内容，保存后即时生效。
