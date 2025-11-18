@@ -1,0 +1,254 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow: hidden;
+}
+
+/* Landscape mode (default) */
+.calendar-container {
+    width: 100%;
+    max-width: 1200px;
+    height: 90vh;
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 图片和日历各占一半 */
+    grid-template-rows: auto 50px; /* 日历头部和底部 */
+    grid-template-areas:
+        "image calendar"
+        "footer footer";
+}
+
+.image-section {
+    grid-area: image;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    border-radius: 15px 0 0 15px;
+}
+
+.month-display {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    z-index: 2;
+}
+
+.month-text {
+    font-size: 3em; /* 增大字体 */
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+    margin-bottom: 5px;
+    text-align: center; /* 确保文字居中 */
+}
+
+.month-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    color: white;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+.month-title {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    color: white;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+    z-index: 2;
+    text-align: right;
+}
+
+.month-title-large {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.month-title-message {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.month-title-line1,
+.month-title-line2 {
+    font-size: 0.9em;
+    line-height: 1.4;
+    margin-bottom: 3px;
+}
+
+.lucky-plant {
+    font-size: 0.8em;
+    margin-top: 5px;
+}
+
+.calendar-section {
+    grid-area: calendar;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.nav-btn {
+    background: #a777e3;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 1.2em;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.nav-btn:hover {
+    background: #6e8efb;
+}
+
+#currentMonthYear {
+    font-size: 1.5em;
+    color: #333;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: 40px 1fr;  /* 明确指定行高，第二行占剩余空间 */
+    gap: 2px;
+    background: #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    height: 100%;
+}
+
+.day-header {
+    background: #f0f0f0;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    border-top: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.day-header:first-child {
+    border-left: none;
+}
+
+#calendarDays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr);  /* 6行日期 */
+    gap: 2px;
+    /* 定位在网格的第2行，横跨所有列 */
+    grid-row: 2;
+    grid-column: 1 / -1;
+}
+
+.calendar-day {
+    background: white;
+    padding: 10px;
+    text-align: center;
+    border-top: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 确保元素在网格中的行为 */
+    overflow: hidden;
+}
+
+.calendar-day:first-child {
+    border-left: none;
+}
+
+.calendar-day.empty {
+    background: #f9f9f9;
+}
+
+.calendar-day.weekend {
+    background: #f0f8ff;
+}
+
+.footer {
+    grid-area: footer;
+    padding: 10px 20px;
+    background: #f0f0f0;
+    text-align: center;
+    font-size: 0.9em;
+    color: #666;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stats, .copyright {
+    margin: 0;
+}
+
+/* Portrait mode - when height is much greater than width */
+@media screen and (max-height: 600px), screen and (max-width: 767px) {
+    .calendar-container {
+        height: auto;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        min-height: 100vh;
+        grid-template-areas:
+            "image"
+            "calendar"
+            "footer";
+    }
+
+    .image-section {
+        border-radius: 15px 15px 0 0;
+        min-height: 250px;
+    }
+
+    .month-display {
+        bottom: 15px;
+    }
+
+    .month-text {
+        font-size: 2em;
+    }
+
+    .month-title {
+        top: 15px;
+    }
+
+    .calendar-grid {
+        grid-template-rows: 30px auto;
+    }
+
+    .footer {
+        flex-direction: column;
+        gap: 5px;
+    }
+}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026年历</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="calendar-container">
+        <!-- 图片背景部分 -->
+        <div class="image-section" id="imageSection">
+            <!-- 月份显示 (左下角) -->
+            <div class="month-display">
+                <div class="month-text" id="monthText">1月</div>
+                <div class="month-info">
+                    <div class="lucky-plant">本月幸运花</div>
+                </div>
+            </div>
+
+            <!-- 右上角月份标题 -->
+            <div class="month-title" id="monthTitle">
+                <div class="month-title-message">
+                    <div class="month-title-line1" id="monthTitleLine1">不论晴天还是雨天，进入梦乡以前，</div>
+                    <div class="month-title-line2" id="monthTitleLine2">记得和自己说一声：「明天见」！</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 月历部分 -->
+        <div class="calendar-section">
+            <div class="calendar-header">
+                <button id="prevMonth" class="nav-btn">&lt;</button>
+                <h2 id="currentMonthYear">2026年1月</h2>
+                <button id="nextMonth" class="nav-btn">&gt;</button>
+            </div>
+            
+            <div class="calendar-grid">
+                <div class="day-header">Sun</div>
+                <div class="day-header">Mon</div>
+                <div class="day-header">Tue</div>
+                <div class="day-header">Wed</div>
+                <div class="day-header">Thu</div>
+                <div class="day-header">Fri</div>
+                <div class="day-header">Sat</div>
+                
+                <!-- 日期将在JavaScript中动态生成 -->
+                <div id="calendarDays"></div>
+            </div>
+        </div>
+        
+        <!-- 底部信息 -->
+        <div class="footer">
+            <div class="stats">UV: <span id="uvCount">0</span> | PV: <span id="pvCount">1</span></div>
+            <div class="copyright">© 2025 AetherWish. All rights reserved.</div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
