@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>明天见。</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: url('img/amphoreus.webp') center/cover no-repeat, 
+                       linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .construction-text {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .info-text {
+            font-size: 1.5rem;
+            color: #555;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        
+        .announcement-link {
+            color: #eb7ea3;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .announcement-link:hover {
+            color: #d65c8a;
+            text-decoration: underline;
+        }
+        
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+
+        .footer_stat {
+            margin-top: 10px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+        
+        .blog-link {
+            color: #eb7ea3;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .blog-link:hover {
+            color: #d65c8a;
+            text-decoration: underline;
+        }
+        
+        .cyrene-link {
+            color: #eb7ea3;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .cyrene-link:hover {
+            color: #d65c8a;
+            text-decoration: underline;
+        }
+
+        .construction-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #eb7ea3;
+        }
+        
+        @media (max-width: 768px) {
+            .construction-text {
+                font-size: 2.5rem;
+            }
+            
+            .info-text {
+                font-size: 1.2rem;
+            }
+            
+            .container {
+                padding: 30px 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .construction-text {
+                font-size: 2rem;
+            }
+            
+            .info-text {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="construction-icon">🚧</div>
+        <h1 class="construction-text">网站建设中</h1>
+        <p class="info-text">具体信息请查看<a href="https://blog.cyrene.icu/2025/11/18/site-migration/" class="announcement-link" target="_blank" rel="noopener noreferrer">公告</a></p>
+    </div>
+    
+    <div class="footer">
+        <p><a href="https://blog.cyrene.icu/" class="blog-link" target="_blank" rel="noopener noreferrer">空愿的小站</a> / <a href="https://blog.cyrene.icu/philia093/" class="cyrene-link" target="_blank" rel="noopener noreferrer">激起往昔的涟漪</a></p> 
+    </div>
+    <div class="footer_stat">
+        <p><span id="busuanzi_container_site_pv">本站总访问量 <span id="busuanzi_value_site_pv"></span> 次</span></p>
+    </div>
+    
+</body>
+</html>
