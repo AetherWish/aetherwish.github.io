@@ -47,7 +47,7 @@ function initLanguageToggle() {
 
         if (isEnglish) {
             // 切换到英文
-            langToggleBtn.textContent = '中文';
+            langToggleBtn.textContent = '你好，世界';
             chineseContent.style.display = 'none';
             englishContent.style.display = 'block';
             chineseCountdownText.style.display = 'none';
@@ -69,7 +69,7 @@ function initLanguageToggle() {
             document.documentElement.lang = 'en';
         } else {
             // 切换到中文
-            langToggleBtn.textContent = 'EN';
+            langToggleBtn.textContent = 'Hello World';
             chineseContent.style.display = 'block';
             englishContent.style.display = 'none';
             chineseCountdownText.style.display = 'block';
@@ -90,6 +90,7 @@ function initLanguageToggle() {
             // 更新页面语言属性
             document.documentElement.lang = 'zh-CN';
         }
+    });
     });
 }
 

@@ -98,6 +98,17 @@ body {
     --nav-btn-text-color: #f0f0f0;
 }
 
+/* Make sure theme toggle icon is visible in both themes */
+.theme-toggle-icon {
+    width: 24px;
+    height: 24px;
+    fill: white;
+}
+
+[data-theme="dark"] .theme-toggle-icon {
+    fill: white;
+}
+
 body {
     font-family: Arial, sans-serif;
     background: url('../img/amphoreus.webp');
@@ -221,8 +232,10 @@ body {
 }
 
 .toggle-icon {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
+    display: block;
+    margin: auto;
 }
 
 /* 深色模式切换按钮 */
@@ -234,10 +247,15 @@ body {
     border: none;
     cursor: pointer;
     z-index: 1000;
-    padding: 8px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     transition: background 0.3s;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0; /* Remove any default padding */
 }
 
 .theme-toggle-btn:hover {
@@ -247,6 +265,11 @@ body {
 .theme-toggle-icon {
     width: 24px;
     height: 24px;
+    min-width: 16px;
+    min-height: 16px;
+    display: block;
+    margin: auto;
+    transform: translate(-1px, 2px); /* Move 1px left and 2px down (net result: 1px right from original, 2px down) */
 }
 
 /* 胶囊底部样式 */
@@ -495,6 +518,20 @@ body {
     }
 }
 
+/* Calendar fade in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.calendar-fade-in {
+    animation: fadeIn 0.5s ease-in forwards;
+}
+
 .footer {
     grid-area: footer;
     padding: 10px 20px;
@@ -698,6 +735,7 @@ body {
     }
 
     .footer {
+        display: none; /* Hide footer in portrait mode */
         flex-direction: column;
         gap: 5px;
         padding: 10px 20px;
@@ -728,3 +766,36 @@ body {
         padding: 10px; /* Reduce padding in portrait */
     }
 }
+
+/* Specific portrait mode style for 400px width */
+@media screen and (max-width: 400px) and (orientation: portrait) {
+    .calendar-container {
+        height: auto;
+        grid-template-rows: 35vh 1fr auto;
+        grid-template-areas:
+            "image"
+            "calendar"
+            "footer";
+        border-radius: 15px;
+    }
+
+    .image-section {
+        height: 35vh;
+        max-height: none;
+    }
+
+    .calendar-grid {
+        height: 100%;
+    }
+
+    #calendarDays {
+        max-height: none;
+        height: 100%;
+    }
+
+    /* Hide footer information and links in portrait mode on small screens */
+    .footer {
+        display: none;
+    }
+}
+
