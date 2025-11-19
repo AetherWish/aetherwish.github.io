@@ -29,6 +29,50 @@
     --current-theme-color: #8A2B3B; /* 默认主题色，由JavaScript设置 */
 }
 
+/* Add transition for theme switching */
+body {
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.calendar-container {
+    transition: background 0.5s ease, box-shadow 0.5s ease;
+}
+
+.footer {
+    transition: background 0.5s ease, color 0.5s ease;
+}
+
+#currentMonthYear {
+    transition: color 0.5s ease;
+}
+
+.nav-btn {
+    transition: background 0.5s ease, opacity 0.2s ease;
+}
+
+.capsule-content {
+    transition: background 0.5s ease, color 0.5s ease;
+}
+
+.info-tooltip {
+    transition: background 0.5s ease, color 0.5s ease;
+}
+
+/* Transitions for theme switching */
+[data-theme="dark"] body,
+[data-theme="dark"] .calendar-container,
+[data-theme="dark"] .footer,
+[data-theme="dark"] .capsule-content,
+[data-theme="dark"] .info-tooltip {
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* Animation class for transitions */
+.calendar-container.animating,
+.capsule-footer.animating {
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
 /* Dark theme variables */
 [data-theme="dark"] {
     --bg-color: #1a1a1a;

@@ -172,6 +172,10 @@ function toggleTheme() {
         localStorage.setItem('theme', 'dark');
         updateThemeIcon('dark');
     }
+
+    // 重新应用当前月份的主题颜色以适应新的主题模式
+    const monthData = monthsData[currentMonthIndex];
+    applyThemeColor(monthData.themeColor);
 }
 
 // 更新日历显示
@@ -458,22 +462,40 @@ function toggleCalendarVisibility() {
     const calendarContainer = document.querySelector('.calendar-container');
     const capsuleFooter = document.getElementById('capsuleFooter');
 
+    // 检查是否有正在进行的动画
+    if (calendarContainer.classList.contains('animating') || capsuleFooter.classList.contains('animating')) {
+        // 如果有动画正在进行，先移除类
+        calendarContainer.classList.remove('animating');
+        capsuleFooter.classList.remove('animating');
+
+        // 清除可能的定时器
+        if (window.calendarTransitionTimer) {
+            clearTimeout(window.calendarTransitionTimer);
+        }
+    }
+
+    // 添加动画状态类
+    calendarContainer.classList.add('animating');
+    capsuleFooter.classList.add('animating');
+
     // Check if calendar is currently visible by checking if it's not faded out
-    const isCalendarVisible = calendarContainer.style.opacity !== '0';
+    const isCalendarVisible = parseFloat(calendarContainer.style.opacity) !== 0 ||
+                              calendarContainer.style.opacity === '' ||
+                              calendarContainer.style.display !== 'none';
 
     if (isCalendarVisible) {
         // 隐藏日历
         calendarContainer.style.opacity = '0';
         // Delay hiding calendar to allow transition to complete
-        setTimeout(() => {
+        window.calendarTransitionTimer = setTimeout(() => {
             calendarContainer.style.display = 'none';
-        }, 500); // Match the CSS transition duration
-        // Show capsule with transition
-        setTimeout(() => {
+            calendarContainer.classList.remove('animating');
+
             capsuleFooter.classList.add('show');
+            capsuleFooter.classList.remove('animating');
             // Ensure stats are synchronized when showing capsule
             syncStatsToCapsule();
-        }, 10);
+        }, 500); // Match the CSS transition duration
         toggleCalendarBtn.innerHTML = `
             <svg class="toggle-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 4.5C7 4.5 2.73 7.61 1 12C2.73 16.39 7 19.5 12 19.5C17 19.5 21.27 16.39 23 12C21.27 7.61 17 4.5 12 4.5ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9Z" fill="white"/>
@@ -488,8 +510,10 @@ function toggleCalendarVisibility() {
         // Start the fade-in animation
         calendarContainer.style.opacity = '1';
         // Delay hiding capsule to allow transition
-        setTimeout(() => {
+        window.calendarTransitionTimer = setTimeout(() => {
             capsuleFooter.classList.remove('show');
+            capsuleFooter.classList.remove('animating');
+            calendarContainer.classList.remove('animating');
         }, 10);
         toggleCalendarBtn.innerHTML = `
             <svg class="toggle-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
