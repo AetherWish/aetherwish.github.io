@@ -100,8 +100,8 @@ function initBackToTop() {
 
     // 监听滚动事件
     window.addEventListener('scroll', function() {
-        // 当页面滚动超过一定距离时显示按钮
-        if (window.pageYOffset > 300) {
+        // 只要页面滚动超过一定距离（例如50px）就显示按钮
+        if (window.pageYOffset > 50) {
             backToTopBtn.classList.add('show');
         } else {
             backToTopBtn.classList.remove('show');

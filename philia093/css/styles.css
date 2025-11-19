@@ -195,7 +195,7 @@ main {
 
 /* 返回顶部按钮 */
 .back-to-top-btn {
-    position: absolute;
+    position: fixed;  /* Changed from absolute to fixed to position relative to viewport */
     bottom: 20px;
     right: 20px;
     width: 50px;
@@ -209,7 +209,7 @@ main {
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
+    z-index: 9999; /* Increased z-index to ensure it's above all other elements */
     opacity: 0;
     visibility: hidden;
     transform: translateY(10px);
