@@ -38,6 +38,8 @@ function initLanguageToggle() {
     const englishCountdownText = document.querySelector('.english-countdown-text');
     const chineseLabels = document.querySelectorAll('.label');
     const englishLabels = document.querySelectorAll('.label-en');
+    const homeTextZh = document.querySelector('.home-text-zh');
+    const homeTextEn = document.querySelector('.home-text-en');
     let isEnglish = false;
 
     langToggleBtn.addEventListener('click', function() {
@@ -59,6 +61,10 @@ function initLanguageToggle() {
                 label.style.display = 'block';
             });
 
+            // 切换主页按钮文字
+            homeTextZh.style.display = 'none';
+            homeTextEn.style.display = 'inline';
+
             // 更新页面语言属性
             document.documentElement.lang = 'en';
         } else {
@@ -76,6 +82,10 @@ function initLanguageToggle() {
             englishLabels.forEach(label => {
                 label.style.display = 'none';
             });
+
+            // 切换主页按钮文字
+            homeTextZh.style.display = 'inline';
+            homeTextEn.style.display = 'none';
 
             // 更新页面语言属性
             document.documentElement.lang = 'zh-CN';

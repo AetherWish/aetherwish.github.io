@@ -42,6 +42,34 @@ body::before {
     position: relative; /* 为返回顶部按钮定位做准备 */
 }
 
+.home-link {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+}
+
+.home-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(235, 126, 163, 0.8);
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease;
+}
+
+.home-btn:hover {
+    background: rgba(235, 126, 163, 1);
+}
+
 .language-switcher {
     position: absolute;
     top: 20px;
