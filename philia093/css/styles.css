@@ -1,0 +1,211 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: url('/img/philia093.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.4), rgba(235, 126, 163, 0.3)); /* 紫粉色渐变遮罩 */
+    z-index: -1;
+}
+
+.container {
+    max-width: 800px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    position: relative; /* 为返回顶部按钮定位做准备 */
+}
+
+.language-switcher {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+}
+
+.lang-toggle-btn {
+    background: rgba(235, 126, 163, 0.8);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease;
+}
+
+.lang-toggle-btn:hover {
+    background: rgba(235, 126, 163, 1);
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.content {
+    text-align: center;
+    margin-bottom: 30px;
+    line-height: 1.8;
+    font-size: 1.2em;
+    color: white; /* 使用白色提高可读性 */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); /* 添加文字阴影以增强可读性 */
+}
+
+.content p {
+    margin: 10px 0;
+}
+
+.countdown-container {
+    text-align: center;
+    margin: 30px 0;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    width: 100%;
+}
+
+.countdown-container h2 {
+    margin-bottom: 20px;
+    font-size: 1.3em;
+    color: white; /* 使用白色提高可读性 */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); /* 添加文字阴影以增强可读性 */
+}
+
+.countdown {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.countdown-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 60px;
+}
+
+.countdown-item span {
+    display: block;
+}
+
+#days, #hours, #minutes, #seconds {
+    font-size: 2em;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px;
+    border-radius: 5px;
+    min-width: 60px;
+    text-align: center;
+    color: white; /* 使用白色提高可读性 */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); /* 添加文字阴影以增强可读性 */
+}
+
+.label {
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.video-container {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.video-container iframe {
+    width: 100%;
+    height: 400px;
+    border-radius: 10px;
+    border: none;
+}
+
+/* 返回顶部按钮 */
+.back-to-top-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(235, 126, 163, 0.8); /* 主题色，半透明 */
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, background 0.3s ease;
+}
+
+.back-to-top-btn:hover {
+    background: rgba(235, 126, 163, 1); /* 主题色，完全不透明 */
+    transform: translateY(-2px);
+}
+
+.back-to-top-btn.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+
+    .content {
+        font-size: 1em;
+    }
+
+    .video-container iframe {
+        height: 250px;
+    }
+
+    #days, #hours, #minutes, #seconds {
+        font-size: 1.5em;
+        min-width: 45px;
+        padding: 5px;
+    }
+
+    .back-to-top-btn {
+        width: 45px;
+        height: 45px;
+        bottom: 15px;
+        right: 15px;
+    }
+}
