@@ -4,12 +4,63 @@
     box-sizing: border-box;
 }
 
+/* CSS Variables for themes */
+:root {
+    /* Light theme variables (default) */
+    --bg-color: #ffffff;
+    --text-color: #333333;
+    --calendar-bg: rgba(255, 255, 255, 0.9);
+    --footer-bg: rgba(240, 240, 240, 0.85);
+    --day-header-bg: rgba(240, 240, 240, 0.85);
+    --calendar-day-bg: rgba(255, 255, 255, 0.9);
+    --calendar-day-empty-bg: rgba(249, 249, 249, 0.7);
+    --weekend-day-bg: rgba(240, 248, 255, 0.8);
+    --border-color: #ccc;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --tooltip-bg: rgba(255, 255, 255, 0.95);
+    --info-color: #666;
+    --link-color: #eb7ea3;
+    --link-hover-color: #d65c8a;
+    --capsule-bg: rgba(255, 255, 255, 0.9);
+    --capsule-shadow: rgba(0, 0, 0, 0.15);
+    --day-text-color: #333;
+    --header-text-color: #333;
+    --stat-text-color: #666;
+    --current-theme-color: #8A2B3B; /* 默认主题色，由JavaScript设置 */
+}
+
+/* Dark theme variables */
+[data-theme="dark"] {
+    --bg-color: #1a1a1a;
+    --text-color: #f0f0f0;
+    --calendar-bg: rgba(30, 30, 30, 0.9);
+    --footer-bg: rgba(40, 40, 40, 0.85);
+    --day-header-bg: rgba(50, 50, 50, 0.85);
+    --calendar-day-bg: rgba(40, 40, 40, 0.9);
+    --calendar-day-empty-bg: rgba(45, 45, 45, 0.7);
+    --weekend-day-bg: rgba(60, 60, 80, 0.8);
+    --border-color: #555;
+    --shadow-color: rgba(0, 0, 0, 0.7);
+    --tooltip-bg: rgba(40, 40, 40, 0.95);
+    --info-color: #aaa;
+    --link-color: #ff9eb3;
+    --link-hover-color: #ff7a9d;
+    --capsule-bg: rgba(40, 40, 40, 0.9);
+    --capsule-shadow: rgba(0, 0, 0, 0.4);
+    --day-text-color: #f0f0f0;
+    --header-text-color: #f0f0f0;
+    --stat-text-color: #aaa;
+    --nav-btn-color: #ff9eb3; /* Use link color for better visibility in dark mode */
+    --nav-btn-text-color: #f0f0f0;
+}
+
 body {
     font-family: Arial, sans-serif;
     background: url('../img/amphoreus.webp');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    background-color: var(--bg-color);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -24,10 +75,10 @@ body {
     width: 100%;
     max-width: 1200px;
     height: 85vh; /* Reduced to account for fixed footer stats */
-    background: rgba(255, 255, 255, 0.9); /* Slightly transparent white for better visibility */
+    background: var(--calendar-bg); /* Slightly transparent white for better visibility */
     border-radius: 15px;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 30px var(--shadow-color);
     display: grid;
     grid-template-columns: 1fr 1fr; /* 图片和日历各占一半 */
     grid-template-rows: 1fr 50px; /* Fixed footer height, rest for content */
@@ -66,14 +117,14 @@ body {
     display: flex;
     flex-direction: row;
     align-items: flex-end; /* Align items to bottom */
-    color: white;
+    color: white; /* Keep white for readability over background images */
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
 }
 
 .month-text {
     font-size: 3em; /* 增大字体 */
     font-weight: bold;
-    color: white;
+    color: white; /* Keep white for readability over background images */
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
     text-align: center; /* 确保文字居中 */
     margin: 0; /* Remove margin to better control alignment */
@@ -81,17 +132,30 @@ body {
     line-height: 1; /* Tighter line height */
 }
 
+/* For dark mode, we keep the same styling for readability over background */
+[data-theme="dark"] .month-text-group,
+[data-theme="dark"] .month-text {
+    color: white; /* Still white to maintain readability over background image */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+}
+
 
 .month-title {
     position: absolute;
     right: 20px;  /* Align to right with same margin as month text on left */
     top: 20px;
-    color: white;
+    color: white; /* Keep white for readability over background images */
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
     z-index: 2;
     text-align: right;
     padding: 10px;
     max-width: calc(100% - 120px); /* Ensure it doesn't go beyond the container and leaves room for the toggle button */
+}
+
+/* For dark mode, we keep the same styling for readability over background */
+[data-theme="dark"] .month-title {
+    color: white; /* Still white to maintain readability over background image */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
 }
 
 .toggle-calendar-btn {
@@ -117,6 +181,30 @@ body {
     height: 24px;
 }
 
+/* 深色模式切换按钮 */
+.theme-toggle-btn {
+    position: fixed;
+    right: 65px; /* Positioned to the left of the calendar toggle button, with more spacing */
+    top: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    cursor: pointer;
+    z-index: 1000;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background 0.3s;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.theme-toggle-btn:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.theme-toggle-icon {
+    width: 24px;
+    height: 24px;
+}
+
 /* 胶囊底部样式 */
 .capsule-footer {
     position: fixed;
@@ -137,11 +225,11 @@ body {
 }
 
 .capsule-content {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--capsule-bg);
     border-radius: 30px;
-    padding: 15px 25px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    border: 1px solid #ddd;
+    padding: 12px 20px; /* Reduced padding to minimize blank space */
+    box-shadow: 0 4px 20px var(--capsule-shadow);
+    border: 1px solid var(--border-color);
     font-size: 0.9em;
     line-height: 1.4;
     display: flex;
@@ -150,22 +238,24 @@ body {
     flex-wrap: wrap;
     gap: 0;
     text-align: center;
+    color: var(--stat-text-color);
 }
 
 .capsule-separator {
     margin: 0 8px;
-    color: #666;
+    color: var(--stat-text-color);
     flex-shrink: 0;
 }
 
-.capsule-links a {
+.blog-link, .cyrene-link {
+    color: var(--link-color);
     text-decoration: none;
-    color: #eb7ea3;
     font-weight: 600;
+    transition: color 0.3s ease;
 }
 
-.capsule-links a:hover {
-    color: #d65c8a;
+.blog-link:hover, .cyrene-link:hover {
+    color: var(--link-hover-color);
     text-decoration: underline;
 }
 
@@ -222,24 +312,37 @@ body {
 }
 
 .nav-btn {
-    color: white;
+    color: white; /* Keep white text for better contrast with background */
     border: none;
     padding: 10px 15px;
     font-size: 1.2em;
     cursor: pointer;
     border-radius: 5px;
     transition: background 0.3s;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 5px var(--shadow-color);
+    background: var(--current-theme-color); /* 默认使用当前月份主题色 */
 }
 
 .nav-btn:hover {
     opacity: 0.8;
 }
 
+/* 在暗色模式下，导航按钮使用当前月份的主题色并增加亮度以提高可见性 */
+[data-theme="dark"] .nav-btn {
+    background: var(--current-theme-color); /* 使用当前月份主题色 */
+    opacity: 0.9; /* 提高可见性 */
+}
+
 #currentMonthYear {
     font-size: 1.5em;
-    color: #333;
+    color: var(--current-theme-color); /* 默认使用当前月份主题色 */
     text-shadow: 0 0 2px rgba(255, 255, 255, 0.7);
+}
+
+/* 在暗色模式下，月份标题使用当前月份的主题色 */
+[data-theme="dark"] #currentMonthYear {
+    color: var(--current-theme-color); /* 使用当前月份主题色 */
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.5); /* 确保文字在暗色背景下清晰可见 */
 }
 
 .calendar-grid {
@@ -247,21 +350,21 @@ body {
     grid-template-columns: repeat(7, 1fr);
     grid-template-rows: 40px 1fr;  /* 明确指定行高，第二行占剩余空间 */
     gap: 2px;
-    background: rgba(221, 221, 221, 0.7);  /* Slightly transparent for better theme integration */
-    border-left: 1px solid #ccc;
-    border-right: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
+    background: var(--calendar-day-bg);  /* Slightly transparent for better theme integration */
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
     height: 100%;
     overflow: hidden; /* Prevent overflow in the grid itself */
 }
 
 .day-header {
-    background: rgba(240, 240, 240, 0.85);
+    background: var(--day-header-bg);
     padding: 10px;
     text-align: center;
     font-weight: bold;
-    border-top: 1px solid #ccc;
-    border-left: 1px solid #ccc;
+    border-top: 1px solid var(--border-color);
+    border-left: 1px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -284,11 +387,12 @@ body {
 }
 
 .calendar-day {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--calendar-day-bg);
     padding: 10px;
     text-align: center;
-    border-top: 1px solid #ccc;
-    border-left: 1px solid #ccc;
+    border-top: 1px solid var(--border-color);
+    border-left: 1px solid var(--border-color);
+    color: var(--day-text-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -301,12 +405,12 @@ body {
 }
 
 .calendar-day.empty {
-    background: rgba(249, 249, 249, 0.7);
+    background: var(--calendar-day-empty-bg);
 }
 
 .calendar-day.weekend {
     /* This will be overridden by JavaScript */
-    background: rgba(240, 248, 255, 0.8);
+    background: var(--weekend-day-bg);
 }
 
 .infinity-day {
@@ -317,9 +421,9 @@ body {
 .footer {
     grid-area: footer;
     padding: 10px 20px;
-    background: rgba(240, 240, 240, 0.85);
+    background: var(--footer-bg);
     font-size: 0.9em;
-    color: #666;
+    color: var(--info-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -335,7 +439,7 @@ body {
 
 .footer-separator {
     margin: 0 8px;
-    color: #666;
+    color: var(--info-color);
     flex-shrink: 0;
 }
 
@@ -346,27 +450,28 @@ body {
 
 .info-label {
     cursor: pointer;
-    color: #333;
+    color: var(--text-color);
     font-weight: 600;
     text-decoration: underline;
     text-decoration-style: dotted;
 }
 
 .info-label:hover {
-    color: #eb7ea3;
+    color: var(--link-color);
 }
 
 .info-tooltip {
     position: absolute;
     bottom: 100%;
     left: 0;
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid #ddd;
+    background: var(--tooltip-bg);
+    border: 1px solid var(--border-color);
     border-radius: 5px;
-    padding: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    padding: 8px 12px; /* Reduced padding to minimize blank space */
+    box-shadow: 0 2px 8px var(--shadow-color);
     z-index: 10;
-    width: 250px;
+    width: max-content; /* Only as wide as the content */
+    max-width: 300px; /* But with a reasonable max width */
     font-size: 0.9em;
     line-height: 1.4;
     opacity: 0;
@@ -379,6 +484,13 @@ body {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+}
+
+/* Adjust tooltip for capsule footer */
+.capsule-content .info-tooltip {
+    width: max-content; /* Only as wide as the content */
+    max-width: 250px; /* Reasonable max width for capsule tooltips */
+    padding: 6px 10px; /* Slightly smaller padding */
 }
 
 .links {

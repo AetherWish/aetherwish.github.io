@@ -111,12 +111,67 @@ const capsuleCopyrightToggle = document.getElementById('capsuleCopyrightToggle')
 const capsuleStatsToggle = document.getElementById('capsuleStatsToggle');
 const capsuleCopyrightTooltip = document.getElementById('capsuleCopyrightTooltip');
 const capsuleStatsTooltip = document.getElementById('capsuleStatsTooltip');
+const themeToggleBtn = document.getElementById('themeToggle');
 
 // 初始化日历
 function initCalendar() {
+    initTheme();
     updateCalendar();
     setupEventListeners();
     updateStats();
+}
+
+// Initialize theme based on user preference or system setting
+function initTheme() {
+    // Check for saved theme preference in localStorage
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+    } else {
+        // Check system preference
+        const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (systemPrefersDark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            updateThemeIcon('dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            updateThemeIcon('light');
+        }
+    }
+}
+
+// Update theme icon based on current theme
+function updateThemeIcon(theme) {
+    if (theme === 'dark') {
+        // Moon icon for dark mode
+        themeToggleBtn.innerHTML = `
+            <svg class="theme-toggle-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 3C7.03 3 3 7.03 3 12C3 16.97 7.03 21 12 21C16.97 21 21 16.97 21 12C21 11.54 20.96 11.08 20.9 10.64C19.92 11.55 18.57 12.14 17.07 12.14C14.42 12.14 12.26 10.06 12.04 7.43C10.27 7.97 8.93 9.57 8.93 11.5C8.93 13.43 10.5 15 12.43 15C12.61 15 12.78 15 12.95 14.97C12.39 16.7 10.88 18 9 18C6.24 18 4 15.76 4 13C4 10.24 6.24 8 9 8C9.84 8 10.63 8.19 11.34 8.53C11.47 6.79 12.7 5.39 14.29 5.39C15.88 5.39 17.11 6.79 17.24 8.53C17.95 8.19 18.74 8 19.57 8C22.02 8 24 9.98 24 12.43C24 14.88 22.02 16.86 19.57 16.86C17.12 16.86 15.14 14.88 15.14 12.43C15.14 12.28 15.15 12.13 15.16 12H12Z" fill="white"/>
+            </svg>
+        `;
+    } else {
+        // Sun icon for light mode
+        themeToggleBtn.innerHTML = `
+            <svg class="theme-toggle-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 8C9.79 8 8 9.79 8 12C8 14.21 9.79 16 12 16C14.21 16 16 14.21 16 12C16 9.79 14.21 8 12 8ZM12 18C8.69 18 6 15.31 6 12C6 8.69 8.69 6 12 6C15.31 6 18 8.69 18 12C18 15.31 15.31 18 12 18ZM12 4C7.58 4 4 7.58 4 12C4 16.42 7.58 20 12 20C16.42 20 20 16.42 20 12C20 7.58 16.42 4 12 4ZM2 12C2 6.48 6.48 2 12 2C17.52 2 22 6.48 22 12C22 17.52 17.52 22 12 22C6.48 22 2 17.52 2 12Z" fill="white"/>
+            </svg>
+        `;
+    }
+}
+
+// Toggle theme between light and dark
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    if (currentTheme === 'dark') {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+        updateThemeIcon('light');
+    } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        updateThemeIcon('dark');
+    }
 }
 
 // 更新日历显示
@@ -144,9 +199,18 @@ function updateCalendar() {
 
 // 应用主题颜色到界面元素
 function applyThemeColor(themeColor) {
-    // 设置导航按钮颜色
-    prevMonthBtn.style.background = themeColor;
-    nextMonthBtn.style.background = themeColor;
+    // 检查当前是否为暗色模式
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+
+    let displayThemeColor = themeColor;
+
+    // 如果是暗色模式，使用处理后的颜色以确保可见性
+    if (isDarkMode) {
+        displayThemeColor = getLighterColor(themeColor, 30); // 提亮30%以确保在暗色背景上可见
+    }
+
+    // 为导航按钮设置CSS变量，根据是否为暗色模式调整颜色
+    document.documentElement.style.setProperty('--current-theme-color', displayThemeColor);
 
     // 更新日历网格边框颜色以匹配主题
     if (calendarGrid) {
@@ -154,7 +218,7 @@ function applyThemeColor(themeColor) {
     }
 
     // 设置当月年标题的颜色
-    currentMonthYear.style.color = themeColor;
+    currentMonthYear.style.color = displayThemeColor;
 
     // 更新周末日期的颜色
     updateWeekendColors(themeColor);
@@ -293,6 +357,9 @@ function setupEventListeners() {
     // 隐藏/显示月历按钮事件
     toggleCalendarBtn.addEventListener('click', toggleCalendarVisibility);
 
+    // 深色模式切换按钮事件
+    themeToggleBtn.addEventListener('click', toggleTheme);
+
     // 为版权信息和统计信息添加点击事件（用于触屏设备）
     copyrightToggle.addEventListener('click', function() {
         copyrightTooltip.style.opacity = copyrightTooltip.style.opacity === '1' ? '0' : '1';
@@ -368,6 +435,22 @@ function setupEventListeners() {
 
     // 监听窗口大小变化以处理横竖屏切换
     window.addEventListener('resize', handleOrientationChange);
+
+    // Listen for system theme preference changes
+    if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+            // Only change theme automatically if user hasn't set a preference
+            if (!localStorage.getItem('theme')) {
+                if (e.matches) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    updateThemeIcon('dark');
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                    updateThemeIcon('light');
+                }
+            }
+        });
+    }
 }
 
 // 切换日历可见性
@@ -388,6 +471,8 @@ function toggleCalendarVisibility() {
         // Show capsule with transition
         setTimeout(() => {
             capsuleFooter.classList.add('show');
+            // Ensure stats are synchronized when showing capsule
+            syncStatsToCapsule();
         }, 10);
         toggleCalendarBtn.innerHTML = `
             <svg class="toggle-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -432,8 +517,41 @@ function handleOrientationChange() {
 
 // 更新统计信息
 function updateStats() {
-    // 使用busuanzi统计库，无需手动更新元素
-    // 统计信息会自动更新显示
+    // 监听busuanzi统计值的变化并同步到胶囊视图
+    if (window.Busuanzi) {
+        // 如果Busuanzi已加载，同步值
+        syncStatsToCapsule();
+    } else {
+        // 如果Busuanzi未加载，等待其加载完成
+        const checkBusuanzi = setInterval(() => {
+            if (window.Busuanzi && document.getElementById('busuanzi_value_site_pv') && document.getElementById('busuanzi_value_site_uv')) {
+                syncStatsToCapsule();
+                clearInterval(checkBusuanzi);
+            }
+        }, 100);
+    }
+}
+
+// 同步统计信息到胶囊视图
+function syncStatsToCapsule() {
+    const pvElement = document.getElementById('busuanzi_value_site_pv');
+    const uvElement = document.getElementById('busuanzi_value_site_uv');
+    const capsulePvElement = document.getElementById('capsule_pv_value');
+    const capsuleUvElement = document.getElementById('capsule_uv_value');
+
+    if (pvElement && uvElement && capsulePvElement && capsuleUvElement) {
+        // 同步PV值
+        capsulePvElement.textContent = pvElement.textContent;
+
+        // 同步UV值
+        capsuleUvElement.textContent = uvElement.textContent;
+    }
+
+    // 监听Busuanzi统计的更新事件
+    if (window.Busuanzi && !window.busuanziObserver) {
+        // Set up an interval to periodically sync the values
+        window.busuanziObserver = setInterval(syncStatsToCapsule, 1000); // Update every second
+    }
 }
 
 // 初始化日历
@@ -441,3 +559,10 @@ window.onload = initCalendar;
 
 // 页面加载完成后检查初始方向
 window.addEventListener('load', handleOrientationChange);
+
+// 清理定时器以避免内存泄漏
+window.addEventListener('beforeunload', function() {
+    if (window.busuanziObserver) {
+        clearInterval(window.busuanziObserver);
+    }
+});
