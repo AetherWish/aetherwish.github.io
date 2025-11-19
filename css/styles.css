@@ -314,14 +314,14 @@ body {
     flex-shrink: 0;
 }
 
-.blog-link, .cyrene-link {
+.blog-link, .cyrene-link, .email-link {
     color: var(--link-color);
     text-decoration: none;
     font-weight: 600;
     transition: color 0.3s ease;
 }
 
-.blog-link:hover, .cyrene-link:hover {
+.blog-link:hover, .cyrene-link:hover, .email-link:hover {
     color: var(--link-hover-color);
     text-decoration: underline;
 }
@@ -645,14 +645,14 @@ body {
     }
 }
 
-.blog-link, .cyrene-link {
+.blog-link, .cyrene-link, .email-link {
     color: #eb7ea3;
     text-decoration: none;
     font-weight: 600;
     transition: color 0.3s ease;
 }
 
-.blog-link:hover, .cyrene-link:hover {
+.blog-link:hover, .cyrene-link:hover, .email-link:hover {
     color: #d65c8a;
     text-decoration: underline;
 }
@@ -687,7 +687,7 @@ body {
     overflow: hidden;
 }
 
-.stats, .copyright {
+.stats, .copyright, .usage {
     margin: 0;
 }
 
