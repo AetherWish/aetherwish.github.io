@@ -15,7 +15,8 @@ body {
     justify-content: center;
     align-items: center;
     padding: 20px;
-    overflow: hidden;
+    overflow: auto; /* Allow scrolling when needed */
+    position: relative;
 }
 
 /* Landscape mode (default) */
@@ -33,6 +34,7 @@ body {
     grid-template-areas:
         "image calendar"
         "footer footer";
+    transition: opacity 0.5s ease, transform 0.5s ease; /* Add transition for toggle animation */
 }
 
 .image-section {
@@ -82,13 +84,89 @@ body {
 
 .month-title {
     position: absolute;
-    right: 20px;
+    right: 20px;  /* Align to right with same margin as month text on left */
     top: 20px;
     color: white;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
     z-index: 2;
     text-align: right;
     padding: 10px;
+    max-width: calc(100% - 120px); /* Ensure it doesn't go beyond the container and leaves room for the toggle button */
+}
+
+.toggle-calendar-btn {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    cursor: pointer;
+    z-index: 1000;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background 0.3s;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-calendar-btn:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.toggle-icon {
+    width: 24px;
+    height: 24px;
+}
+
+/* 胶囊底部样式 */
+.capsule-footer {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    width: 90%;
+    max-width: 600px;
+    transition: opacity 0.5s ease, transform 0.5s ease; /* Add transition for toggle animation */
+    opacity: 0;
+    visibility: hidden;
+}
+
+.capsule-footer.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.capsule-content {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 30px;
+    padding: 15px 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid #ddd;
+    font-size: 0.9em;
+    line-height: 1.4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+    text-align: center;
+}
+
+.capsule-separator {
+    margin: 0 8px;
+    color: #666;
+    flex-shrink: 0;
+}
+
+.capsule-links a {
+    text-decoration: none;
+    color: #eb7ea3;
+    font-weight: 600;
+}
+
+.capsule-links a:hover {
+    color: #d65c8a;
+    text-decoration: underline;
 }
 
 .month-title-large {
@@ -174,6 +252,7 @@ body {
     border-right: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
     height: 100%;
+    overflow: hidden; /* Prevent overflow in the grid itself */
 }
 
 .day-header {
@@ -200,6 +279,8 @@ body {
     /* 定位在网格的第2行，横跨所有列 */
     grid-row: 2;
     grid-column: 1 / -1;
+    overflow-y: auto; /* Allow scrolling for calendar days if needed */
+    max-height: none; /* Reset max-height for landscape mode */
 }
 
 .calendar-day {
@@ -228,6 +309,11 @@ body {
     background: rgba(240, 248, 255, 0.8);
 }
 
+.infinity-day {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
 .footer {
     grid-area: footer;
     padding: 10px 20px;
@@ -239,6 +325,60 @@ body {
     align-items: center;
     height: 100%;
     width: 100%;
+}
+
+.info-container {
+    display: flex;
+    gap: 0;
+    align-items: center;
+}
+
+.footer-separator {
+    margin: 0 8px;
+    color: #666;
+    flex-shrink: 0;
+}
+
+.info-item {
+    position: relative;
+    display: inline-block;
+}
+
+.info-label {
+    cursor: pointer;
+    color: #333;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+}
+
+.info-label:hover {
+    color: #eb7ea3;
+}
+
+.info-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    width: 250px;
+    font-size: 0.9em;
+    line-height: 1.4;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity 0.3s, transform 0.3s, visibility 0.3s;
+}
+
+.info-item:hover .info-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
 .links {
@@ -332,15 +472,19 @@ body {
         grid-template-columns: 1fr;
         grid-template-rows: auto auto auto;
         min-height: 100vh;
+        max-height: none;
         grid-template-areas:
             "image"
             "calendar"
             "footer";
+        overflow-y: auto; /* Allow scrolling in portrait mode */
     }
 
     .image-section {
         border-radius: 15px 15px 0 0;
-        min-height: 250px;
+        min-height: 200px;
+        height: 40vh; /* Use viewport height to ensure proper sizing */
+        max-height: 300px;
     }
 
     .month-display {
@@ -356,11 +500,42 @@ body {
     }
 
     .calendar-grid {
-        grid-template-rows: 30px auto;
+        grid-template-rows: 30px 1fr; /* Ensure calendar fills available space */
+        height: auto; /* Allow auto height in portrait */
+    }
+
+    #calendarDays {
+        max-height: 250px; /* Limit max height in portrait mode */
     }
 
     .footer {
         flex-direction: column;
         gap: 5px;
+        padding: 10px 20px;
+    }
+
+    .info-container {
+        display: flex;
+        justify-content: center;
+        gap: 8px; /* Use separator spacing */
+        order: 1; /* Put info container first */
+        margin-bottom: 5px;
+    }
+
+    .footer-separator {
+        margin: 0 4px; /* Reduce margin in portrait */
+    }
+
+    .links {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        order: 2; /* Put links second */
+        flex-wrap: wrap;
+    }
+
+    body {
+        align-items: flex-start; /* Align to top in portrait mode to allow scrolling */
+        padding: 10px; /* Reduce padding in portrait */
     }
 }

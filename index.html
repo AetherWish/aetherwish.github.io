@@ -7,71 +7,129 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <div class="calendar-container">
-        <!-- 图片背景部分 -->
-        <div class="image-section" id="imageSection">
-            <!-- 月份显示 (左下角) -->
-            <div class="month-display">
-                <div class="month-text-group">
-                    <div class="month-text" id="monthText">门关月</div>
-                    <div class="lucky-flower-group" id="luckyFlowerGroup">
-                        <div class="lucky-flower-name" id="luckyFlowerName">铃兰</div>
-                        <div class="lucky-flower-label">本月幸运花</div>
+        <!-- 隐藏月历按钮 -->
+        <button id="toggleCalendar" class="toggle-calendar-btn" aria-label="切换月历显示">
+            <svg class="toggle-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3.34 18.89C2.87 18.3 2.43 17.68 2.02 17.03C1.26 15.83 1.26 14.17 2.02 12.97C3.28 10.98 5.5 8.5 12 8.5C13.78 8.5 15.35 8.93 16.73 9.49L18.66 7.5C17.04 6.73 15.22 6.2 12 6.2C5.5 6.2 2.74 10.07 2.02 11.26C1.78 11.62 1.56 11.99 1.36 12.37C1.12 12.81 1.12 13.35 1.36 13.79C2.12 15.23 3.88 17.7 12 17.7C13.41 17.7 14.64 17.53 15.73 17.31L17.31 18.89C16.09 19.18 14.63 19.4 12 19.4C5.5 19.4 2.74 15.53 2.02 14.34C2.26 14.7 2.48 15.07 2.72 15.43C3.48 16.63 3.48 18.29 2.72 19.49C2.48 19.87 2.26 20.24 2.02 20.6C1.26 21.79 3.88 19.68 3.34 18.89Z" fill="white"/>
+                <circle cx="12" cy="12" r="3" fill="white"/>
+            </svg>
+        </button>
+
+        <div class="calendar-container">
+            <!-- 图片背景部分 -->
+            <div class="image-section" id="imageSection">
+                <!-- 月份显示 (左下角) -->
+                <div class="month-display">
+                    <div class="month-text-group">
+                        <div class="month-text" id="monthText">门关月</div>
+                        <div class="lucky-flower-group" id="luckyFlowerGroup">
+                            <div class="lucky-flower-name" id="luckyFlowerName">铃兰</div>
+                            <div class="lucky-flower-label">本月幸运花</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右上角月份标题 -->
+                <div class="month-title" id="monthTitle">
+                    <div class="month-title-message">
+                        <div class="month-title-line1" id="monthTitleLine1">不论晴天还是雨天，进入梦乡以前，</div>
+                        <div class="month-title-line2" id="monthTitleLine2">记得和自己说一声：「明天见」！</div>
                     </div>
                 </div>
             </div>
-            
-            <!-- 右上角月份标题 -->
-            <div class="month-title" id="monthTitle">
-                <div class="month-title-message">
-                    <div class="month-title-line1" id="monthTitleLine1">不论晴天还是雨天，进入梦乡以前，</div>
-                    <div class="month-title-line2" id="monthTitleLine2">记得和自己说一声：「明天见」！</div>
+
+            <!-- 月历部分 -->
+            <div class="calendar-section">
+                <div class="calendar-header">
+                    <button id="prevMonth" class="nav-btn">&lt;</button>
+                    <h2 id="currentMonthYear">2026年1月</h2>
+                    <button id="nextMonth" class="nav-btn">&gt;</button>
+                </div>
+
+                <div class="calendar-grid">
+                    <div class="day-header">Sun</div>
+                    <div class="day-header">Mon</div>
+                    <div class="day-header">Tue</div>
+                    <div class="day-header">Wed</div>
+                    <div class="day-header">Thu</div>
+                    <div class="day-header">Fri</div>
+                    <div class="day-header">Sat</div>
+
+                    <!-- 日期将在JavaScript中动态生成 -->
+                    <div id="calendarDays"></div>
+                </div>
+            </div>
+
+            <!-- 底部信息 -->
+            <div class="footer">
+                <div class="info-container">
+                    <!-- 版权信息提示 -->
+                    <div class="info-item">
+                        <span class="info-label" id="copyrightToggle">版权信息</span>
+                        <div class="info-tooltip" id="copyrightTooltip">
+                            © 2025 AetherWish & qwen-code. 《崩坏：星穹铁道》美术素材版权归 miHoYo 所有。
+                        </div>
+                    </div>
+
+                    <!-- 分隔符 -->
+                    <span class="footer-separator">/</span>
+
+                    <!-- 统计信息提示 -->
+                    <div class="info-item">
+                        <span class="info-label" id="statsToggle">统计信息</span>
+                        <div class="info-tooltip" id="statsTooltip">
+                            <div id="busuanzi_container_site_pv">总访问量 <span id="busuanzi_value_site_pv"></span> 次</div>
+                            <div id="busuanzi_container_site_uv">总访客数 <span id="busuanzi_value_site_uv"></span> 人</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="links">
+                    <a href="https://blog.cyrene.icu/" class="blog-link" target="_blank" rel="noopener noreferrer">空愿的小站</a> /
+                    <a href="https://blog.cyrene.icu/philia093/" class="cyrene-link" target="_blank" rel="noopener noreferrer">激起往昔的涟漪</a>
                 </div>
             </div>
         </div>
-        
-        <!-- 月历部分 -->
-        <div class="calendar-section">
-            <div class="calendar-header">
-                <button id="prevMonth" class="nav-btn">&lt;</button>
-                <h2 id="currentMonthYear">2026年1月</h2>
-                <button id="nextMonth" class="nav-btn">&gt;</button>
-            </div>
-            
-            <div class="calendar-grid">
-                <div class="day-header">Sun</div>
-                <div class="day-header">Mon</div>
-                <div class="day-header">Tue</div>
-                <div class="day-header">Wed</div>
-                <div class="day-header">Thu</div>
-                <div class="day-header">Fri</div>
-                <div class="day-header">Sat</div>
-                
-                <!-- 日期将在JavaScript中动态生成 -->
-                <div id="calendarDays"></div>
-            </div>
-        </div>
-        
-        <!-- 底部信息 -->
-        <div class="footer">
-            <div class="copyright">© 2025 AetherWish & qwen-code. 《崩坏：星穹铁道》美术素材版权归 miHoYo 所有。</div>
-            <div class="links">
-                <a href="https://blog.cyrene.icu/" class="blog-link" target="_blank" rel="noopener noreferrer">空愿的小站</a> /
+
+        <!-- 底部胶囊区域（隐藏模式时显示） -->
+        <div class="capsule-footer" id="capsuleFooter">
+            <div class="capsule-content">
+                <!-- 版权信息提示 -->
+                <div class="info-item">
+                    <span class="info-label" id="capsuleCopyrightToggle">版权信息</span>
+                    <div class="info-tooltip" id="capsuleCopyrightTooltip">
+                        © 2025 AetherWish & Qwen-code. 《崩坏：星穹铁道》美术素材版权归 miHoYo 所有。
+                    </div>
+                </div>
+
+                <!-- 分隔符 -->
+                <span class="capsule-separator">/</span>
+
+                <!-- 统计信息提示 -->
+                <div class="info-item">
+                    <span class="info-label" id="capsuleStatsToggle">统计信息</span>
+                    <div class="info-tooltip" id="capsuleStatsTooltip">
+                        <div id="busuanzi_container_site_pv">总访问量 <span id="busuanzi_value_site_pv"></span> 次</div>
+                        <div id="busuanzi_container_site_uv">总访客数 <span id="busuanzi_value_site_uv"></span> 人</div>
+                    </div>
+                </div>
+
+                <!-- 分隔符 -->
+                <span class="capsule-separator">/</span>
+
+                <!-- 链接 -->
+                <a href="https://blog.cyrene.icu/" class="blog-link" target="_blank" rel="noopener noreferrer">空愿的小站</a>
+
+                <!-- 分隔符 -->
+                <span class="capsule-separator">/</span>
+
+                <!-- 链接 -->
                 <a href="https://blog.cyrene.icu/philia093/" class="cyrene-link" target="_blank" rel="noopener noreferrer">激起往昔的涟漪</a>
             </div>
         </div>
-    </div>
 
-    <!-- 不蒜子统计 -->
-    <div class="footer_stat">
-        <p>
-            <span id="busuanzi_container_site_pv">总访问量 <span id="busuanzi_value_site_pv"></span> 次</span> /
-            <span id="busuanzi_container_site_uv">总访客数 <span id="busuanzi_value_site_uv"></span> 人</span>
-        </p>
-    </div>
-
-    <!-- 不蒜子统计脚本 -->
-    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <script src="js/script.js"></script>
-</body>
+        <!-- 不蒜子统计脚本 -->
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <script src="js/script.js"></script>
+    </body>
 </html>

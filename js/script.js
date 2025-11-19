@@ -106,6 +106,16 @@ const luckyFlowerName = document.getElementById('luckyFlowerName');
 const uvCountElement = document.getElementById('uvCount');
 const pvCountElement = document.getElementById('pvCount');
 const calendarGrid = document.querySelector('.calendar-grid');
+const toggleCalendarBtn = document.getElementById('toggleCalendar');
+const calendarSection = document.querySelector('.calendar-section');
+const copyrightToggle = document.getElementById('copyrightToggle');
+const statsToggle = document.getElementById('statsToggle');
+const copyrightTooltip = document.getElementById('copyrightTooltip');
+const statsTooltip = document.getElementById('statsTooltip');
+const capsuleCopyrightToggle = document.getElementById('capsuleCopyrightToggle');
+const capsuleStatsToggle = document.getElementById('capsuleStatsToggle');
+const capsuleCopyrightTooltip = document.getElementById('capsuleCopyrightTooltip');
+const capsuleStatsTooltip = document.getElementById('capsuleStatsTooltip');
 
 // 初始化日历
 function initCalendar() {
@@ -235,7 +245,14 @@ function generateCalendarDays(month, year) {
             dayElement.classList.add('weekend');
         }
 
-        dayElement.textContent = day;
+        // 特殊处理：如果是11月12日，显示无限符号
+        if (month === 10 && day === 12) { // Month 10 is November (0-indexed)
+            dayElement.textContent = '∞';
+            dayElement.classList.add('infinity-day');
+        } else {
+            dayElement.textContent = day;
+        }
+
         calendarDays.appendChild(dayElement);
     }
 
@@ -278,6 +295,73 @@ function setupEventListeners() {
     prevMonthBtn.addEventListener('click', goToPrevMonth);
     nextMonthBtn.addEventListener('click', goToNextMonth);
 
+    // 隐藏/显示月历按钮事件
+    toggleCalendarBtn.addEventListener('click', toggleCalendarVisibility);
+
+    // 为版权信息和统计信息添加点击事件（用于触屏设备）
+    copyrightToggle.addEventListener('click', function() {
+        copyrightTooltip.style.opacity = copyrightTooltip.style.opacity === '1' ? '0' : '1';
+        copyrightTooltip.style.visibility = copyrightTooltip.style.visibility === 'visible' ? 'hidden' : 'visible';
+    });
+
+    statsToggle.addEventListener('click', function() {
+        statsTooltip.style.opacity = statsTooltip.style.opacity === '1' ? '0' : '1';
+        statsTooltip.style.visibility = statsTooltip.style.visibility === 'visible' ? 'hidden' : 'visible';
+    });
+
+    // 添加鼠标悬停事件支持
+    copyrightToggle.addEventListener('mouseenter', function() {
+        copyrightTooltip.style.opacity = '1';
+        copyrightTooltip.style.visibility = 'visible';
+    });
+
+    copyrightToggle.addEventListener('mouseleave', function() {
+        copyrightTooltip.style.opacity = '0';
+        copyrightTooltip.style.visibility = 'hidden';
+    });
+
+    statsToggle.addEventListener('mouseenter', function() {
+        statsTooltip.style.opacity = '1';
+        statsTooltip.style.visibility = 'visible';
+    });
+
+    statsToggle.addEventListener('mouseleave', function() {
+        statsTooltip.style.opacity = '0';
+        statsTooltip.style.visibility = 'hidden';
+    });
+
+    // 为胶囊底部的版权信息和统计信息添加点击事件（用于触屏设备）
+    capsuleCopyrightToggle.addEventListener('click', function() {
+        capsuleCopyrightTooltip.style.opacity = capsuleCopyrightTooltip.style.opacity === '1' ? '0' : '1';
+        capsuleCopyrightTooltip.style.visibility = capsuleCopyrightTooltip.style.visibility === 'visible' ? 'hidden' : 'visible';
+    });
+
+    capsuleStatsToggle.addEventListener('click', function() {
+        capsuleStatsTooltip.style.opacity = capsuleStatsTooltip.style.opacity === '1' ? '0' : '1';
+        capsuleStatsTooltip.style.visibility = capsuleStatsTooltip.style.visibility === 'visible' ? 'hidden' : 'visible';
+    });
+
+    // 添加鼠标悬停事件支持
+    capsuleCopyrightToggle.addEventListener('mouseenter', function() {
+        capsuleCopyrightTooltip.style.opacity = '1';
+        capsuleCopyrightTooltip.style.visibility = 'visible';
+    });
+
+    capsuleCopyrightToggle.addEventListener('mouseleave', function() {
+        capsuleCopyrightTooltip.style.opacity = '0';
+        capsuleCopyrightTooltip.style.visibility = 'hidden';
+    });
+
+    capsuleStatsToggle.addEventListener('mouseenter', function() {
+        capsuleStatsTooltip.style.opacity = '1';
+        capsuleStatsTooltip.style.visibility = 'visible';
+    });
+
+    capsuleStatsToggle.addEventListener('mouseleave', function() {
+        capsuleStatsTooltip.style.opacity = '0';
+        capsuleStatsTooltip.style.visibility = 'hidden';
+    });
+
     // 键盘事件监听
     document.addEventListener('keydown', (event) => {
         if (event.key === 'ArrowLeft') {
@@ -289,6 +373,51 @@ function setupEventListeners() {
 
     // 监听窗口大小变化以处理横竖屏切换
     window.addEventListener('resize', handleOrientationChange);
+}
+
+// 切换日历可见性
+function toggleCalendarVisibility() {
+    const calendarContainer = document.querySelector('.calendar-container');
+    const capsuleFooter = document.getElementById('capsuleFooter');
+
+    // Check if calendar is currently visible by checking if it's not faded out
+    const isCalendarVisible = calendarContainer.style.opacity !== '0';
+
+    if (isCalendarVisible) {
+        // 隐藏日历
+        calendarContainer.style.opacity = '0';
+        // Delay hiding calendar to allow transition to complete
+        setTimeout(() => {
+            calendarContainer.style.display = 'none';
+        }, 500); // Match the CSS transition duration
+        // Show capsule with transition
+        setTimeout(() => {
+            capsuleFooter.classList.add('show');
+        }, 10);
+        toggleCalendarBtn.innerHTML = `
+            <svg class="toggle-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 4.5C7 4.5 2.73 7.61 1 12C2.73 16.39 7 19.5 12 19.5C17 19.5 21.27 16.39 23 12C21.27 7.61 17 4.5 12 4.5ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9Z" fill="white"/>
+            </svg>
+        `;
+    } else {
+        // 显示日历
+        // Make sure the calendar container is displayed before starting the animation
+        calendarContainer.style.display = 'grid';
+        // Trigger reflow to ensure the display change is applied
+        void calendarContainer.offsetWidth;
+        // Start the fade-in animation
+        calendarContainer.style.opacity = '1';
+        // Delay hiding capsule to allow transition
+        setTimeout(() => {
+            capsuleFooter.classList.remove('show');
+        }, 10);
+        toggleCalendarBtn.innerHTML = `
+            <svg class="toggle-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3.34 18.89C2.87 18.3 2.43 17.68 2.02 17.03C1.26 15.83 1.26 14.17 2.02 12.97C3.28 10.98 5.5 8.5 12 8.5C13.78 8.5 15.35 8.93 16.73 9.49L18.66 7.5C17.04 6.73 15.22 6.2 12 6.2C5.5 6.2 2.74 10.07 2.02 11.26C1.78 11.62 1.56 11.99 1.36 12.37C1.12 12.81 1.12 13.35 1.36 13.79C2.12 15.23 3.88 17.7 12 17.7C13.41 17.7 14.64 17.53 15.73 17.31L17.31 18.89C16.09 19.18 14.63 19.4 12 19.4C5.5 19.4 2.74 15.53 2.02 14.34C2.26 14.7 2.48 15.07 2.72 15.43C3.48 16.63 3.48 18.29 2.72 19.49C2.48 19.87 2.26 20.24 2.02 20.6C1.26 21.79 3.88 19.68 3.34 18.89Z" fill="white"/>
+                <circle cx="12" cy="12" r="3" fill="white"/>
+            </svg>
+        `;
+    }
 }
 
 // 处理横竖屏切换
