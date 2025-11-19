@@ -412,6 +412,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--header-text-color);
 }
 
 .day-header:first-child {
@@ -460,6 +461,38 @@ body {
 .infinity-day {
     font-weight: bold;
     font-size: 1.2em;
+}
+
+/* 月份切换动画 */
+.calendar-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.slide-left {
+    animation: slideLeft 0.3s ease-in-out;
+}
+
+.slide-right {
+    animation: slideRight 0.3s ease-in-out;
+}
+
+@keyframes slideLeft {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50px);
+    }
+}
+
+@keyframes slideRight {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(50px);
+    }
 }
 
 .footer {

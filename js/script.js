@@ -333,24 +333,91 @@ function generateCalendarDays(month, year) {
     updateWeekendColors(currentMonthData.themeColor);
 }
 
+// 月份切换动画状态
+let isAnimating = false;
+
 // 切换到上一个月
 function goToPrevMonth() {
-    currentMonthIndex--;
-    if (currentMonthIndex < 0) {
-        currentMonthIndex = 11; // 循环到十二月
+    // 如果动画正在进行，忽略新的切换请求
+    if (isAnimating) {
+        return;
     }
-    updateCalendar();
-    updateStats();
+
+    // 设置动画状态为进行中
+    isAnimating = true;
+
+    // 添加滑动动画到日历部分，而非整个calendar-container
+    const calendarDays = document.getElementById('calendarDays');
+    const currentDaysHTML = calendarDays.innerHTML;
+
+    // 添加淡出动画
+    calendarDays.style.opacity = '0';
+    calendarDays.style.transition = 'opacity 0.15s ease-in-out';
+
+    // 在动画结束后更新日历
+    setTimeout(() => {
+        currentMonthIndex--;
+        if (currentMonthIndex < 0) {
+            currentMonthIndex = 11; // 循环到十二月
+        }
+        updateCalendar();
+
+        // 添加淡入效果
+        calendarDays.style.opacity = '0';
+        void calendarDays.offsetWidth; // 强制重排
+        calendarDays.style.transition = 'opacity 0.15s ease-in-out';
+        calendarDays.style.opacity = '1';
+
+        updateStats();
+
+        // 稍后允许新动画
+        setTimeout(() => {
+            calendarDays.style.transition = '';
+            isAnimating = false;
+        }, 200);
+    }, 150); // 在淡出完成后更新
 }
 
 // 切换到下一个月
 function goToNextMonth() {
-    currentMonthIndex++;
-    if (currentMonthIndex > 11) {
-        currentMonthIndex = 0; // 循环到一月
+    // 如果动画正在进行，忽略新的切换请求
+    if (isAnimating) {
+        return;
     }
-    updateCalendar();
-    updateStats();
+
+    // 设置动画状态为进行中
+    isAnimating = true;
+
+    // 添加滑动动画到日历部分，而非整个calendar-container
+    const calendarDays = document.getElementById('calendarDays');
+    const currentDaysHTML = calendarDays.innerHTML;
+
+    // 添加淡出动画
+    calendarDays.style.opacity = '0';
+    calendarDays.style.transition = 'opacity 0.15s ease-in-out';
+
+    // 在动画结束后更新日历
+    setTimeout(() => {
+        currentMonthIndex++;
+        if (currentMonthIndex > 11) {
+            currentMonthIndex = 0; // 循环到一月
+        }
+        updateCalendar();
+
+        // 添加淡入效果
+        calendarDays.style.opacity = '0';
+        void calendarDays.offsetWidth; // 强制重排
+        calendarDays.style.transition = 'opacity 0.15s ease-in-out';
+        calendarDays.style.opacity = '1';
+
+        updateStats();
+
+        // 稍后允许新动画
+        setTimeout(() => {
+            calendarDays.style.transition = '';
+            isAnimating = false;
+        }, 200);
+    }, 150); // 在淡出完成后更新
 }
 
 // 设置事件监听器
