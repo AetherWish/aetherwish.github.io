@@ -89,9 +89,6 @@ const monthsData = [
 // 当前月份索引 (0-11)
 let currentMonthIndex = 0;
 
-// 统计信息
-let uvCount = 0;
-let pvCount = 1;
 
 // 获取DOM元素
 const imageSection = document.getElementById('imageSection');
@@ -103,8 +100,6 @@ const calendarDays = document.getElementById('calendarDays');
 const prevMonthBtn = document.getElementById('prevMonth');
 const nextMonthBtn = document.getElementById('nextMonth');
 const luckyFlowerName = document.getElementById('luckyFlowerName');
-const uvCountElement = document.getElementById('uvCount');
-const pvCountElement = document.getElementById('pvCount');
 const calendarGrid = document.querySelector('.calendar-grid');
 const toggleCalendarBtn = document.getElementById('toggleCalendar');
 const calendarSection = document.querySelector('.calendar-section');
@@ -437,19 +432,8 @@ function handleOrientationChange() {
 
 // 更新统计信息
 function updateStats() {
-    // 简单的本地存储实现 (实际使用中可能需要后端支持)
-    if (!localStorage.getItem('visited')) {
-        uvCount = 1;
-        localStorage.setItem('visited', 'true');
-    } else {
-        uvCount = 1; // 简化处理，实际应用中需要真正的UV统计
-    }
-
-    // PV统计 - 每次切换月份增加
-    pvCount++;
-
-    uvCountElement.textContent = uvCount;
-    pvCountElement.textContent = pvCount;
+    // 使用busuanzi统计库，无需手动更新元素
+    // 统计信息会自动更新显示
 }
 
 // 初始化日历
