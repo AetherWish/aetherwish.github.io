@@ -91,8 +91,8 @@ function initLanguageToggle() {
             document.documentElement.lang = 'zh-CN';
         }
     });
-    });
-}
+};
+
 
 // 返回顶部功能
 function initBackToTop() {
