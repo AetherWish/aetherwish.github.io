@@ -103,12 +103,16 @@ const luckyFlowerName = document.getElementById('luckyFlowerName');
 const calendarGrid = document.querySelector('.calendar-grid');
 const toggleCalendarBtn = document.getElementById('toggleCalendar');
 const calendarSection = document.querySelector('.calendar-section');
+const usageToggle = document.getElementById('usageToggle');
 const copyrightToggle = document.getElementById('copyrightToggle');
 const statsToggle = document.getElementById('statsToggle');
+const usageTooltip = document.getElementById('usageTooltip');
 const copyrightTooltip = document.getElementById('copyrightTooltip');
 const statsTooltip = document.getElementById('statsTooltip');
+const capsuleUsageToggle = document.getElementById('capsuleUsageToggle');
 const capsuleCopyrightToggle = document.getElementById('capsuleCopyrightToggle');
 const capsuleStatsToggle = document.getElementById('capsuleStatsToggle');
+const capsuleUsageTooltip = document.getElementById('capsuleUsageTooltip');
 const capsuleCopyrightTooltip = document.getElementById('capsuleCopyrightTooltip');
 const capsuleStatsTooltip = document.getElementById('capsuleStatsTooltip');
 const themeToggleBtn = document.getElementById('themeToggle');
@@ -442,7 +446,22 @@ function setupEventListeners() {
         statsTooltip.style.visibility = statsTooltip.style.visibility === 'visible' ? 'hidden' : 'visible';
     });
 
+    usageToggle.addEventListener('click', function() {
+        usageTooltip.style.opacity = usageTooltip.style.opacity === '1' ? '0' : '1';
+        usageTooltip.style.visibility = usageTooltip.style.visibility === 'visible' ? 'hidden' : 'visible';
+    });
+
     // 添加鼠标悬停事件支持
+    usageToggle.addEventListener('mouseenter', function() {
+        usageTooltip.style.opacity = '1';
+        usageTooltip.style.visibility = 'visible';
+    });
+
+    usageToggle.addEventListener('mouseleave', function() {
+        usageTooltip.style.opacity = '0';
+        usageTooltip.style.visibility = 'hidden';
+    });
+
     copyrightToggle.addEventListener('mouseenter', function() {
         copyrightTooltip.style.opacity = '1';
         copyrightTooltip.style.visibility = 'visible';
@@ -464,6 +483,11 @@ function setupEventListeners() {
     });
 
     // 为胶囊底部的版权信息和统计信息添加点击事件（用于触屏设备）
+    capsuleUsageToggle.addEventListener('click', function() {
+        capsuleUsageTooltip.style.opacity = capsuleUsageTooltip.style.opacity === '1' ? '0' : '1';
+        capsuleUsageTooltip.style.visibility = capsuleUsageTooltip.style.visibility === 'visible' ? 'hidden' : 'visible';
+    });
+
     capsuleCopyrightToggle.addEventListener('click', function() {
         capsuleCopyrightTooltip.style.opacity = capsuleCopyrightTooltip.style.opacity === '1' ? '0' : '1';
         capsuleCopyrightTooltip.style.visibility = capsuleCopyrightTooltip.style.visibility === 'visible' ? 'hidden' : 'visible';
@@ -475,6 +499,16 @@ function setupEventListeners() {
     });
 
     // 添加鼠标悬停事件支持
+    capsuleUsageToggle.addEventListener('mouseenter', function() {
+        capsuleUsageTooltip.style.opacity = '1';
+        capsuleUsageTooltip.style.visibility = 'visible';
+    });
+
+    capsuleUsageToggle.addEventListener('mouseleave', function() {
+        capsuleUsageTooltip.style.opacity = '0';
+        capsuleUsageTooltip.style.visibility = 'hidden';
+    });
+
     capsuleCopyrightToggle.addEventListener('mouseenter', function() {
         capsuleCopyrightTooltip.style.opacity = '1';
         capsuleCopyrightTooltip.style.visibility = 'visible';
