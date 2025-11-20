@@ -25,6 +25,13 @@
             </div>
             <div class="language-switcher">
                 <button id="langToggle" class="lang-toggle-btn">Hello World</button>
+                <button id="audioToggle" class="audio-toggle-btn">
+                    <svg id="audioIcon" t="1763681506664" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5135" width="200" height="200">
+                        <path d="M384 800c-17.6 0-32-14.4-32-32V248c0-48 36.8-89.6 84.8-96l384-48c27.2-1.6 54.4 6.4 75.2 24 20.8 17.6 32 44.8 32 72V704c0 17.6-14.4 32-32 32s-32-14.4-32-32V200c0-9.6-3.2-17.6-11.2-24s-16-9.6-25.6-8l-384 48c-16 1.6-28.8 16-28.8 32V768c1.6 17.6-12.8 32-30.4 32z" fill="#ffffff" p-id="5136"></path>
+                        <path d="M752 864c-97.6 0-176-72-176-160s78.4-160 176-160 176 72 176 160-78.4 160-176 160z m0-256c-62.4 0-112 43.2-112 96s49.6 96 112 96 112-43.2 112-96-49.6-96-112-96zM240 928C142.4 928 64 856 64 768s78.4-160 176-160 176 72 176 160-78.4 160-176 160z m0-256c-62.4 0-112 43.2-112 96s49.6 96 112 96 112-43.2 112-96-49.6-96-112-96zM416 416c-16 0-28.8-11.2-32-27.2-1.6-17.6 9.6-33.6 27.2-35.2l320-43.2c17.6-1.6 33.6 9.6 35.2 27.2 1.6 17.6-9.6 33.6-27.2 35.2l-320 43.2H416z" fill="#ffffff" p-id="5137"></path>
+                    </svg>
+                    <span id="audioNumber" class="audio-number">1</span>
+                </button>
             </div>
             <div class="content">
                 <div class="chinese-content">
@@ -92,8 +99,8 @@
             </div>
         </main>
         <footer class="font-credit">
-            <p class="copyright-notice-zh">© 2025 AetherWish & Qwen-code. <a href="https://sr.mihoyo.com/" target="_blank" rel="noopener noreferrer">《崩坏：星穹铁道》</a>美术及文本素材版权归 miHoYo 所有。</p>
-            <p class="copyright-notice-en" style="display: none;">© 2025 AetherWish & Qwen-code. <a href="https://sr.mihoyo.com/" target="_blank" rel="noopener noreferrer">Honkai: Star Rail</a> artwork & text copyright by miHoYo.</p>
+            <p class="copyright-notice-zh">© 2025 AetherWish & Qwen-code. <a href="https://sr.mihoyo.com/" target="_blank" rel="noopener noreferrer">《崩坏：星穹铁道》</a>音乐、美术及文本素材版权归 miHoYo 所有。</p>
+            <p class="copyright-notice-en" style="display: none;">© 2025 AetherWish & Qwen-code. <a href="https://sr.mihoyo.com/" target="_blank" rel="noopener noreferrer">Honkai: Star Rail</a> music, artwork & text copyright by miHoYo.</p>
             <p class="font-credit-zh">本站使用了基于 OFL 1.1 协议开源的<a href="https://github.com/lxgw/kose-font/releases/tag/v3.126" target="_blank" rel="noopener noreferrer">小赖字体等宽版本</a></p>
             <p class="font-credit-en" style="display: none;">This site uses <a href="https://github.com/lxgw/kose-font/releases/tag/v3.126" target="_blank" rel="noopener noreferrer">XiaolaiMono-Regular</a> which is open source under the OFL 1.1 license</p>
         </footer>
@@ -104,6 +111,14 @@
             <path d="M7 14L12 9L17 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
     </button>
+
+    <!-- Hidden audio elements for background audio -->
+    <audio id="remembrance-audio" preload="auto">
+        <source src="/audio/remembrance.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="reverie-audio" preload="auto">
+        <source src="/audio/reverie.mp3" type="audio/mpeg">
+    </audio>
 
     <script src="/js/script.js"></script>
 </body>

@@ -157,6 +157,87 @@ function initLanguageToggle() {
     });
 };
 
+// 音频控制功能
+function initAudioToggle() {
+    const audioToggleBtn = document.getElementById('audioToggle');
+    const audioIcon = document.getElementById('audioIcon');
+    const audioNumber = document.getElementById('audioNumber');
+    const remembranceAudio = document.getElementById('remembrance-audio');
+    const reverieAudio = document.getElementById('reverie-audio');
+
+    // 设置音频的循环播放
+    remembranceAudio.loop = true;
+    reverieAudio.loop = true;
+
+    // 音频状态：0=静音，1=remembrance，2=reverie
+    let audioState = 0; // 默认为静音
+
+    // 更新图标显示
+    function updateIcon() {
+        // 清除之前添加的 elements（如斜线）
+        const existingElements = audioIcon.querySelectorAll('.audio-icon-overlay');
+        existingElements.forEach(el => el.remove());
+
+        if (audioState === 0) { // 静音状态 - 添加斜线, 隐藏数字
+            const slashPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            slashPath.setAttribute('d', 'M768 128L128 864');
+            slashPath.setAttribute('stroke', 'white');
+            slashPath.setAttribute('stroke-width', '60'); // Thicker slash for mute
+            slashPath.setAttribute('class', 'audio-icon-overlay');
+            slashPath.setAttribute('fill', 'none');
+            slashPath.setAttribute('stroke-linecap', 'round');
+            audioIcon.appendChild(slashPath);
+
+            // Hide the number for mute state
+            audioNumber.style.display = 'none';
+        } else if (audioState === 1) { // remembrance状态 - 显示数字1
+            // Hide the number initially in case it was showing
+            audioNumber.textContent = '1';
+            audioNumber.style.display = 'inline';
+        } else if (audioState === 2) { // reverie状态 - 显示数字2
+            // Show the number 2
+            audioNumber.textContent = '2';
+            audioNumber.style.display = 'inline';
+        }
+    }
+
+    // 播放音频
+    function playAudio() {
+        // 停止所有音频
+        remembranceAudio.pause();
+        reverieAudio.pause();
+
+        // 播放当前状态对应的音频
+        if (audioState === 1) {
+            reverieAudio.pause(); // Make sure reverie is stopped
+            remembranceAudio.currentTime = 0; // Reset to beginning
+            remembranceAudio.play().catch(e => console.log("Audio play error:", e));
+        } else if (audioState === 2) {
+            remembranceAudio.pause(); // Make sure remembrance is stopped
+            reverieAudio.currentTime = 0; // Reset to beginning
+            reverieAudio.play().catch(e => console.log("Audio play error:", e));
+        }
+    }
+
+    // 切换音频状态
+    audioToggleBtn.addEventListener('click', function() {
+        audioState = (audioState + 1) % 3; // Cycle through 0, 1, 2
+
+        if (audioState === 0) {
+            // 静音状态 - 停止所有音频
+            remembranceAudio.pause();
+            reverieAudio.pause();
+        } else {
+            // 切换到音频播放状态 - 播放对应音频
+            playAudio();
+        }
+
+        updateIcon();
+    });
+
+    // 初始化图标
+    updateIcon();
+}
 
 // 返回顶部功能
 function initBackToTop() {
@@ -194,4 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 初始化语言切换功能
     initLanguageToggle();
+
+    // 初始化音频切换功能
+    initAudioToggle();
 });

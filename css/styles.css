@@ -112,10 +112,72 @@ body::before {
     transition: background 0.3s ease;
     width: auto; /* Allow width to adjust to content */
     font-family: 'XiaolaiMono', Arial, sans-serif;
+    height: 36px; /* Fixed height for consistent alignment */
+    display: -webkit-inline-flex; /* WebKit prefix */
+    display: inline-flex;
+    -webkit-align-items: center; /* WebKit prefix */
+    align-items: center;
+    -webkit-justify-content: center; /* WebKit prefix */
+    justify-content: center;
 }
 
 .lang-toggle-btn:hover {
     background: rgba(235, 126, 163, 1);
+}
+
+.audio-toggle-btn {
+    background: rgba(235, 126, 163, 0.8);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 12px; /* Consistent padding with other buttons */
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease;
+    width: auto; /* Allow width to adjust to content */
+    font-family: 'XiaolaiMono', Arial, sans-serif;
+    display: -webkit-inline-flex; /* WebKit prefix */
+    display: inline-flex;
+    -webkit-align-items: center; /* WebKit prefix */
+    align-items: center;
+    -webkit-justify-content: center; /* WebKit prefix */
+    justify-content: center;
+}
+
+.audio-toggle-btn:hover {
+    background: rgba(235, 126, 163, 1);
+}
+
+/* Style the SVG icon inside the button */
+.audio-toggle-btn svg {
+    width: 16px;
+    height: 16px;
+    display: inline-block; /* Better compatibility with WebKit */
+    margin-right: 4px; /* Add space between icon and number */
+    vertical-align: middle; /* Align properly with text/number */
+    -webkit-flex-shrink: 0; /* Prevent shrinking in WebKit */
+    flex-shrink: 0;
+}
+
+/* Style for the audio number that appears to the right of the icon */
+.audio-number {
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    margin-left: 6px; /* Space between icon and number */
+    display: none; /* Initially hidden, will be shown when needed */
+    vertical-align: middle; /* Align with the SVG icon */
+    line-height: 1; /* Prevent extra spacing */
+    -webkit-font-smoothing: antialiased; /* Better font rendering in WebKit browsers */
+}
+
+/* WebKit-specific styling for the audio button */
+.audio-toggle-btn {
+    -webkit-appearance: none; /* Remove default WebKit styling */
+    -webkit-user-select: none; /* Prevent text selection in WebKit */
+    outline: none; /* Prevent default outline */
 }
 
 .calendar-switcher {
@@ -126,7 +188,9 @@ body::before {
 }
 
 .calendar-toggle-btn {
+    display: -webkit-inline-flex; /* WebKit prefix */
     display: inline-flex;
+    -webkit-align-items: center; /* WebKit prefix */
     align-items: center;
     background: rgba(235, 126, 163, 0.8);
     color: white;
@@ -141,6 +205,38 @@ body::before {
     transition: background 0.3s ease;
     width: auto; /* Allow width to adjust to content */
     font-family: 'XiaolaiMono', Arial, sans-serif;
+    height: 36px; /* Fixed height for consistent alignment */
+    -webkit-justify-content: center; /* WebKit prefix */
+    justify-content: center;
+}
+
+/* Align all top right buttons in a consistent group */
+.language-switcher {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    display: -webkit-flex; /* WebKit prefix */
+    display: flex;
+    -webkit-flex-direction: row; /* WebKit prefix */
+    flex-direction: row;
+    gap: 10px; /* Consistent spacing between buttons */
+    -webkit-align-items: flex-start; /* WebKit prefix */
+    align-items: flex-start; /* Align buttons to the top */
+}
+
+/* Ensure all buttons in the language switcher group have consistent styling */
+.language-switcher .lang-toggle-btn,
+.language-switcher .audio-toggle-btn {
+    display: -webkit-inline-flex; /* WebKit prefix */
+    display: inline-flex;
+    -webkit-align-items: center; /* WebKit prefix */
+    align-items: center;
+    -webkit-justify-content: center; /* WebKit prefix */
+    justify-content: center;
+    -webkit-flex-shrink: 0; /* WebKit prefix */
+    flex-shrink: 0; /* Prevent buttons from shrinking */
+    height: 36px; /* Fixed height for consistent alignment */
 }
 
 .calendar-toggle-btn:hover {
@@ -179,6 +275,19 @@ body::before {
         min-height: 40px; /* Consistent minimum height */
         display: flex !important;
         align-items: center !important;
+        justify-content: center !important;
+        text-align: center;
+    }
+
+    .audio-toggle-btn {
+        padding: 8px !important; /* Force consistent padding */
+        min-width: 40px; /* Consistent minimum width */
+        min-height: 40px; /* Consistent minimum height */
+        display: -webkit-flex !important; /* WebKit prefix */
+        display: flex !important;
+        -webkit-align-items: center !important; /* WebKit prefix */
+        align-items: center !important;
+        -webkit-justify-content: center !important; /* WebKit prefix */
         justify-content: center !important;
         text-align: center;
     }
