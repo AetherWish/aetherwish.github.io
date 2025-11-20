@@ -13,6 +13,13 @@ function updateCountdown() {
         document.getElementById('hours').innerText = '00';
         document.getElementById('minutes').innerText = '00';
         document.getElementById('seconds').innerText = '00';
+
+        // 当倒计时结束时，显示特殊文本
+        if (document.documentElement.lang === 'zh-CN') {
+            document.querySelector('.countdown-main-text-zh').textContent = '已到达';
+        } else {
+            document.querySelector('.countdown-main-text-en').textContent = 'Arrived';
+        }
         return;
     }
 
@@ -27,6 +34,26 @@ function updateCountdown() {
     document.getElementById('hours').innerText = String(hours).padStart(2, '0');
     document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
     document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+
+    // 根据天数更新文本
+    const countdownMainTextZh = document.querySelector('.countdown-main-text-zh');
+    const countdownMainTextEn = document.querySelector('.countdown-main-text-en');
+
+    if (days < 1) {
+        // 剩余不到一天时，显示"明天见"和对应的英文
+        if (document.documentElement.lang === 'zh-CN') {
+            countdownMainTextZh.textContent = '明天见，「PHILIA093」';
+        } else {
+            countdownMainTextEn.textContent = 'See you tomorrow, PHILIA093';
+        }
+    } else {
+        // 剩余一天或以上时，显示"下次见"和对应的英文
+        if (document.documentElement.lang === 'zh-CN') {
+            countdownMainTextZh.textContent = '下次见，「PHILIA093」';
+        } else {
+            countdownMainTextEn.textContent = 'See you soon, PHILIA093';
+        }
+    }
 }
 
 // 语言切换功能
@@ -40,6 +67,11 @@ function initLanguageToggle() {
     const englishLabels = document.querySelectorAll('.label-en');
     const homeTextZh = document.querySelector('.home-text-zh');
     const homeTextEn = document.querySelector('.home-text-en');
+    const chineseFontCredit = document.querySelector('.font-credit-zh');
+    const englishFontCredit = document.querySelector('.font-credit-en');
+    const countdownMainTextZh = document.querySelector('.countdown-main-text-zh');
+    const countdownMainTextEn = document.querySelector('.countdown-main-text-en');
+    const countdownSubText = document.querySelector('.countdown-sub-text');
     let isEnglish = false;
 
     langToggleBtn.addEventListener('click', function() {
@@ -65,6 +97,16 @@ function initLanguageToggle() {
             homeTextZh.style.display = 'none';
             homeTextEn.style.display = 'inline';
 
+            // 切换倒计时文本
+            countdownMainTextZh.style.display = 'none';
+            countdownMainTextEn.style.display = 'inline';
+            chineseCountdownText.style.display = 'none';
+            englishCountdownText.style.display = 'inline';
+
+            // 切换字体版权信息
+            chineseFontCredit.style.display = 'none';
+            englishFontCredit.style.display = 'block';
+
             // 更新页面语言属性
             document.documentElement.lang = 'en';
         } else {
@@ -86,6 +128,16 @@ function initLanguageToggle() {
             // 切换主页按钮文字
             homeTextZh.style.display = 'inline';
             homeTextEn.style.display = 'none';
+
+            // 切换倒计时文本
+            countdownMainTextZh.style.display = 'inline';
+            countdownMainTextEn.style.display = 'none';
+            chineseCountdownText.style.display = 'inline';
+            englishCountdownText.style.display = 'none';
+
+            // 切换字体版权信息
+            chineseFontCredit.style.display = 'block';
+            englishFontCredit.style.display = 'none';
 
             // 更新页面语言属性
             document.documentElement.lang = 'zh-CN';
