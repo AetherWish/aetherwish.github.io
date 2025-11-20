@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>明天见。</title>
+    <link rel="stylesheet" href="/calendar/css/styles.css">
+</head>
+<body>
+        <!-- 隐藏月历按钮 -->
+        <button id="toggleCalendar" class="toggle-calendar-btn" aria-label="切换月历显示">
+            <svg class="toggle-icon" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                <path d="M512 255.488c-309.76 0-433.664 309.76-433.664 309.76s123.904 309.76 433.664 309.76 433.664-309.76 433.664-309.76-123.904-309.76-433.664-309.76z m0 495.616c-102.4 0-185.856-83.456-185.856-185.856S409.088 379.392 512 379.392c102.4 0 185.856 82.944 185.856 185.856S614.4 751.104 512 751.104z" fill="white"/>
+                <path d="M604.672 565.248c0 51.2-41.472 92.672-92.672 92.672s-92.672-41.472-92.672-92.672c0-51.2 41.472-92.672 92.672-92.672 51.2 0 92.672 41.472 92.672 92.672z" fill="white"/>
+            </svg>
+        </button>
+
+        <!-- 返回主页按钮 -->
+        <a href="/" class="home-btn" title="返回主页">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 12L12 4L21 12M5 12V18C5 18.7956 5.31607 19.5587 5.87868 20.1213C6.44129 20.6839 7.20435 21 8 21H16C16.7956 21 17.5587 20.6839 18.1213 20.1213C18.6839 19.5587 19 18.7956 19 18V12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </a>
+
+        <!-- 深色模式切换按钮 -->
+        <button id="themeToggle" class="theme-toggle-btn" aria-label="切换深色模式">
+            <svg class="theme-toggle-icon" viewBox="0 0 1067 1024" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                <path d="M611.448738 766.649841q-137.814436 0-233.189327-95.374891T282.88452 438.085623q0-125.949617 82.141055-218.586472T574.941603 111.346763q11.864819-1.825357 20.991602 3.194374t14.602855 13.233836q5.47607 8.214105 5.932409 19.166246t-6.845088 20.991603q-15.515532 23.729638-23.273299 50.197311t-7.757766 55.673382q0 82.141054 57.498738 139.639792t139.639793 57.498738q28.29303 0 56.12972-8.214105t49.740972-22.81696q10.039462-6.388749 20.535263-5.932409T920.846709 438.998302q9.126784 4.563392 14.146515 13.690175t3.194375 21.904281q-12.777497 125.949617-107.23971 209.00335T611.448738 766.649841z m0-73.014271q80.315698 0 144.203184-44.264901T848.745117 533.916853q-18.253568 4.563392-36.507135 7.301427t-36.507135 2.738036q-112.259441 0-191.206121-78.946681T505.578046 273.803515q0-18.253568 2.738035-36.507136t7.301427-36.507135q-71.188914 29.205708-115.453815 93.093195T355.898791 438.085623q0 105.870692 74.839627 180.71032t180.71032 74.839627z m-9.126784-246.423163z" fill="white"/>
+            </svg>
+        </button>
+
+        <div class="calendar-container">
+            <!-- 图片背景部分 -->
+            <div class="image-section" id="imageSection">
+                <!-- 月份显示 (左下角) -->
+                <div class="month-display">
+                    <div class="month-text-group">
+                        <div class="month-text" id="monthText">门关月</div>
+                        <div class="lucky-flower-group" id="luckyFlowerGroup">
+                            <div class="lucky-flower-name" id="luckyFlowerName">铃兰</div>
+                            <div class="lucky-flower-label">本月幸运花</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右上角月份标题 -->
+                <div class="month-title" id="monthTitle">
+                    <div class="month-title-message">
+                        <div class="month-title-line1" id="monthTitleLine1">不论晴天还是雨天，进入梦乡以前，</div>
+                        <div class="month-title-line2" id="monthTitleLine2">记得和自己说一声：「明天见」！</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 月历部分 -->
+            <div class="calendar-section">
+                <div class="calendar-header">
+                    <button id="prevMonth" class="nav-btn">&lt;</button>
+                    <h2 id="currentMonthYear">2026年1月</h2>
+                    <button id="nextMonth" class="nav-btn">&gt;</button>
+                </div>
+
+                <div class="calendar-grid">
+                    <div class="day-header">Sun</div>
+                    <div class="day-header">Mon</div>
+                    <div class="day-header">Tue</div>
+                    <div class="day-header">Wed</div>
+                    <div class="day-header">Thu</div>
+                    <div class="day-header">Fri</div>
+                    <div class="day-header">Sat</div>
+
+                    <!-- 日期将在JavaScript中动态生成 -->
+                    <div id="calendarDays"></div>
+                </div>
+            </div>
+
+            <!-- 底部信息 -->
+            <div class="footer">
+                <div class="info-container">
+
+                    <div class="info-item">
+                        <span class="info-label" id="usageToggle">使用说明</span>
+                        <div class="info-tooltip" id="usageTooltip">
+                            右上角太阳/月亮图标：切换浅色/深色模式<br>
+                            右上角眼睛图标：切换一年历可见性<br>
+                            可用键盘上的←（左）/→（右）键调整月份
+                        </div>
+                    </div>
+
+
+                    <span class="footer-separator">/</span>
+                    <!-- 版权声明提示 -->
+                    <div class="info-item">
+                        <span class="info-label" id="copyrightToggle">版权声明</span>
+                        <div class="info-tooltip" id="copyrightTooltip">
+                            © 2025 AetherWish & Qwen-code. 《崩坏：星穹铁道》美术素材版权归 miHoYo 所有。
+                        </div>
+                    </div>
+
+                    <!-- 分隔符 -->
+                    <span class="footer-separator">/</span>
+
+                    <!-- 统计信息提示 -->
+                    <div class="info-item">
+                        <span class="info-label" id="statsToggle">统计信息</span>
+                        <div class="info-tooltip" id="statsTooltip">
+                            <div class="busuanzi-container" id="busuanzi_container_site_pv">总访问量 <span id="busuanzi_value_site_pv"></span> 次</div>
+                            <div class="busuanzi-container" id="busuanzi_container_site_uv">总访客数 <span id="busuanzi_value_site_uv"></span> 人</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="links">
+                    <a href="https://blog.cyrene.icu/" class="blog-link" target="_blank" rel="noopener noreferrer">空愿的小站</a> /
+                    <a href="/" class="cyrene-link">激起往昔的涟漪</a> / 
+                    <a href="mailto:aetherwish@cyrene.icu" class="email-link">给站长发邮件</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部胶囊区域（隐藏模式时显示） -->
+        <div class="capsule-footer" id="capsuleFooter">
+            <div class="capsule-content">
+
+                <div class="info-item">
+                    <span class="info-label" id="capsuleUsageToggle">使用说明</span>
+                    <div class="info-tooltip" id="capsuleUsageTooltip">
+                        右上角太阳/月亮图标：切换浅色/深色模式<br>
+                        右上角眼睛图标：切换一年历可见性<br>
+                        可用键盘上的←（左）/→（右）键调整月份
+                    </div>
+                </div>
+
+                <span class="capsule-separator">/</span>
+                <!-- 版权声明提示 -->
+                <div class="info-item">
+                    <span class="info-label" id="capsuleCopyrightToggle">版权声明</span>
+                    <div class="info-tooltip" id="capsuleCopyrightTooltip">
+                        © 2025 AetherWish & Qwen-code. 《崩坏：星穹铁道》美术素材版权归 miHoYo 所有。
+                    </div>
+                </div>
+
+                <!-- 分隔符 -->
+                <span class="capsule-separator">/</span>
+
+                <!-- 统计信息提示 -->
+                <div class="info-item">
+                    <span class="info-label" id="capsuleStatsToggle">统计信息</span>
+                    <div class="info-tooltip" id="capsuleStatsTooltip">
+                        <div class="busuanzi-container">总访问量 <span class="busuanzi-value" id="capsule_pv_value"></span> 次</div>
+                        <div class="busuanzi-container">总访客数 <span class="busuanzi-value" id="capsule_uv_value"></span> 人</div>
+                    </div>
+                </div>
+
+                <!-- 分隔符 -->
+                <span class="capsule-separator">/</span>
+
+                <!-- 链接 -->
+                <a href="https://blog.cyrene.icu/" class="blog-link" target="_blank" rel="noopener noreferrer">空愿的小站</a>
+
+                <!-- 分隔符 -->
+                <span class="capsule-separator">/</span>
+
+                <!-- 链接 -->
+                <a href="/" class="cyrene-link">激起往昔的涟漪</a>
+                
+                <!-- 分隔符 -->
+                <span class="capsule-separator">/</span>
+
+                <!-- 链接 -->
+                <a href="mailto:aetherwish@cyrene.icu" class="email-link">给站长发邮件</a>
+            </div>
+        </div>
+
+        <!-- 不蒜子统计脚本 -->
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+        <script src="/calendar/js/script.js"></script>
+    </body>
+</html>

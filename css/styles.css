@@ -4,798 +4,396 @@
     box-sizing: border-box;
 }
 
-/* CSS Variables for themes */
-:root {
-    /* Light theme variables (default) */
-    --bg-color: #ffffff;
-    --text-color: #333333;
-    --calendar-bg: rgba(255, 255, 255, 0.9);
-    --footer-bg: rgba(240, 240, 240, 0.85);
-    --day-header-bg: rgba(240, 240, 240, 0.85);
-    --calendar-day-bg: rgba(255, 255, 255, 0.9);
-    --calendar-day-empty-bg: rgba(249, 249, 249, 0.7);
-    --weekend-day-bg: rgba(240, 248, 255, 0.8);
-    --border-color: #ccc;
-    --shadow-color: rgba(0, 0, 0, 0.3);
-    --tooltip-bg: rgba(255, 255, 255, 0.95);
-    --info-color: #666;
-    --link-color: #eb7ea3;
-    --link-hover-color: #d65c8a;
-    --capsule-bg: rgba(255, 255, 255, 0.9);
-    --capsule-shadow: rgba(0, 0, 0, 0.15);
-    --day-text-color: #333;
-    --header-text-color: #333;
-    --stat-text-color: #666;
-    --current-theme-color: #8A2B3B; /* 默认主题色，由JavaScript设置 */
-}
-
-/* Add transition for theme switching */
-body {
-    transition: background-color 0.5s ease, color 0.5s ease;
-}
-
-.calendar-container {
-    transition: background 0.5s ease, box-shadow 0.5s ease;
-}
-
-.footer {
-    transition: background 0.5s ease, color 0.5s ease;
-}
-
-#currentMonthYear {
-    transition: color 0.5s ease;
-}
-
-.nav-btn {
-    transition: background 0.5s ease, opacity 0.2s ease;
-}
-
-.capsule-content {
-    transition: background 0.5s ease, color 0.5s ease;
-}
-
-.info-tooltip {
-    transition: background 0.5s ease, color 0.5s ease;
-}
-
-/* Transitions for theme switching */
-[data-theme="dark"] body,
-[data-theme="dark"] .calendar-container,
-[data-theme="dark"] .footer,
-[data-theme="dark"] .capsule-content,
-[data-theme="dark"] .info-tooltip {
-    transition: background-color 0.5s ease, color 0.5s ease;
-}
-
-/* Animation class for transitions */
-.calendar-container.animating,
-.capsule-footer.animating {
-    transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-/* Dark theme variables */
-[data-theme="dark"] {
-    --bg-color: #1a1a1a;
-    --text-color: #f0f0f0;
-    --calendar-bg: rgba(30, 30, 30, 0.9);
-    --footer-bg: rgba(40, 40, 40, 0.85);
-    --day-header-bg: rgba(50, 50, 50, 0.85);
-    --calendar-day-bg: rgba(40, 40, 40, 0.9);
-    --calendar-day-empty-bg: rgba(45, 45, 45, 0.7);
-    --weekend-day-bg: rgba(60, 60, 80, 0.8);
-    --border-color: #555;
-    --shadow-color: rgba(0, 0, 0, 0.7);
-    --tooltip-bg: rgba(40, 40, 40, 0.95);
-    --info-color: #aaa;
-    --link-color: #ff9eb3;
-    --link-hover-color: #ff7a9d;
-    --capsule-bg: rgba(40, 40, 40, 0.9);
-    --capsule-shadow: rgba(0, 0, 0, 0.4);
-    --day-text-color: #f0f0f0;
-    --header-text-color: #f0f0f0;
-    --stat-text-color: #aaa;
-    --nav-btn-color: #ff9eb3; /* Use link color for better visibility in dark mode */
-    --nav-btn-text-color: #f0f0f0;
-}
-
-/* Make sure theme toggle icon is visible in both themes */
-.theme-toggle-icon {
-    width: 24px;
-    height: 24px;
-    fill: white;
-}
-
-[data-theme="dark"] .theme-toggle-icon {
-    fill: white;
+/* Define the XiaolaiMono font */
+@font-face {
+    font-family: 'XiaolaiMono';
+    src: url('/font/XiaolaiMono-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap; /* Ensures text remains visible while font is loading */
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background: url('../img/amphoreus.webp');
+    font-family: 'XiaolaiMono', Arial, sans-serif;
+    background: url('/img/philia093.webp');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-color: var(--bg-color);
+    background-attachment: fixed;
+    color: white;
     min-height: 100vh;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     padding: 20px;
-    overflow: auto; /* Allow scrolling when needed */
     position: relative;
 }
 
-/* Landscape mode (default) */
-.calendar-container {
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    max-width: 1200px;
-    height: 85vh; /* Reduced to account for fixed footer stats */
-    background: var(--calendar-bg); /* Slightly transparent white for better visibility */
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px var(--shadow-color);
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* 图片和日历各占一半 */
-    grid-template-rows: 1fr 50px; /* Fixed footer height, rest for content */
-    grid-template-areas:
-        "image calendar"
-        "footer footer";
-    transition: opacity 0.5s ease, transform 0.5s ease; /* Add transition for toggle animation */
-}
-
-.image-section {
-    grid-area: image;
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    position: relative;
-    border-radius: 15px 0 0 15px;
-    min-height: 0;
-    min-width: 0;
-    /* Ensure the element fills its grid cell */
     height: 100%;
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.4), rgba(235, 126, 163, 0.3)); /* 紫粉色渐变遮罩 */
+    z-index: -1;
+}
+
+.container {
+    max-width: 800px;
     width: 100%;
-    box-sizing: border-box;
-    padding: 20px;
-    overflow: hidden; /* Ensure background extends to all edges */
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    position: relative; /* 为返回顶部按钮定位做准备 */
 }
 
-.month-display {
+.home-link {
     position: absolute;
+    top: 20px;
     left: 20px;
-    bottom: 20px;
-    z-index: 2;
-    padding: 10px;
+    z-index: 100;
 }
 
-.month-text-group {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-end; /* Align items to bottom */
-    color: white; /* Keep white for readability over background images */
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
-}
-
-.month-text {
-    font-size: 3em; /* 增大字体 */
-    font-weight: bold;
-    color: white; /* Keep white for readability over background images */
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
-    text-align: center; /* 确保文字居中 */
-    margin: 0; /* Remove margin to better control alignment */
-    align-self: flex-end; /* Align to bottom of flex container */
-    line-height: 1; /* Tighter line height */
-}
-
-/* For dark mode, we keep the same styling for readability over background */
-[data-theme="dark"] .month-text-group,
-[data-theme="dark"] .month-text {
-    color: white; /* Still white to maintain readability over background image */
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
-}
-
-
-.month-title {
-    position: absolute;
-    right: 20px;  /* Align to right with same margin as month text on left */
-    top: 20px;
-    color: white; /* Keep white for readability over background images */
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
-    z-index: 2;
-    text-align: right;
-    padding: 10px;
-    max-width: calc(100% - 120px); /* Ensure it doesn't go beyond the container and leaves room for the toggle button */
-}
-
-/* For dark mode, we keep the same styling for readability over background */
-[data-theme="dark"] .month-title {
-    color: white; /* Still white to maintain readability over background image */
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
-}
-
-.toggle-calendar-btn {
-    position: fixed;
-    right: 20px;
-    top: 20px;
-    background: rgba(0, 0, 0, 0.5);
-    border: none;
-    cursor: pointer;
-    z-index: 1000;
-    padding: 8px;
-    border-radius: 50%;
-    transition: background 0.3s;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
-.toggle-calendar-btn:hover {
-    background: rgba(0, 0, 0, 0.7);
-}
-
-.toggle-icon {
-    width: 20px;
-    height: 20px;
-    display: block;
-    margin: auto;
-}
-
-/* 深色模式切换按钮 */
-.theme-toggle-btn {
-    position: fixed;
-    right: 65px; /* Positioned to the left of the calendar toggle button, with more spacing */
-    top: 20px;
-    background: rgba(0, 0, 0, 0.5);
-    border: none;
-    cursor: pointer;
-    z-index: 1000;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    transition: background 0.3s;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    display: flex;
+.home-btn {
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    padding: 0; /* Remove any default padding */
-}
-
-.theme-toggle-btn:hover {
-    background: rgba(0, 0, 0, 0.7);
-}
-
-.theme-toggle-icon {
-    width: 24px;
-    height: 24px;
-    min-width: 16px;
-    min-height: 16px;
-    display: block;
-    margin: auto;
-    transform: translate(-1px, 2px); /* Move 1px left and 2px down (net result: 1px right from original, 2px down) */
-}
-
-/* 胶囊底部样式 */
-.capsule-footer {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 999;
-    width: 90%;
-    max-width: 600px;
-    transition: opacity 0.5s ease, transform 0.5s ease; /* Add transition for toggle animation */
-    opacity: 0;
-    visibility: hidden;
-}
-
-.capsule-footer.show {
-    opacity: 1;
-    visibility: visible;
-}
-
-.capsule-content {
-    background: var(--capsule-bg);
-    border-radius: 30px;
-    padding: 12px 20px; /* Reduced padding to minimize blank space */
-    box-shadow: 0 4px 20px var(--capsule-shadow);
-    border: 1px solid var(--border-color);
-    font-size: 0.9em;
-    line-height: 1.4;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0;
-    text-align: center;
-    color: var(--stat-text-color);
-}
-
-.capsule-separator {
-    margin: 0 8px;
-    color: var(--stat-text-color);
-    flex-shrink: 0;
-}
-
-.blog-link, .cyrene-link, .email-link {
-    color: var(--link-color);
+    background: rgba(235, 126, 163, 0.8);
+    color: white;
     text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s ease;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 12px; /* Reduced horizontal padding */
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease;
+    position: relative; /* Ensure proper positioning */
+    width: auto; /* Allow width to adjust to content */
+    justify-content: flex-start; /* Align content to the start */
+    align-items: center;
 }
 
-.blog-link:hover, .cyrene-link:hover, .email-link:hover {
-    color: var(--link-hover-color);
-    text-decoration: underline;
+/* Reduce gap between icon and text */
+.home-btn svg {
+    margin-right: 4px; /* Reduced gap between icon and text */
 }
 
-.month-title-large {
+/* The text elements have been removed from HTML, so these styles are no longer needed */
+
+.home-btn:hover {
+    background: rgba(235, 126, 163, 1);
+}
+
+/* The text elements have been removed from HTML, so these styles are no longer needed */
+
+.language-switcher {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+}
+
+.lang-toggle-btn {
+    background: rgba(235, 126, 163, 0.8);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 12px; /* Consistent padding with home button */
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease;
+    width: auto; /* Allow width to adjust to content */
+    font-family: 'XiaolaiMono', Arial, sans-serif;
+}
+
+.lang-toggle-btn:hover {
+    background: rgba(235, 126, 163, 1);
+}
+
+.calendar-switcher {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+}
+
+.calendar-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(235, 126, 163, 0.8);
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 12px; /* Consistent padding with language button */
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease;
+    width: auto; /* Allow width to adjust to content */
+    font-family: 'XiaolaiMono', Arial, sans-serif;
+}
+
+.calendar-toggle-btn:hover {
+    background: rgba(235, 126, 163, 1);
+}
+
+.calendar-toggle-icon {
+    margin-right: 6px; /* Space between icon and text */
+}
+
+/* On narrow screens, hide text and only show icon */
+@media (max-width: 480px) {
+    .calendar-toggle-text-zh,
+    .calendar-toggle-text-en {
+        display: none !important;
+    }
+
+    .calendar-toggle-icon {
+        margin-right: 0;
+    }
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 45px; /* Reduced padding to move content up approximately one line */
+    padding-left: 60px; /* Add padding to prevent content overlap with home button */
+    padding-right: 60px; /* Add padding to prevent content overlap with language button */
+}
+
+.content {
+    text-align: center;
+    margin-bottom: 30px;
+    line-height: 1.8;
+    font-size: 1.2em;
+    color: white; /* 使用白色提高可读性 */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); /* 添加文字阴影以增强可读性 */
+}
+
+.content p {
+    margin: 10px 0;
+}
+
+.countdown-container {
+    text-align: center;
+    margin: 30px 0;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    width: 100%;
+}
+
+.countdown-main-text {
+    margin-bottom: 15px;
     font-size: 1.5em;
-    margin-bottom: 10px;
-}
-
-.month-title-message {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-
-.month-title-line1,
-.month-title-line2 {
-    font-size: 0.9em;
-    line-height: 1.4;
-    margin-bottom: 3px;
-}
-
-.lucky-flower-group {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-left: 10px; /* Add some space from the month text */
     color: white;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
 }
 
-.lucky-flower-name {
-    font-size: 1.5em; /* Larger font for flower name */
-    margin-bottom: 2px;
+.countdown-sub-text {
+    margin-top: 15px;
+    font-size: 1em;
+    color: rgba(255, 255, 255, 0.8);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
 }
 
-.lucky-flower-label {
-    font-size: 0.8em; /* Smaller font for "本月幸运花" */
+.countdown {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
 }
 
-.calendar-section {
-    grid-area: calendar;
-    padding: 20px;
+.countdown-item {
     display: flex;
     flex-direction: column;
-    height: 100%;
-    width: 100%;
-}
-
-.calendar-header {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    min-width: 60px;
 }
 
-.nav-btn {
-    color: white; /* Keep white text for better contrast with background */
+.countdown-item span {
+    display: block;
+}
+
+#days, #hours, #minutes, #seconds {
+    font-size: 2em;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px;
+    border-radius: 5px;
+    min-width: 60px;
+    text-align: center;
+    color: white; /* 使用白色提高可读性 */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); /* 添加文字阴影以增强可读性 */
+}
+
+.label {
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.video-container {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.video-container iframe {
+    width: 100%;
+    height: 400px;
+    border-radius: 10px;
     border: none;
-    padding: 10px 15px;
-    font-size: 1.2em;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background 0.3s;
-    box-shadow: 0 2px 5px var(--shadow-color);
-    background: var(--current-theme-color); /* 默认使用当前月份主题色 */
 }
 
-.nav-btn:hover {
-    opacity: 0.8;
-}
-
-/* 在暗色模式下，导航按钮使用当前月份的主题色并增加亮度以提高可见性 */
-[data-theme="dark"] .nav-btn {
-    background: var(--current-theme-color); /* 使用当前月份主题色 */
-    opacity: 0.9; /* 提高可见性 */
-}
-
-#currentMonthYear {
-    font-size: 1.5em;
-    color: var(--current-theme-color); /* 默认使用当前月份主题色 */
-    text-shadow: 0 0 2px rgba(255, 255, 255, 0.7);
-}
-
-/* 在暗色模式下，月份标题使用当前月份的主题色 */
-[data-theme="dark"] #currentMonthYear {
-    color: var(--current-theme-color); /* 使用当前月份主题色 */
-    text-shadow: 0 0 3px rgba(0, 0, 0, 0.5); /* 确保文字在暗色背景下清晰可见 */
-}
-
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: 40px 1fr;  /* 明确指定行高，第二行占剩余空间 */
-    gap: 2px;
-    background: var(--calendar-day-bg);  /* Slightly transparent for better theme integration */
-    border-left: 1px solid var(--border-color);
-    border-right: 1px solid var(--border-color);
-    border-bottom: 1px solid var(--border-color);
-    height: 100%;
-    overflow: hidden; /* Prevent overflow in the grid itself */
-}
-
-.day-header {
-    background: var(--day-header-bg);
-    padding: 10px;
+/* Font credit footer */
+.font-credit {
     text-align: center;
-    font-weight: bold;
-    border-top: 1px solid var(--border-color);
-    border-left: 1px solid var(--border-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--header-text-color);
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.7);
 }
 
-.day-header:first-child {
-    border-left: none;
-}
-
-#calendarDays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: repeat(6, 1fr);  /* 6行日期 */
-    gap: 2px;
-    /* 定位在网格的第2行，横跨所有列 */
-    grid-row: 2;
-    grid-column: 1 / -1;
-    overflow-y: auto; /* Allow scrolling for calendar days if needed */
-    max-height: none; /* Reset max-height for landscape mode */
-}
-
-.calendar-day {
-    background: var(--calendar-day-bg);
-    padding: 10px;
-    text-align: center;
-    border-top: 1px solid var(--border-color);
-    border-left: 1px solid var(--border-color);
-    color: var(--day-text-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* 确保元素在网格中的行为 */
-    overflow: hidden;
-}
-
-.calendar-day:first-child {
-    border-left: none;
-}
-
-.calendar-day.empty {
-    background: var(--calendar-day-empty-bg);
-}
-
-.calendar-day.weekend {
-    /* This will be overridden by JavaScript */
-    background: var(--weekend-day-bg);
-}
-
-.infinity-day {
-    font-weight: bold;
-    font-size: 1.2em;
-}
-
-/* 月份切换动画 */
-.calendar-section {
-    position: relative;
-    overflow: hidden;
-}
-
-.slide-left {
-    animation: slideLeft 0.3s ease-in-out;
-}
-
-.slide-right {
-    animation: slideRight 0.3s ease-in-out;
-}
-
-@keyframes slideLeft {
-    from {
-        transform: translateX(0);
-    }
-    to {
-        transform: translateX(-50px);
-    }
-}
-
-@keyframes slideRight {
-    from {
-        transform: translateX(0);
-    }
-    to {
-        transform: translateX(50px);
-    }
-}
-
-/* Calendar fade in animation */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-.calendar-fade-in {
-    animation: fadeIn 0.5s ease-in forwards;
-}
-
-.footer {
-    grid-area: footer;
-    padding: 10px 20px;
-    background: var(--footer-bg);
-    font-size: 0.9em;
-    color: var(--info-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 100%;
-    width: 100%;
-}
-
-.info-container {
-    display: flex;
-    gap: 0;
-    align-items: center;
-}
-
-.footer-separator {
-    margin: 0 8px;
-    color: var(--info-color);
-    flex-shrink: 0;
-}
-
-.info-item {
-    position: relative;
-    display: inline-block;
-}
-
-.info-label {
-    cursor: pointer;
-    color: var(--text-color);
-    font-weight: 600;
+.font-credit a {
+    color: rgba(255, 255, 255, 0.9);
     text-decoration: underline;
-    text-decoration-style: dotted;
 }
 
-.info-label:hover {
-    color: var(--link-color);
+.font-credit a:hover {
+    color: white;
 }
 
-.info-tooltip {
-    position: absolute;
-    bottom: 100%;
-    left: 0;
-    background: var(--tooltip-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-    padding: 8px 12px; /* Reduced padding to minimize blank space */
-    box-shadow: 0 2px 8px var(--shadow-color);
-    z-index: 10;
-    width: max-content; /* Only as wide as the content */
-    max-width: 300px; /* But with a reasonable max width */
-    font-size: 0.9em;
-    line-height: 1.4;
+/* 返回顶部按钮 */
+.back-to-top-btn {
+    position: fixed;  /* Changed from absolute to fixed to position relative to viewport */
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(235, 126, 163, 0.8); /* 主题色，半透明 */
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 9999; /* Increased z-index to ensure it's above all other elements */
     opacity: 0;
     visibility: hidden;
     transform: translateY(10px);
-    transition: opacity 0.3s, transform 0.3s, visibility 0.3s;
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, background 0.3s ease;
 }
 
-.info-item:hover .info-tooltip {
+.back-to-top-btn:hover {
+    background: rgba(235, 126, 163, 1); /* 主题色，完全不透明 */
+    transform: translateY(-2px);
+}
+
+.back-to-top-btn.show {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
 }
 
-/* Adjust tooltip for capsule footer */
-.capsule-content .info-tooltip {
-    width: max-content; /* Only as wide as the content */
-    max-width: 250px; /* Reasonable max width for capsule tooltips */
-    padding: 6px 10px; /* Slightly smaller padding */
-}
-
-.links {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    align-items: center;
-    flex-wrap: wrap; /* Allow wrapping on small screens */
-    min-width: 0; /* Allow shrinking */
-}
-
-.links a {
-    white-space: nowrap; /* Prevent text wrapping within links */
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Responsive layout for portrait mode */
-@media screen and (max-width: 768px) {
-    .footer {
-        flex-direction: column;
-        gap: 5px;
-        align-items: stretch;
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
     }
 
-    .copyright {
-        text-align: center;
-        order: 2;
+    main {
+        padding-top: 90px; /* Increased adjustment for mobile screen with positioned buttons */
+        padding-left: 20px; /* Reduce left padding on mobile */
+        padding-right: 20px; /* Reduce right padding on mobile */
     }
 
-    .links {
-        justify-content: center;
-        order: 1;
+    /* Hide text in home button on mobile screens, keep only the icon */
+    .home-text-zh,
+    .home-text-en {
+        display: none !important;
     }
 
-    .calendar-container {
-        height: 85vh; /* Adjust height to account for footer stats */
-    }
-}
-
-.blog-link, .cyrene-link, .email-link {
-    color: #eb7ea3;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s ease;
-}
-
-.blog-link:hover, .cyrene-link:hover, .email-link:hover {
-    color: #d65c8a;
-    text-decoration: underline;
-}
-
-.footer_stat {
-    text-align: center;
-    color: #666;
-    font-size: 0.9em;
-    padding: 10px 20px;
-    background: rgba(240, 240, 240, 0.9);
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    margin: 0;
-    box-sizing: border-box;
-}
-
-/* Adjust body padding to prevent content from being hidden behind fixed footer stat */
-body {
-    padding-bottom: 50px; /* Adjust based on footer_stat height */
-    font-family: Arial, sans-serif;
-    background: url('../img/amphoreus.webp');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-}
-
-.stats, .copyright, .usage {
-    margin: 0;
-}
-
-/* Portrait mode - when height is much greater than width */
-@media screen and (max-height: 600px), screen and (max-width: 767px) {
-    .calendar-container {
-        height: auto;
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto;
-        min-height: 100vh;
-        max-height: none;
-        grid-template-areas:
-            "image"
-            "calendar"
-            "footer";
-        overflow-y: auto; /* Allow scrolling in portrait mode */
+    /* Make the home button smaller when only showing icon */
+    .home-btn {
+        padding: 8px; /* More compact button when only icon is shown */
+        min-width: auto;
     }
 
-    .image-section {
-        border-radius: 15px 15px 0 0;
-        min-height: 200px;
-        height: 40vh; /* Use viewport height to ensure proper sizing */
-        max-height: 300px;
+    .content {
+        font-size: 1em;
     }
 
-    .month-display {
+    .video-container iframe {
+        height: 250px;
+    }
+
+    #days, #hours, #minutes, #seconds {
+        font-size: 1.5em;
+        min-width: 45px;
+        padding: 5px;
+    }
+
+    .back-to-top-btn {
+        width: 45px;
+        height: 45px;
         bottom: 15px;
-    }
-
-    .month-text {
-        font-size: 2em;
-    }
-
-    .month-title {
-        top: 15px;
-    }
-
-    .calendar-grid {
-        grid-template-rows: 30px 1fr; /* Ensure calendar fills available space */
-        height: auto; /* Allow auto height in portrait */
-    }
-
-    #calendarDays {
-        max-height: 250px; /* Limit max height in portrait mode */
-    }
-
-    .footer {
-        display: none; /* Hide footer in portrait mode */
-        flex-direction: column;
-        gap: 5px;
-        padding: 10px 20px;
-    }
-
-    .info-container {
-        display: flex;
-        justify-content: center;
-        gap: 8px; /* Use separator spacing */
-        order: 1; /* Put info container first */
-        margin-bottom: 5px;
-    }
-
-    .footer-separator {
-        margin: 0 4px; /* Reduce margin in portrait */
-    }
-
-    .links {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        order: 2; /* Put links second */
-        flex-wrap: wrap;
-    }
-
-    body {
-        align-items: flex-start; /* Align to top in portrait mode to allow scrolling */
-        padding: 10px; /* Reduce padding in portrait */
+        right: 15px;
     }
 }
 
-/* Specific portrait mode style for 400px width */
-@media screen and (max-width: 400px) and (orientation: portrait) {
-    .calendar-container {
-        height: auto;
-        grid-template-rows: 35vh 1fr auto;
-        grid-template-areas:
-            "image"
-            "calendar"
-            "footer";
-        border-radius: 15px;
+/* Extra small screens adjustments */
+@media (max-width: 480px) {
+    .home-link {
+        position: absolute;
+        top: 10px;
+        left: 10px;
     }
 
-    .image-section {
-        height: 35vh;
-        max-height: none;
+    .language-switcher {
+        position: absolute;
+        top: 10px;
+        right: 10px;
     }
 
-    .calendar-grid {
-        height: 100%;
+    main {
+        padding-top: 100px; /* Increased padding to prevent overlap on small screens */
+        padding-left: 15px;
+        padding-right: 15px;
     }
 
-    #calendarDays {
-        max-height: none;
-        height: 100%;
+    .home-btn {
+        padding: 8px; /* Make the home button smaller when only showing icon */
+        min-width: auto;
     }
 
-    /* Hide footer information and links in portrait mode on small screens */
-    .footer {
-        display: none;
+    .lang-toggle-btn {
+        padding: 6px 10px; /* More compact button */
+        font-size: 12px; /* Smaller font */
     }
 }
 
+/* For very narrow screens (like portrait mode on some phones), stack buttons vertically */
+@media (max-width: 360px) {
+    .language-switcher {
+        position: absolute;
+        top: 50px; /* Position below the home button */
+        right: 10px;
+    }
+
+    main {
+        padding-top: 120px; /* Increased top padding to account for vertically stacked buttons */
+    }
+}
