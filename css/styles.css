@@ -163,6 +163,29 @@ body::before {
     }
 }
 
+/* Combined footer styling */
+.font-credit {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.font-credit p {
+    margin: 5px 0; /* Add spacing between copyright lines */
+}
+
+.font-credit a {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: underline;
+}
+
+.font-credit a:hover {
+    color: white;
+}
+
 main {
     display: flex;
     flex-direction: column;

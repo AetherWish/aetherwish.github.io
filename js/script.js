@@ -74,6 +74,8 @@ function initLanguageToggle() {
     const countdownSubText = document.querySelector('.countdown-sub-text');
     const calendarToggleTextZh = document.querySelector('.calendar-toggle-text-zh');
     const calendarToggleTextEn = document.querySelector('.calendar-toggle-text-en');
+    const copyrightNoticeZh = document.querySelector('.copyright-notice-zh');
+    const copyrightNoticeEn = document.querySelector('.copyright-notice-en');
     let isEnglish = false;
 
     langToggleBtn.addEventListener('click', function() {
@@ -109,6 +111,10 @@ function initLanguageToggle() {
             if (calendarToggleTextZh) calendarToggleTextZh.style.display = 'none';
             if (calendarToggleTextEn) calendarToggleTextEn.style.display = 'inline';
 
+            // 切换版权申明
+            if (copyrightNoticeZh) copyrightNoticeZh.style.display = 'none';
+            if (copyrightNoticeEn) copyrightNoticeEn.style.display = 'block';
+
             // 更新页面语言属性
             document.documentElement.lang = 'en';
         } else {
@@ -140,6 +146,10 @@ function initLanguageToggle() {
             // 切换日历切换文本
             if (calendarToggleTextZh) calendarToggleTextZh.style.display = 'inline';
             if (calendarToggleTextEn) calendarToggleTextEn.style.display = 'none';
+
+            // 切换版权申明
+            if (copyrightNoticeZh) copyrightNoticeZh.style.display = 'block';
+            if (copyrightNoticeEn) copyrightNoticeEn.style.display = 'none';
 
             // 更新页面语言属性
             document.documentElement.lang = 'zh-CN';
