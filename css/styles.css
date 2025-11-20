@@ -161,6 +161,33 @@ body::before {
     .calendar-toggle-icon {
         margin-right: 0;
     }
+
+    /* Make both buttons consistent in size and shape on mobile */
+    .calendar-toggle-btn {
+        padding: 8px !important; /* Force consistent padding */
+        min-width: 40px; /* Consistent minimum width */
+        min-height: 40px; /* Consistent minimum height */
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center;
+    }
+
+    .lang-toggle-btn {
+        padding: 8px !important; /* Force consistent padding */
+        min-width: 40px; /* Consistent minimum width */
+        min-height: 40px; /* Consistent minimum height */
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center;
+    }
+
+    /* Align both buttons to the same height and position */
+    .calendar-switcher,
+    .language-switcher {
+        top: 10px; /* Ensure consistent top positioning */
+    }
 }
 
 /* Combined footer styling */
@@ -403,7 +430,6 @@ main {
     }
 
     .lang-toggle-btn {
-        padding: 6px 10px; /* More compact button */
         font-size: 12px; /* Smaller font */
     }
 }
