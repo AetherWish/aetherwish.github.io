@@ -1,7 +1,7 @@
 // 倒计时功能
 function updateCountdown() {
-    // 设置目标日期为2026年11月12日中午12点整
-    const targetDate = new Date('2026-11-12T12:00:00').getTime();
+    // 设置目标日期为2026年11月12日13点整
+    const targetDate = new Date('2026-11-12T13:00:00').getTime();
     const currentDate = new Date().getTime();
 
     // 计算时间差
@@ -16,9 +16,9 @@ function updateCountdown() {
 
         // 当倒计时结束时，显示特殊文本
         if (document.documentElement.lang === 'zh-CN') {
-            document.querySelector('.countdown-main-text-zh').textContent = '已到达';
+            document.querySelector('.countdown-main-text-zh').textContent = '你好，世界！';
         } else {
-            document.querySelector('.countdown-main-text-en').textContent = 'Arrived';
+            document.querySelector('.countdown-main-text-en').textContent = 'Hello World!';
         }
         return;
     }
