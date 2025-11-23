@@ -176,7 +176,9 @@ body::before {
 /* WebKit-specific styling for the audio button */
 .audio-toggle-btn {
     -webkit-appearance: none; /* Remove default WebKit styling */
+    appearance: none;
     -webkit-user-select: none; /* Prevent text selection in WebKit */
+    user-select: none;
     outline: none; /* Prevent default outline */
 }
 
