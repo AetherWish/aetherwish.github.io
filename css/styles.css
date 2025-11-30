@@ -435,6 +435,32 @@ main {
     color: white;
 }
 
+/* Statistics container styling */
+.statistics-container {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.statistics-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.statistics-item span[style*="display: none"] {
+    display: none !important;
+}
+
+.separator {
+    color: rgba(255, 255, 255, 0.5);
+}
+
 /* 返回顶部按钮 */
 .back-to-top-btn {
     position: fixed;  /* Changed from absolute to fixed to position relative to viewport */

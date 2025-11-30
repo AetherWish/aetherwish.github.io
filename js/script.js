@@ -76,6 +76,11 @@ function initLanguageToggle() {
     const calendarToggleTextEn = document.querySelector('.calendar-toggle-text-en');
     const copyrightNoticeZh = document.querySelector('.copyright-notice-zh');
     const copyrightNoticeEn = document.querySelector('.copyright-notice-en');
+
+    // Add selectors for statistics elements
+    const statisticsTextZh = document.querySelectorAll('.statistics-text-zh');
+    const statisticsTextEn = document.querySelectorAll('.statistics-text-en');
+
     let isEnglish = false;
 
     langToggleBtn.addEventListener('click', function() {
@@ -115,6 +120,14 @@ function initLanguageToggle() {
             if (copyrightNoticeZh) copyrightNoticeZh.style.display = 'none';
             if (copyrightNoticeEn) copyrightNoticeEn.style.display = 'block';
 
+            // 切换 statistics text
+            statisticsTextZh.forEach(text => {
+                text.style.display = 'none';
+            });
+            statisticsTextEn.forEach(text => {
+                text.style.display = 'inline';
+            });
+
             // 更新页面语言属性
             document.documentElement.lang = 'en';
         } else {
@@ -150,6 +163,14 @@ function initLanguageToggle() {
             // 切换版权申明
             if (copyrightNoticeZh) copyrightNoticeZh.style.display = 'block';
             if (copyrightNoticeEn) copyrightNoticeEn.style.display = 'none';
+
+            // 切换 statistics text
+            statisticsTextZh.forEach(text => {
+                text.style.display = 'inline';
+            });
+            statisticsTextEn.forEach(text => {
+                text.style.display = 'none';
+            });
 
             // 更新页面语言属性
             document.documentElement.lang = 'zh-CN';
