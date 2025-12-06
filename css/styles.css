@@ -7,7 +7,7 @@
 /* Define the XiaolaiMono font */
 @font-face {
     font-family: 'XiaolaiMono';
-    src: url('/font/XiaolaiMono-Regular.ttf') format('truetype');
+    src: url('../font/XiaolaiMono-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
     font-display: swap; /* Ensures text remains visible while font is loading */
