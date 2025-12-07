@@ -285,6 +285,8 @@ function initBackToTop() {
 
 // 页面加载完成后开始倒计时和返回顶部功能
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("嗨~想我了吗♪")
+    
     // 立即更新一次倒计时
     updateCountdown();
 
