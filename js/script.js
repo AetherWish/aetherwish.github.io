@@ -42,16 +42,16 @@ function updateCountdown() {
     if (days < 1) {
         // 剩余不到一天时，显示"明天见"和对应的英文
         if (document.documentElement.lang === 'zh-CN') {
-            countdownMainTextZh.textContent = '明天见，「PHILIA093」';
+            countdownMainTextZh.textContent = '明天见，「PhiLia093」';
         } else {
-            countdownMainTextEn.textContent = 'See you tomorrow, PHILIA093';
+            countdownMainTextEn.textContent = 'See you tomorrow, PhiLia093';
         }
     } else {
         // 剩余一天或以上时，显示"下次见"和对应的英文
         if (document.documentElement.lang === 'zh-CN') {
-            countdownMainTextZh.textContent = '下次见，「PHILIA093」';
+            countdownMainTextZh.textContent = '下次见，「PhiLia093」';
         } else {
-            countdownMainTextEn.textContent = 'See you soon, PHILIA093';
+            countdownMainTextEn.textContent = 'See you soon, PhiLia093';
         }
     }
 }
