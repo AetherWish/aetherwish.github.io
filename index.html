@@ -19,8 +19,7 @@
                         <path d="M704 224c17.696 0 32-14.304 32-32L736 96c0-17.696-14.304-32-32-32s-32 14.304-32 32l0 96C672 209.696 686.304 224 704 224z" fill="white"></path>
                         <path d="M352 224c17.696 0 32-14.304 32-32L384 96c0-17.696-14.304-32-32-32s-32 14.304-32 32l0 96C320 209.696 334.304 224 352 224z" fill="white"></path>
                     </svg>
-                    <span class="calendar-toggle-text-zh">翁法罗斯一年历</span>
-                    <span class="calendar-toggle-text-en" style="display: none;">Amphoreus calendar</span>
+                    <span id="calendarToggleText">翁法罗斯一年历</span>
                 </a>
             </div>
             <div class="language-switcher">
@@ -34,76 +33,61 @@
                 </button>
             </div>
             <div class="content">
-                <div class="chinese-content">
-                    <!-- 内容将由translation.js动态填充 -->
-                </div>
-                <div class="english-content" style="display: none;">
+                <div id="mainContent">
                     <!-- 内容将由translation.js动态填充 -->
                 </div>
             </div>
 
             <div class="countdown-container">
-                <h2 class="countdown-main-text">
-                    <span class="countdown-main-text-zh">下次见, 「PhiLia093」</span>
-                    <span class="countdown-main-text-en" style="display: none;">See you soon, PhiLia093</span>
-                </h2>
+                <h2 id="countdownMainText">下次见, 「PhiLia093」</h2>
                 <div id="countdown" class="countdown">
                     <div class="countdown-item">
                         <span id="days">00</span>
-                        <span class="label">天</span>
-                        <span class="label-en" style="display: none;">d</span>
+                        <span id="daysLabel" class="label">天</span>
                     </div>
                     <div class="countdown-item">
                         <span id="hours">00</span>
-                        <span class="label">时</span>
-                        <span class="label-en" style="display: none;">h</span>
+                        <span id="hoursLabel" class="label">时</span>
                     </div>
                     <div class="countdown-item">
                         <span id="minutes">00</span>
-                        <span class="label">分</span>
-                        <span class="label-en" style="display: none;">m</span>
+                        <span id="minutesLabel" class="label">分</span>
                     </div>
                     <div class="countdown-item">
                         <span id="seconds">00</span>
-                        <span class="label">秒</span>
-                        <span class="label-en" style="display: none;">s</span>
+                        <span id="secondsLabel" class="label">秒</span>
                     </div>
                 </div>
-                <h3 class="countdown-sub-text">
-                    <span class="chinese-countdown-text">距离2026年11月12日13:00还有</span>
-                    <span class="english-countdown-text" style="display: none;">Time until Nov 12, 2026 1:00 PM</span>
-                </h3>
+                <h3 id="countdownSubText">距离2026年11月12日13:00还有</h3>
             </div>
 
             <div class="video-container">
                 <video controls width="100%" preload="metadata">
                     <source src="https://fastcdn.mihoyo.com/content-v2/hkrpg/160743/cb5f8aa92adc45ac2300a328a15453b1_4468579145965178971.mp4" type="video/mp4">
-                    当前浏览器不支持视频播放♪
+                    <span id="videoUnsupportedText">当前浏览器不支持视频播放♪</span>
                 </video>
             </div>
         </main>
         <footer class="font-credit">
-            <p class="copyright-notice-zh">© 2025 <a href="mailto:aetherwish@cyrene.icu">AetherWish</a>. <a href="https://sr.mihoyo.com/" target="_blank" rel="noopener noreferrer">《崩坏：星穹铁道》</a>音乐、美术及文本素材版权归 miHoYo 所有。</p>
-            <p class="copyright-notice-en" style="display: none;">© 2025 <a href="mailto:aetherwish@cyrene.icu">AetherWish</a>. <a href="https://hsr.hoyoverse.com/" target="_blank" rel="noopener noreferrer">Honkai: Star Rail</a> music, artwork & text copyright by COGNOSPHERE.</p>
-            <p class="font-credit-zh">本站使用了基于 OFL 1.1 协议开源的<a href="https://github.com/lxgw/kose-font/releases/tag/v3.126" target="_blank" rel="noopener noreferrer">小赖字体等宽版本</a></p>
-            <p class="font-credit-en" style="display: none;">This site uses <a href="https://github.com/lxgw/kose-font/releases/tag/v3.126" target="_blank" rel="noopener noreferrer">XiaolaiMono-Regular</a> which is open source under the OFL 1.1 license</p>
+            <p id="copyrightNotice">
+                © 2025 <a href="mailto:aetherwish@cyrene.icu">AetherWish</a>. <a href="https://sr.mihoyo.com/" target="_blank" rel="noopener noreferrer">《崩坏：星穹铁道》</a>音乐、美术及文本素材版权归 miHoYo 所有。
+            </p>
+            <p id="fontCredit">
+                本站使用了基于 OFL 1.1 协议开源的<a href="https://github.com/lxgw/kose-font/releases/tag/v3.126" target="_blank" rel="noopener noreferrer">小赖字体等宽版本</a>
+            </p>
 
             <!-- Website statistics using Busuanzi from calendar service -->
             <div class="statistics-container">
                 <span class="statistics-item">
-                    <span class="statistics-text-zh">总访问量</span>
-                    <span class="statistics-text-en" style="display: none;">Total Views: </span>
+                    <span id="totalViewsLabel">总访问量</span>
                     <span id="busuanzi_value_site_pv"></span>
-                    <span class="statistics-text-zh">次</span>
-                    <span class="statistics-text-en" style="display: none;"></span>
+                    <span id="viewsUnit">次</span>
                 </span>
                 <span class="separator">|</span>
                 <span class="statistics-item">
-                    <span class="statistics-text-zh">总访客数</span>
-                    <span class="statistics-text-en" style="display: none;">Individual Visitors: </span>
+                    <span id="individualVisitorsLabel">总访客数</span>
                     <span id="busuanzi_value_site_uv"></span>
-                    <span class="statistics-text-zh">人</span>
-                    <span class="statistics-text-en" style="display: none;"></span>
+                    <span id="visitorsUnit">人</span>
                 </span>
             </div>
         </footer>

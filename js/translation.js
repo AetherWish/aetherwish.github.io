@@ -105,154 +105,83 @@ class TranslationManager {
         }
 
         // 更新日历切换按钮文本
-        const calendarToggleTextZh = document.querySelector('.calendar-toggle-text-zh');
-        const calendarToggleTextEn = document.querySelector('.calendar-toggle-text-en');
-        if (calendarToggleTextZh) {
-            calendarToggleTextZh.textContent = this.t('calendarToggle');
-            calendarToggleTextZh.style.display = this.currentLang === 'zh-CN' ? 'inline' : 'none';
-        }
-        if (calendarToggleTextEn) {
-            calendarToggleTextEn.textContent = this.t('calendarToggle');
-            calendarToggleTextEn.style.display = this.currentLang === 'en' ? 'inline' : 'none';
+        const calendarToggleText = document.getElementById('calendarToggleText');
+        if (calendarToggleText) {
+            calendarToggleText.textContent = this.t('calendarToggle');
         }
 
         // 更新主内容区域
-        const chineseContent = document.querySelector('.chinese-content');
-        const englishContent = document.querySelector('.english-content');
-        
-        if (chineseContent && englishContent) {
+        const mainContent = document.getElementById('mainContent');
+        if (mainContent) {
             // 先清空内容
-            chineseContent.innerHTML = '';
-            englishContent.innerHTML = '';
-            
+            mainContent.innerHTML = '';
+
             // 获取当前语言的内容
             const contentArray = this.t('mainContent');
-            const isEnglish = this.currentLang === 'en';
-            
+
             // 填充内容
             contentArray.forEach(paragraph => {
                 const p = document.createElement('p');
                 p.innerHTML = paragraph; // 使用innerHTML支持内部标签
-                if (isEnglish) {
-                    englishContent.appendChild(p);
-                } else {
-                    chineseContent.appendChild(p);
-                }
+                mainContent.appendChild(p);
             });
-            
-            // 显示对应语言的内容
-            chineseContent.style.display = this.currentLang === 'zh-CN' ? 'block' : 'none';
-            englishContent.style.display = this.currentLang === 'en' ? 'block' : 'none';
         }
 
-        // 更新倒计时文本 - 初始化时只设置显示/隐藏状态
-        const countdownMainTextZh = document.querySelector('.countdown-main-text-zh');
-        const countdownMainTextEn = document.querySelector('.countdown-main-text-en');
-        
-        if (countdownMainTextZh) {
-            // 不设置文本内容，因为 updateCountdown 函数会根据实际天数设置
-            countdownMainTextZh.style.display = this.currentLang === 'zh-CN' ? 'inline' : 'none';
-        }
-        if (countdownMainTextEn) {
-            // 不设置文本内容，因为 updateCountdown 函数会根据实际天数设置
-            countdownMainTextEn.style.display = this.currentLang === 'en' ? 'inline' : 'none';
-        }
+        // 更新倒计时主文本 - 重要：需要立即更新倒计时文本
+        this.updateCountdownText();
 
-        const chineseCountdownText = document.querySelector('.chinese-countdown-text');
-        const englishCountdownText = document.querySelector('.english-countdown-text');
-        
-        if (chineseCountdownText) {
-            chineseCountdownText.textContent = this.t('countdownSub');
-            chineseCountdownText.style.display = this.currentLang === 'zh-CN' ? 'block' : 'none';
-        }
-        if (englishCountdownText) {
-            englishCountdownText.textContent = this.t('countdownSub');
-            englishCountdownText.style.display = this.currentLang === 'en' ? 'block' : 'none';
+        // 更新倒计时副文本
+        const countdownSubText = document.getElementById('countdownSubText');
+        if (countdownSubText) {
+            countdownSubText.textContent = this.t('countdownSub');
         }
 
         // 更新倒计时标签
-        const chineseLabels = document.querySelectorAll('.label');
-        const englishLabels = document.querySelectorAll('.label-en');
-        const countdownLabels = this.t('countdownLabels');
-        
-        chineseLabels.forEach((label, index) => {
-            label.textContent = countdownLabels[index];
-            label.style.display = this.currentLang === 'zh-CN' ? 'block' : 'none';
-        });
-        
-        englishLabels.forEach((label, index) => {
-            label.textContent = countdownLabels[index];
-            label.style.display = this.currentLang === 'en' ? 'block' : 'none';
-        });
+        const daysLabel = document.getElementById('daysLabel');
+        const hoursLabel = document.getElementById('hoursLabel');
+        const minutesLabel = document.getElementById('minutesLabel');
+        const secondsLabel = document.getElementById('secondsLabel');
+
+        if (daysLabel) daysLabel.textContent = this.t('countdownLabels')[0];
+        if (hoursLabel) hoursLabel.textContent = this.t('countdownLabels')[1];
+        if (minutesLabel) minutesLabel.textContent = this.t('countdownLabels')[2];
+        if (secondsLabel) secondsLabel.textContent = this.t('countdownLabels')[3];
 
         // 更新版权信息
-        const copyrightNoticeZh = document.querySelector('.copyright-notice-zh');
-        const copyrightNoticeEn = document.querySelector('.copyright-notice-en');
-        
-        if (copyrightNoticeZh) {
-            copyrightNoticeZh.innerHTML = this.t('copyright');
-            copyrightNoticeZh.style.display = this.currentLang === 'zh-CN' ? 'block' : 'none';
-        }
-        if (copyrightNoticeEn) {
-            copyrightNoticeEn.innerHTML = this.t('copyright');
-            copyrightNoticeEn.style.display = this.currentLang === 'en' ? 'block' : 'none';
+        const copyrightNotice = document.getElementById('copyrightNotice');
+        if (copyrightNotice) {
+            copyrightNotice.innerHTML = this.t('copyright');
         }
 
         // 更新字体版权信息
-        const chineseFontCredit = document.querySelector('.font-credit-zh');
-        const englishFontCredit = document.querySelector('.font-credit-en');
-        
-        if (chineseFontCredit) {
-            chineseFontCredit.innerHTML = this.t('fontCredit');
-            chineseFontCredit.style.display = this.currentLang === 'zh-CN' ? 'block' : 'none';
-        }
-        if (englishFontCredit) {
-            englishFontCredit.innerHTML = this.t('fontCredit');
-            englishFontCredit.style.display = this.currentLang === 'en' ? 'block' : 'none';
+        const fontCredit = document.getElementById('fontCredit');
+        if (fontCredit) {
+            fontCredit.innerHTML = this.t('fontCredit');
         }
 
         // 更新统计文本
-        const statisticsTextZh = document.querySelectorAll('.statistics-text-zh');
-        const statisticsTextEn = document.querySelectorAll('.statistics-text-en');
-        
-        if (statisticsTextZh[0]) {
-            statisticsTextZh[0].textContent = this.t('statistics', 'totalViews');
-            statisticsTextZh[0].style.display = this.currentLang === 'zh-CN' ? 'inline' : 'none';
+        const totalViewsLabel = document.getElementById('totalViewsLabel');
+        const individualVisitorsLabel = document.getElementById('individualVisitorsLabel');
+        const viewsUnit = document.getElementById('viewsUnit');
+        const visitorsUnit = document.getElementById('visitorsUnit');
+
+        if (totalViewsLabel) {
+            totalViewsLabel.textContent = this.t('statistics', 'totalViews');
         }
-        if (statisticsTextZh[1]) {
-            statisticsTextZh[1].textContent = this.t('statistics', 'viewsUnit');
-            statisticsTextZh[1].style.display = this.currentLang === 'zh-CN' ? 'inline' : 'none';
+        if (individualVisitorsLabel) {
+            individualVisitorsLabel.textContent = this.t('statistics', 'individualVisitors');
         }
-        if (statisticsTextZh[2]) {
-            statisticsTextZh[2].textContent = this.t('statistics', 'individualVisitors');
-            statisticsTextZh[2].style.display = this.currentLang === 'zh-CN' ? 'inline' : 'none';
+        if (viewsUnit) {
+            viewsUnit.textContent = this.t('statistics', 'viewsUnit');
         }
-        if (statisticsTextZh[3]) {
-            statisticsTextZh[3].textContent = this.t('statistics', 'visitorsUnit');
-            statisticsTextZh[3].style.display = this.currentLang === 'zh-CN' ? 'inline' : 'none';
-        }
-        
-        if (statisticsTextEn[0]) {
-            statisticsTextEn[0].textContent = this.t('statistics', 'totalViews');
-            statisticsTextEn[0].style.display = this.currentLang === 'en' ? 'inline' : 'none';
-        }
-        if (statisticsTextEn[2]) {
-            statisticsTextEn[2].textContent = this.t('statistics', 'individualVisitors');
-            statisticsTextEn[2].style.display = this.currentLang === 'en' ? 'inline' : 'none';
+        if (visitorsUnit) {
+            visitorsUnit.textContent = this.t('statistics', 'visitorsUnit');
         }
 
         // 更新视频不支持文本
-        const videoElement = document.querySelector('video');
-        if (videoElement) {
-            // 找到或创建不支持文本
-            let unsupportedText = videoElement.querySelector('.unsupported-text');
-            if (!unsupportedText) {
-                unsupportedText = document.createElement('div');
-                unsupportedText.className = 'unsupported-text';
-                videoElement.parentNode.insertBefore(unsupportedText, videoElement.nextSibling);
-            }
-            unsupportedText.textContent = this.t('videoUnsupported');
-            unsupportedText.style.display = 'none'; // 默认隐藏，只在需要时显示
+        const videoUnsupportedText = document.getElementById('videoUnsupportedText');
+        if (videoUnsupportedText) {
+            videoUnsupportedText.textContent = this.t('videoUnsupported');
         }
 
         // 更新返回顶部按钮的title属性
@@ -262,30 +191,38 @@ class TranslationManager {
         }
     }
 
+    // 更新倒计时文本 - 独立方法，可在语言切换时立即调用
+    updateCountdownText() {
+        // 计算剩余时间以确定显示的文本
+        const targetDate = new Date('2026-11-12T13:00:00').getTime();
+        const currentDate = new Date().getTime();
+        const timeDifference = targetDate - currentDate;
+
+        let daysRemaining;
+        if (timeDifference <= 0) {
+            daysRemaining = -1; // 已结束
+        } else {
+            daysRemaining = timeDifference / (1000 * 60 * 60 * 24); // 以天为单位
+        }
+
+        this.updateCountdownMainText(daysRemaining);
+    }
+
     // 更新倒计时主文本的特殊方法（考虑剩余时间）
     updateCountdownMainText(daysRemaining) {
-        const countdownMainTextZh = document.querySelector('.countdown-main-text-zh');
-        const countdownMainTextEn = document.querySelector('.countdown-main-text-en');
-        let zhText, enText;
-        
+        const countdownMainText = document.getElementById('countdownMainText');
+        let text;
+
         if (daysRemaining <= 0) {
-            zhText = translations['zh-CN']['countdownMainExpired'];
-            enText = translations['en']['countdownMainExpired'];
+            text = this.t('countdownMainExpired');
         } else if (daysRemaining < 1) {
-            zhText = translations['zh-CN']['countdownMainTomorrow'];
-            enText = translations['en']['countdownMainTomorrow'];
+            text = this.t('countdownMainTomorrow');
         } else {
-            zhText = translations['zh-CN']['countdownMain'];
-            enText = translations['en']['countdownMain'];
+            text = this.t('countdownMain');
         }
-        
-        if (countdownMainTextZh) {
-            countdownMainTextZh.textContent = zhText;
-            countdownMainTextZh.style.display = this.currentLang === 'zh-CN' ? 'inline' : 'none';
-        }
-        if (countdownMainTextEn) {
-            countdownMainTextEn.textContent = enText;
-            countdownMainTextEn.style.display = this.currentLang === 'en' ? 'inline' : 'none';
+
+        if (countdownMainText) {
+            countdownMainText.textContent = text;
         }
     }
 }
