@@ -15,10 +15,8 @@ function updateCountdown() {
         document.getElementById('seconds').innerText = '00';
 
         // 当倒计时结束时，显示特殊文本
-        if (document.documentElement.lang === 'zh-CN') {
-            document.querySelector('.countdown-main-text-zh').textContent = '你好，世界！';
-        } else {
-            document.querySelector('.countdown-main-text-en').textContent = 'Hello World!';
+        if (translationManager) {
+            translationManager.updateCountdownMainText(-1); // 传入-1表示已结束
         }
         return;
     }
@@ -28,6 +26,7 @@ function updateCountdown() {
     const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+    const actualDays = timeDifference / (1000 * 60 * 60 * 24);
 
     // 更新倒计时显示
     document.getElementById('days').innerText = String(days).padStart(2, '0');
@@ -36,146 +35,23 @@ function updateCountdown() {
     document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
 
     // 根据天数更新文本
-    const countdownMainTextZh = document.querySelector('.countdown-main-text-zh');
-    const countdownMainTextEn = document.querySelector('.countdown-main-text-en');
-
-    if (days < 1) {
-        // 剩余不到一天时，显示"明天见"和对应的英文
-        if (document.documentElement.lang === 'zh-CN') {
-            countdownMainTextZh.textContent = '明天见，「PhiLia093」';
-        } else {
-            countdownMainTextEn.textContent = 'See you tomorrow, PhiLia093';
-        }
-    } else {
-        // 剩余一天或以上时，显示"下次见"和对应的英文
-        if (document.documentElement.lang === 'zh-CN') {
-            countdownMainTextZh.textContent = '下次见，「PhiLia093」';
-        } else {
-            countdownMainTextEn.textContent = 'See you soon, PhiLia093';
-        }
+    if (translationManager) {
+        translationManager.updateCountdownMainText(actualDays);
     }
 }
 
 // 语言切换功能
 function initLanguageToggle() {
     const langToggleBtn = document.getElementById('langToggle');
-    const chineseContent = document.querySelector('.chinese-content');
-    const englishContent = document.querySelector('.english-content');
-    const chineseCountdownText = document.querySelector('.chinese-countdown-text');
-    const englishCountdownText = document.querySelector('.english-countdown-text');
-    const chineseLabels = document.querySelectorAll('.label');
-    const englishLabels = document.querySelectorAll('.label-en');
-    const homeTextZh = document.querySelector('.home-text-zh');  // May be null since home button was removed
-    const homeTextEn = document.querySelector('.home-text-en');  // May be null since home button was removed
-    const chineseFontCredit = document.querySelector('.font-credit-zh');
-    const englishFontCredit = document.querySelector('.font-credit-en');
-    const countdownMainTextZh = document.querySelector('.countdown-main-text-zh');
-    const countdownMainTextEn = document.querySelector('.countdown-main-text-en');
-    const countdownSubText = document.querySelector('.countdown-sub-text');
-    const calendarToggleTextZh = document.querySelector('.calendar-toggle-text-zh');
-    const calendarToggleTextEn = document.querySelector('.calendar-toggle-text-en');
-    const copyrightNoticeZh = document.querySelector('.copyright-notice-zh');
-    const copyrightNoticeEn = document.querySelector('.copyright-notice-en');
 
-    // Add selectors for statistics elements
-    const statisticsTextZh = document.querySelectorAll('.statistics-text-zh');
-    const statisticsTextEn = document.querySelectorAll('.statistics-text-en');
-
-    let isEnglish = false;
-
-    langToggleBtn.addEventListener('click', function() {
-        isEnglish = !isEnglish;
-
-        if (isEnglish) {
-            // 切换到英文
-            langToggleBtn.textContent = '你好，世界';
-            chineseContent.style.display = 'none';
-            englishContent.style.display = 'block';
-            chineseCountdownText.style.display = 'none';
-            englishCountdownText.style.display = 'block';
-
-            // 显示英文标签
-            chineseLabels.forEach(label => {
-                label.style.display = 'none';
-            });
-            englishLabels.forEach(label => {
-                label.style.display = 'block';
-            });
-
-            // 切换倒计时文本
-            if (countdownMainTextZh) countdownMainTextZh.style.display = 'none';
-            if (countdownMainTextEn) countdownMainTextEn.style.display = 'inline';
-            chineseCountdownText.style.display = 'none';
-            englishCountdownText.style.display = 'inline';
-
-            // 切换字体版权信息
-            if (chineseFontCredit) chineseFontCredit.style.display = 'none';
-            if (englishFontCredit) englishFontCredit.style.display = 'block';
-
-            // 切换日历切换文本
-            if (calendarToggleTextZh) calendarToggleTextZh.style.display = 'none';
-            if (calendarToggleTextEn) calendarToggleTextEn.style.display = 'inline';
-
-            // 切换版权申明
-            if (copyrightNoticeZh) copyrightNoticeZh.style.display = 'none';
-            if (copyrightNoticeEn) copyrightNoticeEn.style.display = 'block';
-
-            // 切换 statistics text
-            statisticsTextZh.forEach(text => {
-                text.style.display = 'none';
-            });
-            statisticsTextEn.forEach(text => {
-                text.style.display = 'inline';
-            });
-
-            // 更新页面语言属性
-            document.documentElement.lang = 'en';
-        } else {
-            // 切换到中文
-            langToggleBtn.textContent = 'Hello World';
-            chineseContent.style.display = 'block';
-            englishContent.style.display = 'none';
-            chineseCountdownText.style.display = 'block';
-            englishCountdownText.style.display = 'none';
-
-            // 显示中文标签
-            chineseLabels.forEach(label => {
-                label.style.display = 'block';
-            });
-            englishLabels.forEach(label => {
-                label.style.display = 'none';
-            });
-
-            // 切换倒计时文本
-            if (countdownMainTextZh) countdownMainTextZh.style.display = 'inline';
-            if (countdownMainTextEn) countdownMainTextEn.style.display = 'none';
-            chineseCountdownText.style.display = 'inline';
-            englishCountdownText.style.display = 'none';
-
-            // 切换字体版权信息
-            if (chineseFontCredit) chineseFontCredit.style.display = 'block';
-            if (englishFontCredit) englishFontCredit.style.display = 'none';
-
-            // 切换日历切换文本
-            if (calendarToggleTextZh) calendarToggleTextZh.style.display = 'inline';
-            if (calendarToggleTextEn) calendarToggleTextEn.style.display = 'none';
-
-            // 切换版权申明
-            if (copyrightNoticeZh) copyrightNoticeZh.style.display = 'block';
-            if (copyrightNoticeEn) copyrightNoticeEn.style.display = 'none';
-
-            // 切换 statistics text
-            statisticsTextZh.forEach(text => {
-                text.style.display = 'inline';
-            });
-            statisticsTextEn.forEach(text => {
-                text.style.display = 'none';
-            });
-
-            // 更新页面语言属性
-            document.documentElement.lang = 'zh-CN';
-        }
-    });
+    // 初始化翻译管理器
+    if (typeof TranslationManager !== 'undefined') {
+        translationManager = new TranslationManager();
+        
+        langToggleBtn.addEventListener('click', function() {
+            translationManager.toggleLanguage();
+        });
+    }
 };
 
 // 音频控制功能
@@ -287,7 +163,10 @@ function initBackToTop() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log("嗨~想我了吗♪")
     
-    // 立即更新一次倒计时
+    // 先初始化语言切换功能，创建翻译管理器
+    initLanguageToggle();
+    
+    // 然后立即更新一次倒计时
     updateCountdown();
 
     // 每秒更新一次倒计时
@@ -295,9 +174,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 初始化返回顶部功能
     initBackToTop();
-
-    // 初始化语言切换功能
-    initLanguageToggle();
 
     // 初始化音频切换功能
     initAudioToggle();
