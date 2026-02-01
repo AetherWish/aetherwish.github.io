@@ -4,6 +4,11 @@ const translations = {
         langToggle: 'Hello World',
         calendarToggle: '翁法罗斯一年历',
         mainContent: [
+            '......昔涟是。哭着诞生的。脆弱的。透明的。像是水晶的。',
+            '昔涟是。笑着道别的。柔软的。粉色的。像是花的。',
+            '「二相乐园」将至，但开拓者们仍然思念着这位被留在「昨天」的她......'
+        ],
+        mainContentBak: [
             '昔涟。是桃子。是爱。',
             '昔涟有。粉色的发。尖尖的耳。',
             '昔涟是。女孩。是祭司。',
@@ -17,7 +22,7 @@ const translations = {
         countdownMain: '下次见, 「PhiLia093」',
         countdownMainTomorrow: '明天见，「PhiLia093」',
         countdownMainExpired: '你好，世界！',
-        countdownSub: '距离2026年11月12日13:00还有',
+        countdownSub: '距离2026年11月12日13:00（4.6期间）还有',
         countdownLabels: ['天', '时', '分', '秒'],
         copyright: '© 2025 <a href="mailto:aetherwish@cyrene.icu">AetherWish</a>. <a href="https://sr.mihoyo.com/" target="_blank" rel="noopener noreferrer">《崩坏：星穹铁道》</a>音乐、美术及文本素材版权归 miHoYo 所有。',
         fontCredit: '本站使用了基于 OFL 1.1 协议开源的<a href="https://github.com/lxgw/kose-font/releases/tag/v3.126" target="_blank" rel="noopener noreferrer">小赖字体等宽版本</a>',
@@ -27,13 +32,18 @@ const translations = {
             viewsUnit: '次',
             visitorsUnit: '人'
         },
-        videoUnsupported: '当前浏览器不支持视频播放♪',
+        videoUnsupported: '当前浏览器不支持视频播放哦♪',
         backToTop: '返回顶部'
     },
     'en': {
         langToggle: '你好，世界',
         calendarToggle: 'Amphoreus calendar',
         mainContent: [
+            '......Cyrene <b>was</b>, crying when she was born. Fragile. Transparent. Like a crystal.',
+            'Cyrene <b>was</b>, smiling when she said goodbye. Soft. Pink. Like a flower.',
+            '<em>Planarcadia</em> is to arrive. Still, Trailblazers will miss HER who was left in YESTERDAY.'
+        ],
+        mainContentBak: [
             'Cyrene. Is Peach. Is love.',
             'Cyrene has. Pink hair. Sharp ears.',
             'Cyrene is. A girl. A priest.',
@@ -47,7 +57,7 @@ const translations = {
         countdownMain: 'See you soon, PhiLia093',
         countdownMainTomorrow: 'See you tomorrow, PhiLia093',
         countdownMainExpired: 'Hello World!',
-        countdownSub: 'Time until Nov 12, 2026 1:00 PM',
+        countdownSub: 'Time until Nov 12, 2026 1:00 PM (during ver.4.6)',
         countdownLabels: ['d', 'h', 'm', 's'],
         copyright: '© 2025 <a href="mailto:aetherwish@cyrene.icu">AetherWish</a>. <a href="https://hsr.hoyoverse.com/" target="_blank" rel="noopener noreferrer">Honkai: Star Rail</a> music, artwork & text copyright by COGNOSPHERE.',
         fontCredit: 'This site uses <a href="https://github.com/lxgw/kose-font/releases/tag/v3.126" target="_blank" rel="noopener noreferrer">XiaolaiMono-Regular</a> which is open source under the OFL 1.1 license',
