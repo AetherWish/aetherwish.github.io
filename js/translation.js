@@ -24,8 +24,8 @@ const translations = {
         countdownMainExpired: '你好，世界！',
         countdownSub: '距离2026年11月12日13:00（4.6期间）还有',
         countdownLabels: ['天', '时', '分', '秒'],
-        copyright: '© 2025 <a href="mailto:aetherwish@cyrene.icu">AetherWish</a>. <a href="https://sr.mihoyo.com/" target="_blank" rel="noopener noreferrer">《崩坏：星穹铁道》</a>音乐、美术及文本素材版权归 miHoYo 所有。',
-        fontCredit: '本站使用了基于 OFL 1.1 协议开源的<a href="https://github.com/lxgw/kose-font/releases/tag/v3.126" target="_blank" rel="noopener noreferrer">小赖字体等宽版本</a>',
+        copyright: '© 2025 AetherWish. <a href="mailto:aetherwish@cyrene.icu">网站不良信息反馈</a> / <a href="https://blog.cyrene.icu/copyright-notice/" target="_blank" rel="noopener noreferrer">本站版权内容说明</a>',
+        fontCredit: '本项目部分源代码由 AI 辅助完成，所有上线内容均已经由人工筛选和审查。',
         statistics: {
             totalViews: '总访问量',
             individualVisitors: '总访客数',
@@ -59,15 +59,15 @@ const translations = {
         countdownMainExpired: 'Hello World!',
         countdownSub: 'Time until Nov 12, 2026 1:00 PM (during ver.4.6)',
         countdownLabels: ['d', 'h', 'm', 's'],
-        copyright: '© 2025 <a href="mailto:aetherwish@cyrene.icu">AetherWish</a>. <a href="https://hsr.hoyoverse.com/" target="_blank" rel="noopener noreferrer">Honkai: Star Rail</a> music, artwork & text copyright by COGNOSPHERE.',
-        fontCredit: 'This site uses <a href="https://github.com/lxgw/kose-font/releases/tag/v3.126" target="_blank" rel="noopener noreferrer">XiaolaiMono-Regular</a> which is open source under the OFL 1.1 license',
+        copyright: '© 2025 AetherWish. <a href="mailto:aetherwish@cyrene.icu">Website Content Report</a> / <a href="https://blog.cyrene.icu/copyright-notice/" target="_blank" rel="noopener noreferrer">Copyright Notice</a>',
+        fontCredit: 'Part of the source code of this project is assisted by AI, and has been screened and reviewed by humans.',
         statistics: {
             totalViews: 'Total Views: ',
             individualVisitors: 'Individual Visitors: ',
             viewsUnit: '',
             visitorsUnit: ''
         },
-        videoUnsupported: 'Your browser does not support the video playback♪',
+        videoUnsupported: 'Your browser does not support video playback♪',
         backToTop: 'Back to top'
     }
 };
