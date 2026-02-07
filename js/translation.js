@@ -24,7 +24,7 @@ const translations = {
         countdownMainExpired: '你好，世界！',
         countdownSub: '距离2026年11月12日13:00（4.6期间）还有',
         countdownLabels: ['天', '时', '分', '秒'],
-        copyright: '© 2025 AetherWish. <a href="mailto:aetherwish@cyrene.icu">网站不良信息反馈</a> / <a href="https://blog.cyrene.icu/copyright-notice/" target="_blank" rel="noopener noreferrer">本站版权内容说明</a>',
+        copyright: '© 2025 cyrene.icu. <a href="mailto:aetherwish@cyrene.icu">网站不良信息反馈</a> / <a href="https://blog.cyrene.icu/copyright-notice/" target="_blank" rel="noopener noreferrer">本站版权内容说明</a>',
         fontCredit: '本项目部分源代码由 AI 辅助完成，所有上线内容均已经由人工筛选和审查。',
         statistics: {
             totalViews: '总访问量',
@@ -59,7 +59,7 @@ const translations = {
         countdownMainExpired: 'Hello World!',
         countdownSub: 'Time until Nov 12, 2026 1:00 PM (during ver.4.6)',
         countdownLabels: ['d', 'h', 'm', 's'],
-        copyright: '© 2025 AetherWish. <a href="mailto:aetherwish@cyrene.icu">Website Content Report</a> / <a href="https://blog.cyrene.icu/copyright-notice/" target="_blank" rel="noopener noreferrer">Copyright Notice</a>',
+        copyright: '© 2025 cyrene.icu. <a href="mailto:aetherwish@cyrene.icu">Website Content Report</a> / <a href="https://blog.cyrene.icu/copyright-notice/" target="_blank" rel="noopener noreferrer">Copyright Notice</a>',
         fontCredit: 'Part of the source code of this project is assisted by AI, and has been screened and reviewed by humans.',
         statistics: {
             totalViews: 'Total Views: ',
