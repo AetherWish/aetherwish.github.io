@@ -6,7 +6,7 @@ const translations = {
         mainContent: [
             '“......昔涟是。哭着诞生的。脆弱的。透明的。像是水晶的。”',
             '“昔涟是。笑着道别的。柔软的。粉色的。像是花的。”',
-            '「二相乐园」将至，但开拓者们依然思念着被留在「昨天」的她......'
+            '「二相乐园」已至，但开拓者们依然思念着被留在「昨天」的她......'
         ],
         mainContentBak: [
             '昔涟。是桃子。是爱。',
@@ -41,7 +41,7 @@ const translations = {
         mainContent: [
             '&#39;......Cyrene <b>was</b>, crying when she was born. Fragile. Transparent. Like a crystal.&#39;',
             '&#39;Cyrene <b>was</b>, smiling when she said goodbye. Soft. Pink. Like a flower.&#39;',
-            '<em>Planarcadia</em> is to arrive. Still, Trailblazers will miss HER who was left in YESTERDAY.'
+            '<em>Planarcadia</em> has arrived. Still, Trailblazers will miss HER who was left in YESTERDAY.'
         ],
         mainContentBak: [
             'Cyrene. Is Peach. Is love.',
