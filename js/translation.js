@@ -3,6 +3,7 @@ const translations = {
     'zh-CN': {
         langToggle: 'Hello World',
         calendarToggle: '翁法罗斯一年历',
+        blogToggle: 'blog.cyrene.icu',
         mainContent: [
             '“......昔涟是。哭着诞生的。脆弱的。透明的。像是水晶的。”',
             '“昔涟是。笑着道别的。柔软的。粉色的。像是花的。”',
@@ -38,6 +39,7 @@ const translations = {
     'en': {
         langToggle: '你好，世界',
         calendarToggle: 'Amphoreus calendar',
+        blogToggle: 'blog.cyrene.icu',
         mainContent: [
             '&#39;......Cyrene <b>was</b>, crying when she was born. Fragile. Transparent. Like a crystal.&#39;',
             '&#39;Cyrene <b>was</b>, smiling when she said goodbye. Soft. Pink. Like a flower.&#39;',
@@ -118,6 +120,12 @@ class TranslationManager {
         const calendarToggleText = document.getElementById('calendarToggleText');
         if (calendarToggleText) {
             calendarToggleText.textContent = this.t('calendarToggle');
+        }
+
+        // 更新博客切换按钮文本
+        const blogToggleText = document.getElementById('blogToggleText');
+        if (blogToggleText) {
+            blogToggleText.textContent = this.t('blogToggle');
         }
 
         // 更新主内容区域
