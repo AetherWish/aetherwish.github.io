@@ -65,10 +65,16 @@
     /* 圆角按钮的内边距 */
     --pill-padding: 8px 12px;
 
-    /* 层级 */
-    --z-toolbar: 100;
+    /* 层级：数值越大越靠上。返回顶部按钮需盖过 .container 的玻璃层 */
     --z-overlay: -1;
-    --z-back-to-top: 9999;
+    --z-toolbar: 100;
+    --z-back-to-top: 1000;
+
+    /* 返回顶部按钮占用的右下角空间，供容器预留滚动余量 */
+    --back-to-top-size: 50px;
+    --back-to-top-gap: var(--space-xl);
+    /* 容器底部需预留的总高度：按钮本体 + 与视口下沿的间距 + 一点呼吸空间 */
+    --back-to-top-reserve: calc(var(--back-to-top-size) + var(--back-to-top-gap) + var(--space-sm));
 
     /* 动效 */
     --ease: 0.3s ease;
@@ -128,6 +134,8 @@ body::before {
     background: var(--glass-bg);
     border-radius: var(--radius-lg);
     padding: var(--space-2xl);
+    /* 底部额外留出返回顶部按钮的高度，避免其遮挡页脚文字 */
+    padding-bottom: calc(var(--space-2xl) + var(--back-to-top-reserve));
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
@@ -199,7 +207,8 @@ body::before {
 
 /* --- 图标：不再需要单独的间距（间距由基类的 gap 统一负责） --- */
 .calendar-toggle-icon,
-.blog-toggle-icon {
+.blog-toggle-icon,
+.lang-toggle-icon {
     flex-shrink: 0;
 }
 
@@ -371,10 +380,10 @@ main {
    ========================================================================== */
 .back-to-top-btn {
     position: fixed; /* 相对视口定位，始终贴在右下角 */
-    bottom: var(--space-xl);
-    right: var(--space-xl);
-    width: 50px;
-    height: 50px;
+    bottom: var(--back-to-top-gap);
+    right: var(--back-to-top-gap);
+    width: var(--back-to-top-size);
+    height: var(--back-to-top-size);
     border-radius: 50%;
     background: var(--brand-80);
     border: none;
@@ -385,6 +394,8 @@ main {
     justify-content: center;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     z-index: var(--z-back-to-top);
+    /* 独立层叠上下文：避免被祖先元素的 backdrop-filter / transform 影响层级 */
+    isolation: isolate;
     /* 默认隐藏，滚动后由 JS 添加 .show 淡入 */
     opacity: 0;
     visibility: hidden;
@@ -408,11 +419,19 @@ main {
    --------------------------------------------------------------------------
    768px：平板 / 小屏笔记本，收紧容器与主内容内边距
    600px：进入窄屏，顶部按钮收为纯图标（四个按钮一同切换）
-   480px：手机上进一步收紧，语言按钮字号下调
+   480px：手机上进一步收紧容器与主内容内边距
    ========================================================================== */
 @media (max-width: 768px) {
+    /* 按钮在窄屏略小，同步收窄容器为其预留的底部空间 */
+    body {
+        --back-to-top-size: 45px;
+        --back-to-top-gap: var(--space-lg);
+        --back-to-top-reserve: calc(var(--back-to-top-size) + var(--back-to-top-gap) + var(--space-sm));
+    }
+
     .container {
         padding: var(--space-xl);
+        padding-bottom: calc(var(--space-xl) + var(--back-to-top-reserve));
     }
 
     main {
@@ -444,7 +463,7 @@ main {
     /* 窄屏下按钮只保留图标，因此文字统一隐藏、取消图标间距 */
     .calendar-toggle-text,
     .blog-toggle-text,
-    #langToggle,
+    .lang-toggle-text,
     .audio-number {
         display: none;
     }
@@ -482,14 +501,12 @@ main {
 @media (max-width: 480px) {
     .container {
         padding: var(--space-md);
+        /* 覆盖上面的 padding 简写后，需重新补回返回顶部按钮的预留空间 */
+        padding-bottom: calc(var(--space-md) + var(--back-to-top-reserve));
     }
 
     main {
         padding-left: var(--space-lg);
         padding-right: var(--space-lg);
-    }
-
-    .lang-toggle-btn {
-        font-size: 12px;
     }
 }

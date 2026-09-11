@@ -109,7 +109,8 @@
 
     /** 用 textContent 写入的元素（纯文本，不会被解析为 HTML） */
     const TEXT_TARGETS = [
-        { id: 'langToggle', key: 'langToggle' },
+        /* 写入按钮内的文字 span，而非按钮本身——按钮内还含有图标，不能整体覆写 */
+        { id: 'langToggleText', key: 'langToggle' },
         { id: 'calendarToggleText', key: 'calendarToggle' },
         { id: 'blogToggleText', key: 'blogToggle' },
         { id: 'countdownSubText', key: 'countdownSub' },
