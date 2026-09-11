@@ -1,421 +1,277 @@
+/* ==========================================================================
+   首页样式 ——「记忆的幼芽」 (cyrene.icu)
+   --------------------------------------------------------------------------
+   结构：
+     1. 设计令牌 (Design Tokens)
+     2. 基础重置与字体
+     3. 页面骨架 (body / 遮罩 / 容器)
+     4. 顶部工具按钮（日历 / 博客 / 语言 / 音频）
+     5. 主内容区
+     6. 倒计时
+     7. 视频
+     8. 页脚
+     9. 返回顶部按钮
+    10. 响应式断点
+   ========================================================================== */
+
+/* ==========================================================================
+   1. 设计令牌
+   --------------------------------------------------------------------------
+   所有颜色、圆角、间距、层级集中在此维护；组件内不再出现魔法数字。
+   ========================================================================== */
+:root {
+    /* 主题色（粉紫） */
+    --brand: rgb(235, 126, 163);
+    --brand-80: rgba(235, 126, 163, 0.8);
+    --brand-60: rgba(235, 126, 163, 0.6);
+    --brand-40: rgba(235, 126, 163, 0.4);
+    --brand-30: rgba(235, 126, 163, 0.3);
+
+    /* 玻璃态面板 */
+    --glass-bg: rgba(255, 255, 255, 0.15);
+    --glass-bg-soft: rgba(255, 255, 255, 0.1);
+    --glass-bg-strong: rgba(255, 255, 255, 0.2);
+    --glass-blur: 10px;
+
+    /* 文字与分隔线 */
+    --text: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.7);
+    --text-soft: rgba(255, 255, 255, 0.8);
+    --text-strong: rgba(255, 255, 255, 0.9);
+    --divider: rgba(255, 255, 255, 0.3);
+    --divider-soft: rgba(255, 255, 255, 0.5);
+
+    /* 文本投影：保证图片背景上的可读性 */
+    --text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+
+    /* 尺寸与形状 */
+    --radius-pill: 20px;
+    --radius-lg: 15px;
+    --radius-md: 10px;
+    --radius-sm: 5px;
+    --control-height: 36px;
+    --container-max: 800px;
+
+    /* 间距 */
+    --space-2xs: 4px;
+    --space-xs: 6px;
+    --space-sm: 8px;
+    --space-md: 10px;
+    --space-lg: 15px;
+    --space-xl: 20px;
+    --space-2xl: 30px;
+    --space-3xl: 60px;
+
+    /* 圆角按钮的内边距 */
+    --pill-padding: 8px 12px;
+
+    /* 层级 */
+    --z-toolbar: 100;
+    --z-overlay: -1;
+    --z-back-to-top: 9999;
+
+    /* 动效 */
+    --ease: 0.3s ease;
+}
+
+/* ==========================================================================
+   2. 基础重置与字体
+   ========================================================================== */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Define the XiaolaiMono font */
 @font-face {
     font-family: 'XiaolaiMono';
     src: url('../font/XiaolaiMono-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
-    font-display: swap; /* Ensures text remains visible while font is loading */
+    font-display: swap; /* 字体加载期间先用回退字体渲染，避免文字不可见 */
 }
 
-body {
+/* 页面统一使用等宽字体；按钮等表单元素不会自动继承，故单独声明 */
+body,
+button {
     font-family: 'XiaolaiMono', Arial, sans-serif;
-    background: url('/img/philia093.webp');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    color: white;
+}
+
+/* ==========================================================================
+   3. 页面骨架
+   ========================================================================== */
+
+/* 背景图固定在视口，页面滚动时内容在其上滑动 */
+body {
+    background: url('/img/philia093.webp') center / cover no-repeat fixed;
+    color: var(--text);
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: var(--space-xl);
     position: relative;
 }
 
+/* 紫粉色渐变遮罩，压暗背景图以突出前景文字 */
 body::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(138, 43, 226, 0.4), rgba(235, 126, 163, 0.3)); /* 紫粉色渐变遮罩 */
-    z-index: -1;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.4), rgba(235, 126, 163, 0.3));
+    z-index: var(--z-overlay);
 }
 
 .container {
-    max-width: 800px;
+    max-width: var(--container-max);
     width: 100%;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 15px;
-    padding: 30px;
+    background: var(--glass-bg);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2xl);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    position: relative; /* 为返回顶部按钮定位做准备 */
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(var(--glass-blur));
+    position: relative;
 }
 
-.home-link {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    z-index: 100;
-}
+/* ==========================================================================
+   4. 顶部工具按钮
+   --------------------------------------------------------------------------
+   左组 .calendar-switcher（日历 / 博客），右组 .language-switcher（语言 / 音频）。
+   四类按钮共享 .tool-btn 的外观，尺寸差异在各自的修饰规则中覆盖。
+   ========================================================================== */
 
-.home-btn {
-    display: inline-flex;
-    align-items: center;
-    background: rgba(235, 126, 163, 0.8);
-    color: white;
-    text-decoration: none;
-    border: none;
-    border-radius: 20px;
-    padding: 8px 12px; /* Reduced horizontal padding */
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    transition: background 0.3s ease;
-    position: relative; /* Ensure proper positioning */
-    width: auto; /* Allow width to adjust to content */
-    justify-content: flex-start; /* Align content to the start */
-    align-items: center;
-}
-
-/* Reduce gap between icon and text */
-.home-btn svg {
-    margin-right: 4px; /* Reduced gap between icon and text */
-}
-
-/* The text elements have been removed from HTML, so these styles are no longer needed */
-
-.home-btn:hover {
-    background: rgba(235, 126, 163, 1);
-}
-
-/* The text elements have been removed from HTML, so these styles are no longer needed */
-
+/* --- 分组定位：两组按钮分别固定在容器左上角与右上角 --- */
+.calendar-switcher,
 .language-switcher {
     position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 100;
-}
-
-.lang-toggle-btn {
-    background: rgba(235, 126, 163, 0.8);
-    color: white;
-    border: none;
-    border-radius: 20px;
-    padding: 8px 12px; /* Consistent padding with home button */
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    transition: background 0.3s ease;
-    width: auto; /* Allow width to adjust to content */
-    font-family: 'XiaolaiMono', Arial, sans-serif;
-    height: 36px; /* Fixed height for consistent alignment */
-    display: -webkit-inline-flex; /* WebKit prefix */
-    display: inline-flex;
-    -webkit-align-items: center; /* WebKit prefix */
-    align-items: center;
-    -webkit-justify-content: center; /* WebKit prefix */
-    justify-content: center;
-}
-
-.lang-toggle-btn:hover {
-    background: rgba(235, 126, 163, 1);
-}
-
-.audio-toggle-btn {
-    background: rgba(235, 126, 163, 0.8);
-    color: white;
-    border: none;
-    border-radius: 20px;
-    padding: 8px 12px; /* Consistent padding with other buttons */
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    transition: background 0.3s ease;
-    width: auto; /* Allow width to adjust to content */
-    font-family: 'XiaolaiMono', Arial, sans-serif;
-    display: -webkit-inline-flex; /* WebKit prefix */
-    display: inline-flex;
-    -webkit-align-items: center; /* WebKit prefix */
-    align-items: center;
-    -webkit-justify-content: center; /* WebKit prefix */
-    justify-content: center;
-}
-
-.audio-toggle-btn:hover {
-    background: rgba(235, 126, 163, 1);
-}
-
-/* Style the SVG icon inside the button */
-.audio-toggle-btn svg {
-    width: 16px;
-    height: 16px;
-    display: inline-block; /* Better compatibility with WebKit */
-    margin-right: 4px; /* Add space between icon and number */
-    vertical-align: middle; /* Align properly with text/number */
-    -webkit-flex-shrink: 0; /* Prevent shrinking in WebKit */
-    flex-shrink: 0;
-}
-
-/* Style for the audio number that appears to the right of the icon */
-.audio-number {
-    font-size: 14px;
-    font-weight: bold;
-    color: white;
-    margin-left: 6px; /* Space between icon and number */
-    display: none; /* Initially hidden, will be shown when needed */
-    vertical-align: middle; /* Align with the SVG icon */
-    line-height: 1; /* Prevent extra spacing */
-    -webkit-font-smoothing: antialiased; /* Better font rendering in WebKit browsers */
-}
-
-/* WebKit-specific styling for the audio button */
-.audio-toggle-btn {
-    -webkit-appearance: none; /* Remove default WebKit styling */
-    appearance: none;
-    -webkit-user-select: none; /* Prevent text selection in WebKit */
-    user-select: none;
-    outline: none; /* Prevent default outline */
+    top: var(--space-xl);
+    z-index: var(--z-toolbar);
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--space-md);
 }
 
 .calendar-switcher {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    z-index: 100;
+    left: var(--space-xl);
 }
 
-.calendar-toggle-btn {
-    display: -webkit-inline-flex; /* WebKit prefix */
-    display: inline-flex;
-    -webkit-align-items: center; /* WebKit prefix */
-    align-items: center;
-    background: rgba(235, 126, 163, 0.8);
-    color: white;
-    text-decoration: none;
-    border: none;
-    border-radius: 20px;
-    padding: 8px 12px; /* Consistent padding with language button */
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    transition: background 0.3s ease;
-    width: auto; /* Allow width to adjust to content */
-    font-family: 'XiaolaiMono', Arial, sans-serif;
-    height: 36px; /* Fixed height for consistent alignment */
-    -webkit-justify-content: center; /* WebKit prefix */
-    justify-content: center;
-}
-
-/* Align all top right buttons in a consistent group */
 .language-switcher {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 100;
-    display: -webkit-flex; /* WebKit prefix */
-    display: flex;
-    -webkit-flex-direction: row; /* WebKit prefix */
-    flex-direction: row;
-    gap: 10px; /* Consistent spacing between buttons */
-    -webkit-align-items: flex-start; /* WebKit prefix */
-    align-items: flex-start; /* Align buttons to the top */
+    right: var(--space-xl);
 }
 
-/* Ensure all buttons in the language switcher group have consistent styling */
-.language-switcher .lang-toggle-btn,
-.language-switcher .audio-toggle-btn {
-    display: -webkit-inline-flex; /* WebKit prefix */
+/* --- 共享外观：胶囊形玻璃按钮 --- */
+.calendar-toggle-btn,
+.blog-toggle-btn,
+.lang-toggle-btn,
+.audio-toggle-btn {
     display: inline-flex;
-    -webkit-align-items: center; /* WebKit prefix */
     align-items: center;
-    -webkit-justify-content: center; /* WebKit prefix */
     justify-content: center;
-    -webkit-flex-shrink: 0; /* WebKit prefix */
-    flex-shrink: 0; /* Prevent buttons from shrinking */
-    height: 36px; /* Fixed height for consistent alignment */
-}
-
-.calendar-toggle-btn:hover {
-    background: rgba(235, 126, 163, 1);
-}
-
-.calendar-toggle-icon {
-    margin-right: 6px; /* Space between icon and text */
-}
-
-.blog-toggle-btn {
-    display: -webkit-inline-flex; /* WebKit prefix */
-    display: inline-flex;
-    -webkit-align-items: center; /* WebKit prefix */
-    align-items: center;
-    background: rgba(235, 126, 163, 0.8);
-    color: white;
-    text-decoration: none;
+    flex-shrink: 0;
+    gap: var(--space-2xs);
+    height: var(--control-height);
+    padding: var(--pill-padding);
     border: none;
-    border-radius: 20px;
-    padding: 8px 12px; /* Consistent padding with language button */
-    cursor: pointer;
+    border-radius: var(--radius-pill);
+    background: var(--brand-80);
+    color: var(--text);
     font-size: 14px;
     font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    transition: background 0.3s ease;
-    width: auto; /* Allow width to adjust to content */
-    font-family: 'XiaolaiMono', Arial, sans-serif;
-    height: 36px; /* Fixed height for consistent alignment */
-    -webkit-justify-content: center; /* WebKit prefix */
-    justify-content: center;
-    margin-left: 8px; /* Space between calendar and blog button */
+    transition: background var(--ease);
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-user-select: none;
+    user-select: none;
+    outline: none;
 }
 
-.blog-toggle-btn:hover {
-    background: rgba(235, 126, 163, 1);
+.calendar-toggle-btn:hover,
+.blog-toggle-btn:hover,
+.lang-toggle-btn:hover,
+.audio-toggle-btn:hover {
+    background: var(--brand);
 }
 
+/* --- 图标：不再需要单独的间距（间距由基类的 gap 统一负责） --- */
+.calendar-toggle-icon,
 .blog-toggle-icon {
-    margin-right: 6px; /* Space between icon and text */
+    flex-shrink: 0;
 }
 
-/* On narrow screens, hide text and only show icon */
-@media (max-width: 480px) {
-    .calendar-toggle-text-zh,
-    .calendar-toggle-text-en {
-        display: none !important;
-    }
-
-    .calendar-toggle-icon {
-        margin-right: 0;
-    }
-
-    /* Make both buttons consistent in size and shape on mobile */
-    .calendar-toggle-btn {
-        padding: 8px !important; /* Force consistent padding */
-        min-width: 40px; /* Consistent minimum width */
-        min-height: 40px; /* Consistent minimum height */
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        text-align: center;
-    }
-
-    .blog-toggle-btn {
-        padding: 8px !important; /* Force consistent padding */
-        min-width: 40px; /* Consistent minimum width */
-        min-height: 40px; /* Consistent minimum height */
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        text-align: center;
-        margin-left: 8px; /* Maintain spacing between buttons */
-    }
-
-    .lang-toggle-btn {
-        padding: 8px !important; /* Force consistent padding */
-        min-width: 40px; /* Consistent minimum width */
-        min-height: 40px; /* Consistent minimum height */
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        text-align: center;
-    }
-
-    .audio-toggle-btn {
-        padding: 8px !important; /* Force consistent padding */
-        min-width: 40px; /* Consistent minimum width */
-        min-height: 40px; /* Consistent minimum height */
-        display: -webkit-flex !important; /* WebKit prefix */
-        display: flex !important;
-        -webkit-align-items: center !important; /* WebKit prefix */
-        align-items: center !important;
-        -webkit-justify-content: center !important; /* WebKit prefix */
-        justify-content: center !important;
-        text-align: center;
-    }
-
-    /* Align both buttons to the same height and position */
-    .calendar-switcher,
-    .language-switcher {
-        top: 10px; /* Ensure consistent top positioning */
-    }
+.audio-toggle-btn svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
 }
 
-/* Combined footer styling */
-.font-credit {
-    text-align: center;
-    margin-top: 20px;
-    padding-top: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
-    font-size: 0.85em;
-    color: rgba(255, 255, 255, 0.7);
+/* --- 音频按钮右侧的状态序号（0 静音 / 1 / 2） --- */
+.audio-number {
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--text);
+    line-height: 1;
+    display: none; /* 默认静音，由 JS 切换为 inline */
+    -webkit-font-smoothing: antialiased;
 }
 
-.font-credit p {
-    margin: 5px 0; /* Add spacing between copyright lines */
-}
-
-.font-credit a {
-    color: rgba(255, 255, 255, 0.9);
-    text-decoration: underline;
-}
-
-.font-credit a:hover {
-    color: white;
-}
-
+/* ==========================================================================
+   5. 主内容区
+   ========================================================================== */
 main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 45px; /* Reduced padding to move content up approximately one line */
-    padding-left: 60px; /* Add padding to prevent content overlap with home button */
-    padding-right: 60px; /* Add padding to prevent content overlap with language button */
+    padding: 45px var(--space-3xl) 0; /* 顶部留出工具按钮的空间 */
 }
 
 .content {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: var(--space-2xl);
     line-height: 1.8;
     font-size: 1.2em;
-    color: white; /* 使用白色提高可读性 */
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); /* 添加文字阴影以增强可读性 */
+    color: var(--text);
+    text-shadow: var(--text-shadow);
 }
 
 .content p {
-    margin: 10px 0;
+    margin: var(--space-md) 0;
 }
 
+/* ==========================================================================
+   6. 倒计时
+   ========================================================================== */
 .countdown-container {
     text-align: center;
-    margin: 30px 0;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
+    margin: var(--space-2xl) 0;
+    padding: var(--space-xl);
+    background: var(--glass-bg-soft);
+    border-radius: var(--radius-md);
     width: 100%;
 }
 
 #countdownMainText {
-    margin-bottom: 15px;
+    margin-bottom: var(--space-lg);
     font-size: 1.5em;
-    color: white;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+    color: var(--text);
+    text-shadow: var(--text-shadow);
 }
 
 #countdownSubText {
-    margin-top: 15px;
+    margin-top: var(--space-lg);
     font-size: 1em;
-    color: rgba(255, 255, 255, 0.8);
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+    color: var(--text-soft);
+    text-shadow: var(--text-shadow);
 }
 
 .countdown {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: var(--space-lg);
     flex-wrap: wrap;
 }
 
@@ -430,102 +286,114 @@ main {
     display: block;
 }
 
-#days, #hours, #minutes, #seconds {
+/* 时 / 分 / 秒的数字块 */
+#days,
+#hours,
+#minutes,
+#seconds {
     font-size: 2em;
     font-weight: bold;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 10px;
-    border-radius: 5px;
+    background: var(--glass-bg-strong);
+    padding: var(--space-md);
+    border-radius: var(--radius-sm);
     min-width: 60px;
     text-align: center;
-    color: white; /* 使用白色提高可读性 */
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); /* 添加文字阴影以增强可读性 */
+    color: var(--text);
+    text-shadow: var(--text-shadow);
 }
 
 .label {
     font-size: 0.9em;
-    margin-top: 5px;
+    margin-top: var(--space-xs);
 }
 
+/* ==========================================================================
+   7. 视频
+   ========================================================================== */
 .video-container {
     width: 100%;
-    margin-top: 20px;
+    margin-top: var(--space-xl);
 }
 
-.video-container iframe {
+.video-container video {
     width: 100%;
-    height: 400px;
-    border-radius: 10px;
-    border: none;
+    border-radius: var(--radius-md);
 }
 
-/* Font credit footer */
+/* ==========================================================================
+   8. 页脚（版权声明 + 访问统计）
+   ========================================================================== */
 .font-credit {
     text-align: center;
-    margin-top: 20px;
-    padding-top: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    margin-top: var(--space-xl);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--divider);
     font-size: 0.85em;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-muted);
+}
+
+.font-credit p {
+    margin: var(--space-xs) 0;
 }
 
 .font-credit a {
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--text-strong);
     text-decoration: underline;
 }
 
 .font-credit a:hover {
-    color: white;
+    color: var(--text);
 }
 
-/* Statistics container styling */
 .statistics-container {
-    margin-top: 10px;
+    margin-top: var(--space-md);
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 15px;
+    gap: var(--space-lg);
     flex-wrap: wrap;
     font-size: 0.85em;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-muted);
 }
 
 .statistics-item {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: var(--space-sm);
 }
-
 
 .separator {
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--divider-soft);
 }
 
-/* 返回顶部按钮 */
+/* ==========================================================================
+   9. 返回顶部按钮
+   ========================================================================== */
 .back-to-top-btn {
-    position: fixed;  /* Changed from absolute to fixed to position relative to viewport */
-    bottom: 20px;
-    right: 20px;
+    position: fixed; /* 相对视口定位，始终贴在右下角 */
+    bottom: var(--space-xl);
+    right: var(--space-xl);
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background: rgba(235, 126, 163, 0.8); /* 主题色，半透明 */
+    background: var(--brand-80);
     border: none;
-    color: white;
+    color: var(--text);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    z-index: 9999; /* Increased z-index to ensure it's above all other elements */
+    z-index: var(--z-back-to-top);
+    /* 默认隐藏，滚动后由 JS 添加 .show 淡入 */
     opacity: 0;
     visibility: hidden;
     transform: translateY(10px);
-    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, background 0.3s ease;
+    transition: opacity var(--ease), visibility var(--ease), transform var(--ease), background var(--ease);
 }
 
 .back-to-top-btn:hover {
-    background: rgba(235, 126, 163, 1); /* 主题色，完全不透明 */
+    background: var(--brand);
     transform: translateY(-2px);
 }
 
@@ -535,91 +403,93 @@ main {
     transform: translateY(0);
 }
 
-/* 响应式设计 */
+/* ==========================================================================
+   10. 响应式断点
+   --------------------------------------------------------------------------
+   768px：平板 / 小屏笔记本，收紧容器与主内容内边距
+   600px：进入窄屏，顶部按钮收为纯图标（四个按钮一同切换）
+   480px：手机上进一步收紧，语言按钮字号下调
+   ========================================================================== */
 @media (max-width: 768px) {
     .container {
-        padding: 20px;
+        padding: var(--space-xl);
     }
 
     main {
-        padding-top: 90px; /* Increased adjustment for mobile screen with positioned buttons */
-        padding-left: 20px; /* Reduce left padding on mobile */
-        padding-right: 20px; /* Reduce right padding on mobile */
-    }
-
-    /* Hide text in home button on mobile screens, keep only the icon */
-    .home-text-zh,
-    .home-text-en {
-        display: none !important;
-    }
-
-    /* Make the home button smaller when only showing icon */
-    .home-btn {
-        padding: 8px; /* More compact button when only icon is shown */
-        min-width: auto;
+        padding: 90px var(--space-xl) 0; /* 工具按钮改为绝对定位后需要更多顶部空间 */
     }
 
     .content {
         font-size: 1em;
     }
 
-    .video-container iframe {
-        height: 250px;
-    }
-
-    #days, #hours, #minutes, #seconds {
+    #days,
+    #hours,
+    #minutes,
+    #seconds {
         font-size: 1.5em;
         min-width: 45px;
-        padding: 5px;
+        padding: var(--space-xs);
     }
 
     .back-to-top-btn {
+        bottom: var(--space-lg);
+        right: var(--space-lg);
         width: 45px;
         height: 45px;
-        bottom: 15px;
-        right: 15px;
     }
 }
 
-/* Extra small screens adjustments */
-@media (max-width: 480px) {
-    .home-link {
-        position: absolute;
-        top: 10px;
-        left: 10px;
+@media (max-width: 600px) {
+    /* 窄屏下按钮只保留图标，因此文字统一隐藏、取消图标间距 */
+    .calendar-toggle-text,
+    .blog-toggle-text,
+    #langToggle,
+    .audio-number {
+        display: none;
+    }
+
+    .calendar-switcher,
+    .language-switcher {
+        top: var(--space-md);
+        gap: var(--space-sm);
+    }
+
+    .calendar-switcher {
+        left: var(--space-md);
     }
 
     .language-switcher {
-        position: absolute;
-        top: 10px;
-        right: 10px;
+        right: var(--space-md);
+    }
+
+    /* 统一为正方形图标按钮 */
+    .calendar-toggle-btn,
+    .blog-toggle-btn,
+    .lang-toggle-btn,
+    .audio-toggle-btn {
+        width: 40px;
+        min-width: 40px;
+        height: 40px;
+        padding: var(--space-sm);
     }
 
     main {
-        padding-top: 100px; /* Increased padding to prevent overlap on small screens */
-        padding-left: 15px;
-        padding-right: 15px;
+        padding-top: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: var(--space-md);
     }
 
-    .home-btn {
-        padding: 8px; /* Make the home button smaller when only showing icon */
-        min-width: auto;
+    main {
+        padding-left: var(--space-lg);
+        padding-right: var(--space-lg);
     }
 
     .lang-toggle-btn {
-        font-size: 12px; /* Smaller font */
-    }
-}
-
-/* For very narrow screens (like portrait mode on some phones), stack buttons vertically */
-@media (max-width: 360px) {
-    .language-switcher {
-        position: absolute;
-        top: 50px; /* Position below the home button */
-        right: 10px;
-    }
-
-    main {
-        padding-top: 120px; /* Increased top padding to account for vertically stacked buttons */
+        font-size: 12px;
     }
 }

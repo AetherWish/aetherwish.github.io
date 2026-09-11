@@ -1,180 +1,261 @@
-// 倒计时功能
-function updateCountdown() {
-    // 设置目标日期为2026年11月12日13点整
-    const targetDate = new Date('2026-11-12T13:00:00').getTime();
-    const currentDate = new Date().getTime();
+/**
+ * 首页交互脚本 ——「记忆的幼芽」
+ * ---------------------------------------------------------------------------
+ * 职责（每项对应下面一个 init 函数）：
+ *   1. 倒计时       —— 每秒刷新距目标时间的剩余量
+ *   2. 语言切换     —— 委托给 translation.js 的 TranslationManager
+ *   3. 背景音频     —— 静音 / 曲目一 / 曲目二 三态循环
+ *   4. 返回顶部     —— 滚动超过阈值后显示浮动按钮
+ *
+ * 依赖：translation.js（需先于本文件加载）
+ * 编码注意：本文件为无 BOM 的 UTF-8。
+ */
+(function () {
+    'use strict';
 
-    // 计算时间差
-    const timeDifference = targetDate - currentDate;
+    /* =========================================================================
+       常量
+       ====================================================================== */
 
-    // 如果倒计时结束
-    if (timeDifference <= 0) {
-        document.getElementById('days').innerText = '00';
-        document.getElementById('hours').innerText = '00';
-        document.getElementById('minutes').innerText = '00';
-        document.getElementById('seconds').innerText = '00';
+    /** 返回顶部按钮的出现阈值（像素） */
+    const BACK_TO_TOP_THRESHOLD = 50;
 
-        // 当倒计时结束时，显示特殊文本
-        if (translationManager) {
-            translationManager.updateCountdownMainText(-1); // 传入-1表示已结束
+    /** 倒计时刷新间隔（毫秒） */
+    const COUNTDOWN_INTERVAL = 1000;
+
+    /** 倒计时四个数字块的 id，与「天 / 时 / 分 / 秒」顺序一致 */
+    const COUNTDOWN_UNIT_IDS = ['days', 'hours', 'minutes', 'seconds'];
+
+    /** 一首曲目对应的音频元素 id，下标即音频状态值（1 = remembrance，2 = reverie） */
+    const AUDIO_TRACK_IDS = [null, 'remembrance-audio', 'reverie-audio'];
+
+    /** 音频状态：0 静音 / 1 曲目一 / 2 曲目二 */
+    const AUDIO_STATE = { MUTED: 0, TRACK_ONE: 1, TRACK_TWO: 2 };
+    const AUDIO_STATE_COUNT = 3;
+
+    /** 静音时叠加在喇叭图标上的斜线路径（viewBox 1024） */
+    const MUTE_SLASH_PATH = 'M768 128L128 864';
+    const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+
+    /* =========================================================================
+       小工具
+       ====================================================================== */
+
+    const byId = (id) => document.getElementById(id);
+
+    /** 补零到两位，如 3 → "03" */
+    const pad2 = (value) => String(value).padStart(2, '0');
+
+    /* =========================================================================
+       1. 倒计时
+       ====================================================================== */
+
+    /** 每个数字块的缓存引用，避免每秒重复查询 DOM */
+    let countdownSlots = null;
+    let countdownTimerId = null;
+
+    function cacheCountdownSlots() {
+        countdownSlots = COUNTDOWN_UNIT_IDS.map(byId);
+    }
+
+    /**
+     * 把剩余毫秒数拆成「天 / 时 / 分 / 秒」并写入页面，同时同步主标题措辞。
+     *
+     * 目标时间来自 translation.js 的 TranslationManager.TARGET_DATE，
+     * 这里不再重复定义日期。
+     */
+    function updateCountdown() {
+        const manager = window.translationManager;
+        if (!countdownSlots) {
+            cacheCountdownSlots();
         }
-        return;
+
+        const targetTime = window.TranslationManager
+            ? window.TranslationManager.TARGET_DATE.getTime()
+            : 0;
+        const remaining = targetTime - Date.now();
+
+        if (remaining <= 0) {
+            // 已到目标时间：全部归零，并切换到「已结束」文案
+            countdownSlots.forEach((slot) => {
+                if (slot) {
+                    slot.textContent = '00';
+                }
+            });
+            if (manager) {
+                manager.updateCountdownMainText(-1);
+            }
+            return;
+        }
+
+        const values = [
+            Math.floor(remaining / (1000 * 60 * 60 * 24)),
+            Math.floor((remaining / (1000 * 60 * 60)) % 24),
+            Math.floor((remaining / (1000 * 60)) % 60),
+            Math.floor((remaining / 1000) % 60)
+        ];
+
+        countdownSlots.forEach((slot, index) => {
+            if (slot) {
+                slot.textContent = pad2(values[index]);
+            }
+        });
+
+        // 主标题按剩余天数切档（需用未取整的天数，否则「不足一天」无法识别）
+        if (manager) {
+            manager.updateCountdownMainText(remaining / (1000 * 60 * 60 * 24));
+        }
     }
 
-    // 计算天、小时、分钟、秒
-    const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
-    const actualDays = timeDifference / (1000 * 60 * 60 * 24);
+    function initCountdown() {
+        cacheCountdownSlots();
 
-    // 更新倒计时显示
-    document.getElementById('days').innerText = String(days).padStart(2, '0');
-    document.getElementById('hours').innerText = String(hours).padStart(2, '0');
-    document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
-    document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+        // 语言切换需要立即重算主标题，这里把刷新函数交给管理器复用
+        if (window.translationManager) {
+            window.translationManager.refreshCountdownText = updateCountdown;
+        }
 
-    // 根据天数更新文本
-    if (translationManager) {
-        translationManager.updateCountdownMainText(actualDays);
+        updateCountdown();
+        countdownTimerId = window.setInterval(updateCountdown, COUNTDOWN_INTERVAL);
     }
-}
 
-// 语言切换功能
-function initLanguageToggle() {
-    const langToggleBtn = document.getElementById('langToggle');
+    /* =========================================================================
+       2. 语言切换
+       ====================================================================== */
 
-    // 初始化翻译管理器
-    if (typeof TranslationManager !== 'undefined') {
-        translationManager = new TranslationManager();
-        
-        langToggleBtn.addEventListener('click', function() {
-            translationManager.toggleLanguage();
+    function initLanguageToggle() {
+        const button = byId('langToggle');
+        if (!button || typeof window.TranslationManager !== 'function') {
+            return;
+        }
+
+        window.translationManager = new window.TranslationManager();
+        button.addEventListener('click', function () {
+            window.translationManager.toggleLanguage();
         });
     }
-};
 
-// 音频控制功能
-function initAudioToggle() {
-    const audioToggleBtn = document.getElementById('audioToggle');
-    const audioIcon = document.getElementById('audioIcon');
-    const audioNumber = document.getElementById('audioNumber');
-    const remembranceAudio = document.getElementById('remembrance-audio');
-    const reverieAudio = document.getElementById('reverie-audio');
+    /* =========================================================================
+       3. 背景音频
+       ====================================================================== */
 
-    // 设置音频的循环播放
-    remembranceAudio.loop = true;
-    reverieAudio.loop = true;
+    function initAudioToggle() {
+        const toggleButton = byId('audioToggle');
+        const icon = byId('audioIcon');
+        const numberBadge = byId('audioNumber');
+        const tracks = AUDIO_TRACK_IDS.map(byId);
 
-    // 音频状态：0=静音，1=remembrance，2=reverie
-    let audioState = 0; // 默认为静音
-
-    // 更新图标显示
-    function updateIcon() {
-        // 清除之前添加的 elements（如斜线）
-        const existingElements = audioIcon.querySelectorAll('.audio-icon-overlay');
-        existingElements.forEach(el => el.remove());
-
-        if (audioState === 0) { // 静音状态 - 添加斜线, 隐藏数字
-            const slashPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            slashPath.setAttribute('d', 'M768 128L128 864');
-            slashPath.setAttribute('stroke', 'white');
-            slashPath.setAttribute('stroke-width', '60'); // Thicker slash for mute
-            slashPath.setAttribute('class', 'audio-icon-overlay');
-            slashPath.setAttribute('fill', 'none');
-            slashPath.setAttribute('stroke-linecap', 'round');
-            audioIcon.appendChild(slashPath);
-
-            // Hide the number for mute state
-            audioNumber.style.display = 'none';
-        } else if (audioState === 1) { // remembrance状态 - 显示数字1
-            // Hide the number initially in case it was showing
-            audioNumber.textContent = '1';
-            audioNumber.style.display = 'inline';
-        } else if (audioState === 2) { // reverie状态 - 显示数字2
-            // Show the number 2
-            audioNumber.textContent = '2';
-            audioNumber.style.display = 'inline';
-        }
-    }
-
-    // 播放音频
-    function playAudio() {
-        // 停止所有音频
-        remembranceAudio.pause();
-        reverieAudio.pause();
-
-        // 播放当前状态对应的音频
-        if (audioState === 1) {
-            reverieAudio.pause(); // Make sure reverie is stopped
-            remembranceAudio.currentTime = 0; // Reset to beginning
-            remembranceAudio.play().catch(e => console.log("Audio play error:", e));
-        } else if (audioState === 2) {
-            remembranceAudio.pause(); // Make sure remembrance is stopped
-            reverieAudio.currentTime = 0; // Reset to beginning
-            reverieAudio.play().catch(e => console.log("Audio play error:", e));
-        }
-    }
-
-    // 切换音频状态
-    audioToggleBtn.addEventListener('click', function() {
-        audioState = (audioState + 1) % 3; // Cycle through 0, 1, 2
-
-        if (audioState === 0) {
-            // 静音状态 - 停止所有音频
-            remembranceAudio.pause();
-            reverieAudio.pause();
-        } else {
-            // 切换到音频播放状态 - 播放对应音频
-            playAudio();
+        // 缺少任一必需元素时直接跳过，避免抛出异常影响其它交互
+        if (!toggleButton || !icon || !numberBadge || !tracks[1] || !tracks[2]) {
+            return;
         }
 
-        updateIcon();
-    });
+        let state = AUDIO_STATE.MUTED;
 
-    // 初始化图标
-    updateIcon();
-}
-
-// 返回顶部功能
-function initBackToTop() {
-    const backToTopBtn = document.getElementById('backToTop');
-
-    // 监听滚动事件
-    window.addEventListener('scroll', function() {
-        // 只要页面滚动超过一定距离（例如50px）就显示按钮
-        if (window.pageYOffset > 50) {
-            backToTopBtn.classList.add('show');
-        } else {
-            backToTopBtn.classList.remove('show');
+        /** 暂停全部曲目 */
+        function pauseAll() {
+            tracks.forEach((track) => {
+                if (track) {
+                    track.pause();
+                }
+            });
         }
-    });
 
-    // 点击按钮时返回顶部
-    backToTopBtn.addEventListener('click', function() {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
+        /** 播放指定曲目（从头开始） */
+        function playTrack(track) {
+            track.currentTime = 0;
+            const playback = track.play();
+            // 浏览器可能因自动播放策略拒绝播放，静默处理即可
+            if (playback && typeof playback.catch === 'function') {
+                playback.catch(() => {});
+            }
+        }
+
+        /** 按当前状态刷新图标（静音加斜线并隐藏序号，播放中显示曲目序号） */
+        function renderIcon() {
+            icon.querySelectorAll('.audio-icon-overlay').forEach((node) => node.remove());
+
+            if (state === AUDIO_STATE.MUTED) {
+                const slash = document.createElementNS(SVG_NAMESPACE, 'path');
+                slash.setAttribute('d', MUTE_SLASH_PATH);
+                slash.setAttribute('stroke', 'white');
+                slash.setAttribute('stroke-width', '60');
+                slash.setAttribute('stroke-linecap', 'round');
+                slash.setAttribute('fill', 'none');
+                slash.setAttribute('class', 'audio-icon-overlay');
+                icon.appendChild(slash);
+
+                numberBadge.style.display = 'none';
+                return;
+            }
+
+            numberBadge.textContent = String(state);
+            numberBadge.style.display = 'inline';
+        }
+
+        // 三态循环：静音 → 曲目一 → 曲目二 → 静音
+        toggleButton.addEventListener('click', function () {
+            state = (state + 1) % AUDIO_STATE_COUNT;
+
+            pauseAll();
+            if (state !== AUDIO_STATE.MUTED) {
+                playTrack(tracks[state]);
+            }
+
+            renderIcon();
         });
+
+        renderIcon();
+    }
+
+    /* =========================================================================
+       4. 返回顶部
+       ====================================================================== */
+
+    function initBackToTop() {
+        const button = byId('backToTop');
+        if (!button) {
+            return;
+        }
+
+        // 滚动事件用 rAF 节流，避免高频触发样式写入
+        let ticking = false;
+        let isVisible = false;
+
+        function applyVisibility() {
+            ticking = false;
+            const shouldShow = window.scrollY > BACK_TO_TOP_THRESHOLD;
+            if (shouldShow === isVisible) {
+                return;
+            }
+            isVisible = shouldShow;
+            button.classList.toggle('show', shouldShow);
+        }
+
+        window.addEventListener('scroll', function () {
+            if (ticking) {
+                return;
+            }
+            ticking = true;
+            window.requestAnimationFrame(applyVisibility);
+        }, { passive: true });
+
+        button.addEventListener('click', function () {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        applyVisibility(); // 刷新时可能已经处于滚动位置
+    }
+
+    /* =========================================================================
+       启动
+       ====================================================================== */
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // 语言先初始化：倒计时需要依赖它来输出主标题
+        initLanguageToggle();
+        initCountdown();
+        initBackToTop();
+        initAudioToggle();
     });
-}
-
-// 页面加载完成后开始倒计时和返回顶部功能
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("嗨~想我了吗♪")
-    
-    // 先初始化语言切换功能，创建翻译管理器
-    initLanguageToggle();
-    
-    // 然后立即更新一次倒计时
-    updateCountdown();
-
-    // 每秒更新一次倒计时
-    setInterval(updateCountdown, 1000);
-
-    // 初始化返回顶部功能
-    initBackToTop();
-
-    // 初始化音频切换功能
-    initAudioToggle();
-});
+}());
