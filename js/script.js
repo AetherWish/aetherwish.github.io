@@ -5,7 +5,8 @@
  *   1. 倒计时       —— 每秒刷新距目标时间的剩余量
  *   2. 语言切换     —— 委托给 translation.js 的 TranslationManager
  *   3. 背景音频     —— 音乐选择与播控面板（播放 / 暂停 / 选曲 / 播放模式）
- *   4. 返回顶部     —— 滚动超过阈值后显示浮动按钮
+ *   4. 全屏模式     —— 全屏 / 退出全屏，全屏时只保留倒计时与播放器按钮
+ *   5. 返回顶部     —— 滚动超过阈值后显示浮动按钮
  *
  * 依赖：translation.js（需先于本文件加载）
  * 编码注意：本文件为无 BOM 的 UTF-8。
@@ -26,11 +27,13 @@
     /** 倒计时四个数字块的 id，与「天 / 时 / 分 / 秒」顺序一致 */
     const COUNTDOWN_UNIT_IDS = ['days', 'hours', 'minutes', 'seconds'];
 
-    /** 曲目表：顺序即面板中的显示顺序，id 对应页面里的 <audio> 元素 */
+    /** 曲目表：顺序即面板中的显示顺序，id 对应页面里的 <audio> 元素。
+        name 只是翻译管理器不可用时的兜底文案，实际显示名取自
+        translation.js 的 audioTrackNames（随语言切换）。 */
     const AUDIO_TRACKS = [
-        { id: 'remembrance-audio', name: '心忆 Remembrance' },
-        { id: 'reverie-audio', name: '昔涟 Ripples of Past Reverie' },
-        { id: 'withyou-audio', name: '再度和你 With You Once More' }
+        { id: 'remembrance-audio', name: '心忆' },
+        { id: 'reverie-audio', name: '昔涟' },
+        { id: 'withyou-audio', name: '再度和你' }
     ];
 
     /** 播放模式：顺序需与 translation.js 中 audioModes 数组一致 */
@@ -158,6 +161,9 @@
         const nowPlaying = byId('audioNowPlaying');
         const trackList = byId('audioTrackList');
         const trackButtons = Array.prototype.slice.call(document.querySelectorAll('.audio-track'));
+        const trackNameElements = trackButtons.map(function (button) {
+            return button.querySelector('.audio-track-name');
+        });
         const audios = AUDIO_TRACKS.map(function (track) {
             return byId(track.id);
         });
@@ -203,6 +209,15 @@
             const labels = t('audioModes');
             const index = PLAY_MODES.indexOf(mode);
             return Array.isArray(labels) && labels[index] ? labels[index] : '';
+        }
+
+        /** 曲目显示名：中文设置显示中文名，英文设置显示英文名 */
+        function trackName(index) {
+            const names = t('audioTrackNames');
+            if (Array.isArray(names) && names[index]) {
+                return names[index];
+            }
+            return AUDIO_TRACKS[index] ? AUDIO_TRACKS[index].name : '';
         }
 
         function activeAudio() {
@@ -252,14 +267,14 @@
 
             nowPlaying.classList.toggle('is-playing', playing);
             nowPlaying.textContent = currentIndex >= 0
-                ? AUDIO_TRACKS[currentIndex].name
+                ? trackName(currentIndex)
                 : t('audioNothingPlaying');
 
             trackButtons.forEach(function (button, index) {
                 const selected = index === currentIndex;
                 button.setAttribute('aria-pressed', selected ? 'true' : 'false');
                 button.classList.toggle('is-playing', selected && playing);
-                button.setAttribute('aria-label', AUDIO_TRACKS[index].name);
+                button.setAttribute('aria-label', trackName(index));
             });
         }
 
@@ -271,6 +286,11 @@
             modeButton.textContent = modeLabel();
             modeButton.setAttribute('aria-label', t('audioModeAria'));
             trackList.setAttribute('aria-label', t('audioTracksAria'));
+            trackNameElements.forEach(function (element, index) {
+                if (element) {
+                    element.textContent = trackName(index);
+                }
+            });
             toggleButton.setAttribute('aria-label', t('audioPanelTitle'));
             toggleButton.setAttribute('title', t('audioPanelTitle'));
             renderState();
@@ -436,7 +456,125 @@
     }
 
     /* =========================================================================
-       4. 返回顶部
+       4. 全屏 / 专注模式
+       ------------------------------------------------------------------------
+       全屏时只保留倒计时区域与音乐播放器按钮（由 CSS 的 .is-fullscreen 控制）。
+       浏览器全屏 API 不可用时（如 iPhone Safari），退化为页面内专注模式。
+       ====================================================================== */
+
+    function initFullscreen() {
+        const button = byId('fullscreenToggle');
+        if (!button) {
+            return;
+        }
+
+        const root = document.documentElement;
+        let isActive = false;
+        let ticking = false;
+        /** 进入全屏前的滚动位置：全屏时 body 禁止滚动会丢失它，退出后恢复 */
+        let savedScrollY = 0;
+
+        /** 返回顶部按钮显示时，全屏按钮左移让位；全屏时返回顶部被隐藏，故不位移 */
+        function syncShift() {
+            ticking = false;
+            const scrolled = window.scrollY > BACK_TO_TOP_THRESHOLD;
+            button.classList.toggle('is-shifted', scrolled && !isActive);
+        }
+
+        function requestSync() {
+            if (ticking) {
+                return;
+            }
+            ticking = true;
+            window.requestAnimationFrame(syncShift);
+        }
+
+        /** 按钮文案与图标状态 */
+        function updateLabel() {
+            const key = isActive ? 'fullscreenExit' : 'fullscreenEnter';
+            const label = window.translationManager ? window.translationManager.t(key) : '';
+            if (label) {
+                button.setAttribute('title', label);
+                button.setAttribute('aria-label', label);
+            }
+            button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        }
+
+        /** 统一处理全屏状态：页面类名、按钮图标与文案 */
+        function setActive(active) {
+            if (active && !isActive) {
+                savedScrollY = window.scrollY;
+            }
+            isActive = active;
+            document.body.classList.toggle('is-fullscreen', active);
+            button.classList.toggle('is-active', active);
+            updateLabel();
+            if (active) {
+                syncShift();
+                return;
+            }
+            // 退出全屏后恢复进入前的滚动位置（全屏时 overflow:hidden 会把它压回 0）
+            window.requestAnimationFrame(function () {
+                window.scrollTo(0, savedScrollY);
+                syncShift();
+            });
+        }
+
+        function enterFullscreen() {
+            setActive(true);
+            if (document.fullscreenElement || typeof root.requestFullscreen !== 'function') {
+                return; // 已是全屏，或浏览器不支持全屏 API：保留页面内专注模式
+            }
+            try {
+                const request = root.requestFullscreen();
+                if (request && typeof request.catch === 'function') {
+                    request.catch(function () {}); // 被拒绝时同样保留专注模式
+                }
+            } catch (error) {
+                // 某些浏览器会在非用户手势等场景同步抛错，忽略即可
+            }
+        }
+
+        function exitFullscreen() {
+            if (document.fullscreenElement && typeof document.exitFullscreen === 'function') {
+                try {
+                    const request = document.exitFullscreen();
+                    if (request && typeof request.catch === 'function') {
+                        request.catch(function () {});
+                    }
+                } catch (error) {
+                    // 同上，忽略退出失败
+                }
+            }
+            setActive(false);
+        }
+
+        button.addEventListener('click', function () {
+            if (isActive) {
+                exitFullscreen();
+            } else {
+                enterFullscreen();
+            }
+        });
+
+        // 用户按 Esc 或浏览器自身退出全屏时，同步页面状态
+        document.addEventListener('fullscreenchange', function () {
+            if (!document.fullscreenElement && isActive) {
+                setActive(false);
+            }
+        });
+
+        // 语言切换时更新按钮文案
+        document.addEventListener('languagechange', updateLabel);
+
+        window.addEventListener('scroll', requestSync, { passive: true });
+
+        syncShift();
+        updateLabel();
+    }
+
+    /* =========================================================================
+       5. 返回顶部
        ====================================================================== */
 
     function initBackToTop() {
@@ -483,6 +621,7 @@
         initLanguageToggle();
         initCountdown();
         initBackToTop();
+        initFullscreen();
         initAudioPlayer();
     });
 }());

@@ -10,8 +10,9 @@
      6. 倒计时
      7. 视频
      8. 页脚
-     9. 返回顶部按钮
+     9. 返回顶部按钮 / 全屏按钮
     10. 响应式断点
+    11. 全屏专注模式
    ========================================================================== */
 
 /* ==========================================================================
@@ -34,7 +35,7 @@
     --glass-blur: 10px;
 
     /* 播放器面板（深色玻璃，保证面板内白字可读） */
-    --panel-bg: rgba(74, 31, 53, 0.82);
+    --panel-bg: rgba(72, 30, 52, 0.9);
     --panel-border: rgba(255, 255, 255, 0.14);
     --panel-hover: rgba(255, 255, 255, 0.1);
     --panel-active: rgba(235, 126, 163, 0.3);
@@ -107,7 +108,8 @@
 
 @font-face {
     font-family: 'XiaolaiMono';
-    src: url('../font/XiaolaiMono-Regular.ttf') format('truetype');
+    /* 子集字体：仅包含页面实际用到的 645 个码位，由完整字体经 subset-font 生成 */
+    src: url('../font/XiaolaiMono-Regular.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
     font-display: swap; /* 字体加载期间先用回退字体渲染，避免文字不可见 */
@@ -690,9 +692,12 @@ main {
 }
 
 /* ==========================================================================
-   9. 返回顶部按钮
+   9. 返回顶部按钮 / 全屏按钮
+   --------------------------------------------------------------------------
+   两个按钮共用右下角的圆形样式与层级；全屏按钮常驻，返回顶部按钮按滚动显隐。
    ========================================================================== */
-.back-to-top-btn {
+.back-to-top-btn,
+.fullscreen-btn {
     position: fixed; /* 相对视口定位，始终贴在右下角 */
     bottom: var(--back-to-top-gap);
     right: var(--back-to-top-gap);
@@ -710,22 +715,55 @@ main {
     z-index: var(--z-back-to-top);
     /* 独立层叠上下文：避免被祖先元素的 backdrop-filter / transform 影响层级 */
     isolation: isolate;
-    /* 默认隐藏，滚动后由 JS 添加 .show 淡入 */
+    -webkit-appearance: none;
+    appearance: none;
+    transition: right var(--ease), background var(--ease), transform var(--ease);
+}
+
+.back-to-top-btn:hover,
+.fullscreen-btn:hover {
+    background: var(--brand);
+    transform: translateY(-2px);
+}
+
+/* 返回顶部：默认隐藏，滚动后由 JS 添加 .show 淡入 */
+.back-to-top-btn {
     opacity: 0;
     visibility: hidden;
     transform: translateY(10px);
     transition: opacity var(--ease), visibility var(--ease), transform var(--ease), background var(--ease);
 }
 
-.back-to-top-btn:hover {
-    background: var(--brand);
-    transform: translateY(-2px);
-}
-
 .back-to-top-btn.show {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+}
+
+/* --- 全屏按钮 ---
+   非全屏时占用返回顶部按钮的位置；返回顶部显示后（.is-shifted）左移让位。
+   全屏状态下只保留退出按钮，故始终停在默认位置。 */
+.fullscreen-btn.is-shifted {
+    right: calc(var(--back-to-top-gap) + var(--back-to-top-size) + var(--space-sm));
+}
+
+.fullscreen-btn:focus-visible,
+.back-to-top-btn:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 3px;
+}
+
+/* 进入 / 退出全屏图标二选一显示 */
+.fullscreen-btn .fullscreen-icon-exit {
+    display: none;
+}
+
+.fullscreen-btn.is-active .fullscreen-icon-enter {
+    display: none;
+}
+
+.fullscreen-btn.is-active .fullscreen-icon-exit {
+    display: block;
 }
 
 /* ==========================================================================
@@ -853,5 +891,88 @@ main {
 
     .countdown {
         gap: var(--space-2xs) var(--space-sm);
+    }
+}
+
+/* ==========================================================================
+   11. 全屏专注模式
+   --------------------------------------------------------------------------
+   全屏时只保留两块内容：
+     · 倒计时区域（.countdown-container）固定在左下角，文本左对齐
+     · 音乐播放器按钮固定在右上角
+   页面其余部分（日历 / 博客、语言按钮、正文、视频、页脚、返回顶部）隐藏。
+   ========================================================================== */
+body.is-fullscreen {
+    padding: 0;
+    display: block;
+    overflow: hidden;
+}
+
+body.is-fullscreen .container {
+    max-width: none;
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+body.is-fullscreen main {
+    display: block;
+    min-height: 100vh;
+    padding: 0;
+}
+
+body.is-fullscreen .calendar-switcher,
+body.is-fullscreen .content,
+body.is-fullscreen .video-container,
+body.is-fullscreen footer,
+body.is-fullscreen #backToTop {
+    display: none;
+}
+
+/* 语言切换按钮隐藏，音乐播放器按钮留在右上角 */
+body.is-fullscreen #langToggle {
+    display: none;
+}
+
+body.is-fullscreen .language-switcher {
+    position: fixed;
+    top: var(--space-xl);
+    right: var(--space-xl);
+    z-index: var(--z-toolbar);
+}
+
+/* 倒计时区域移到左下角并改成左对齐 */
+body.is-fullscreen .countdown-container {
+    position: fixed;
+    left: var(--space-xl);
+    bottom: var(--space-xl);
+    margin: 0;
+    width: auto;
+    max-width: calc(100vw - var(--space-xl) * 2);
+    padding: var(--space-lg) var(--space-xl);
+    text-align: left;
+}
+
+body.is-fullscreen .countdown {
+    justify-content: flex-start;
+}
+
+@media (max-width: 600px) {
+    body.is-fullscreen .language-switcher {
+        top: var(--space-md);
+        right: var(--space-md);
+    }
+
+    body.is-fullscreen .countdown-container {
+        left: var(--space-md);
+        bottom: var(--space-md);
+        max-width: calc(100vw - var(--space-md) * 2);
+        padding: var(--space-md);
     }
 }

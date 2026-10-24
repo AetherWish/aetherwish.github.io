@@ -63,6 +63,12 @@
             audioTracksAria: '曲目列表',
             audioNothingPlaying: '尚未选择曲目',
             audioModes: ['列表循环', '单曲循环', '随机播放'],
+            /** 曲目名随语言切换：中文设置显示中文名，英文设置显示英文名 */
+            audioTrackNames: ['心忆', '昔涟', '再度和你'],
+
+            /* 全屏按钮 */
+            fullscreenEnter: '全屏',
+            fullscreenExit: '退出全屏',
 
             copyright: '© 2026 cyrene.icu. <a href="mailto:philia093@cyrene.icu">网站建议与不良信息反馈</a> / <a href="https://blog.cyrene.icu/copyright-notice/" target="_blank" rel="noopener noreferrer">本站版权内容说明</a>',
             fontCredit: '本项目部分源代码由 AI 辅助完成，所有上线内容均已经由人工筛选和审查。',
@@ -104,6 +110,12 @@
             audioTracksAria: 'Tracks',
             audioNothingPlaying: 'No track selected',
             audioModes: ['Repeat all', 'Repeat one', 'Shuffle'],
+            /** 曲目名随语言切换：中文设置显示中文名，英文设置显示英文名 */
+            audioTrackNames: ['Remembrance', 'Ripples of Past Reverie', 'With You Once More'],
+
+            /* 全屏按钮 */
+            fullscreenEnter: 'Fullscreen',
+            fullscreenExit: 'Exit fullscreen',
 
             copyright: '© 2026 cyrene.icu. <a href="mailto:philia093@cyrene.icu">Website Content Suggestion &amp; Report</a> / <a href="https://blog.cyrene.icu/copyright-notice/" target="_blank" rel="noopener noreferrer">Copyright Notice</a>',
             fontCredit: 'Part of the source code of this project is assisted by AI, and has been screened and reviewed by humans.',

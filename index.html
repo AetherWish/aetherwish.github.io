@@ -6,6 +6,7 @@
     <meta name='description' content='cyrene.icu，《崩坏：星穹铁道》角色「昔涟」纪念站。Made with ❤ in Shanghai.'>
     <title>「记忆的幼芽」</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <link rel="preload" href="/font/XiaolaiMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
 </head>
 <body>
     <div class="container">
@@ -75,21 +76,21 @@
                             <li>
                                 <button class="audio-track" type="button" data-track-index="0" aria-pressed="false">
                                     <span class="audio-track-index">01</span>
-                                    <span class="audio-track-name">心忆 Remembrance</span>
+                                    <span class="audio-track-name">心忆</span>
                                     <span class="audio-track-equalizer" aria-hidden="true"><i></i><i></i><i></i></span>
                                 </button>
                             </li>
                             <li>
                                 <button class="audio-track" type="button" data-track-index="1" aria-pressed="false">
                                     <span class="audio-track-index">02</span>
-                                    <span class="audio-track-name">昔涟 Ripples of Past Reverie</span>
+                                    <span class="audio-track-name">昔涟</span>
                                     <span class="audio-track-equalizer" aria-hidden="true"><i></i><i></i><i></i></span>
                                 </button>
                             </li>
                             <li>
                                 <button class="audio-track" type="button" data-track-index="2" aria-pressed="false">
                                     <span class="audio-track-index">03</span>
-                                    <span class="audio-track-name">再度和你 With You Once More</span>
+                                    <span class="audio-track-name">再度和你</span>
                                     <span class="audio-track-equalizer" aria-hidden="true"><i></i><i></i><i></i></span>
                                 </button>
                             </li>
@@ -161,6 +162,16 @@
     <button id="backToTop" class="back-to-top-btn" title="返回顶部">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M7 14L12 9L17 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+
+    <!-- 全屏 / 退出全屏：非全屏时占用返回顶部按钮的位置，返回顶部出现后左移 -->
+    <button id="fullscreenToggle" class="fullscreen-btn" type="button" title="全屏" aria-label="全屏" aria-pressed="false">
+        <svg class="fullscreen-icon-enter" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M16 21h3a2 2 0 0 0 2-2v-3M8 21H5a2 2 0 0 1-2-2v-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <svg class="fullscreen-icon-exit" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M8 3v3a2 2 0 0 1-2 2H3M16 3v3a2 2 0 0 0 2 2h3M16 21v-3a2 2 0 0 1 2-2h3M8 21v-3a2 2 0 0 0-2-2H3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
     </button>
 
