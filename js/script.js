@@ -4,7 +4,7 @@
  * 职责（每项对应下面一个 init 函数）：
  *   1. 倒计时       —— 每秒刷新距目标时间的剩余量
  *   2. 语言切换     —— 委托给 translation.js 的 TranslationManager
- *   3. 背景音频     —— 静音 / 曲目一 / 曲目二 三态循环
+ *   3. 背景音频     —— 音乐选择与播控面板（播放 / 暂停 / 选曲 / 播放模式）
  *   4. 返回顶部     —— 滚动超过阈值后显示浮动按钮
  *
  * 依赖：translation.js（需先于本文件加载）
@@ -26,14 +26,20 @@
     /** 倒计时四个数字块的 id，与「天 / 时 / 分 / 秒」顺序一致 */
     const COUNTDOWN_UNIT_IDS = ['days', 'hours', 'minutes', 'seconds'];
 
-    /** 一首曲目对应的音频元素 id，下标即音频状态值（1 = remembrance，2 = reverie） */
-    const AUDIO_TRACK_IDS = [null, 'remembrance-audio', 'reverie-audio'];
+    /** 曲目表：顺序即面板中的显示顺序，id 对应页面里的 <audio> 元素 */
+    const AUDIO_TRACKS = [
+        { id: 'remembrance-audio', name: '心忆 Remembrance' },
+        { id: 'reverie-audio', name: '昔涟 Ripples of Past Reverie' },
+        { id: 'withyou-audio', name: '再度和你 With You Once More' }
+    ];
 
-    /** 音频状态：0 静音 / 1 曲目一 / 2 曲目二 */
-    const AUDIO_STATE = { MUTED: 0, TRACK_ONE: 1, TRACK_TWO: 2 };
-    const AUDIO_STATE_COUNT = 3;
+    /** 播放模式：顺序需与 translation.js 中 audioModes 数组一致 */
+    const PLAY_MODES = ['list', 'single', 'shuffle'];
 
-    /** 静音时叠加在喇叭图标上的斜线路径（viewBox 1024） */
+    /** 播放模式的本地存储键名 */
+    const PLAY_MODE_STORAGE_KEY = 'audioPlayMode';
+
+    /** 静音 / 暂停时叠加在喇叭图标上的斜线路径（viewBox 1024） */
     const MUTE_SLASH_PATH = 'M768 128L128 864';
     const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
@@ -136,46 +142,87 @@
     }
 
     /* =========================================================================
-       3. 背景音频
+       3. 背景音频（音乐选择与播控面板）
        ====================================================================== */
 
-    function initAudioToggle() {
+    function initAudioPlayer() {
+        const root = byId('audioPlayer');
         const toggleButton = byId('audioToggle');
         const icon = byId('audioIcon');
         const numberBadge = byId('audioNumber');
-        const tracks = AUDIO_TRACK_IDS.map(byId);
+        const panel = byId('audioPanel');
+        const panelTitle = byId('audioPanelTitle');
+        const closeButton = byId('audioClose');
+        const playPauseButton = byId('audioPlayPause');
+        const modeButton = byId('audioModeBtn');
+        const nowPlaying = byId('audioNowPlaying');
+        const trackList = byId('audioTrackList');
+        const trackButtons = Array.prototype.slice.call(document.querySelectorAll('.audio-track'));
+        const audios = AUDIO_TRACKS.map(function (track) {
+            return byId(track.id);
+        });
 
         // 缺少任一必需元素时直接跳过，避免抛出异常影响其它交互
-        if (!toggleButton || !icon || !numberBadge || !tracks[1] || !tracks[2]) {
+        if (!root || !toggleButton || !icon || !numberBadge || !panel || !playPauseButton ||
+            !modeButton || !nowPlaying || trackButtons.length !== AUDIO_TRACKS.length ||
+            audios.some(function (audio) { return !audio; })) {
             return;
         }
 
-        let state = AUDIO_STATE.MUTED;
+        /** 当前曲目下标；-1 表示还没选过曲目 */
+        let currentIndex = -1;
+        /** 播放模式：list / single / shuffle */
+        let mode = readMode();
 
-        /** 暂停全部曲目 */
-        function pauseAll() {
-            tracks.forEach((track) => {
-                if (track) {
-                    track.pause();
-                }
-            });
-        }
+        /* --- 模式持久化 --- */
 
-        /** 播放指定曲目（从头开始） */
-        function playTrack(track) {
-            track.currentTime = 0;
-            const playback = track.play();
-            // 浏览器可能因自动播放策略拒绝播放，静默处理即可
-            if (playback && typeof playback.catch === 'function') {
-                playback.catch(() => {});
+        function readMode() {
+            try {
+                const stored = window.localStorage.getItem(PLAY_MODE_STORAGE_KEY);
+                return PLAY_MODES.indexOf(stored) !== -1 ? stored : 'list';
+            } catch (error) {
+                return 'list'; // 隐私模式下 localStorage 不可用
             }
         }
 
-        /** 按当前状态刷新图标（静音加斜线并隐藏序号，播放中显示曲目序号） */
-        function renderIcon() {
-            icon.querySelectorAll('.audio-icon-overlay').forEach((node) => node.remove());
+        function saveMode() {
+            try {
+                window.localStorage.setItem(PLAY_MODE_STORAGE_KEY, mode);
+            } catch (error) {
+                // 写入失败不影响播放
+            }
+        }
 
-            if (state === AUDIO_STATE.MUTED) {
+        /* --- 文案：随语言切换刷新 --- */
+
+        function t(key) {
+            return window.translationManager ? window.translationManager.t(key) : '';
+        }
+
+        function modeLabel() {
+            const labels = t('audioModes');
+            const index = PLAY_MODES.indexOf(mode);
+            return Array.isArray(labels) && labels[index] ? labels[index] : '';
+        }
+
+        function activeAudio() {
+            return currentIndex >= 0 ? audios[currentIndex] : null;
+        }
+
+        function isPlaying() {
+            const audio = activeAudio();
+            return !!(audio && !audio.paused && !audio.ended);
+        }
+
+        /* --- 渲染 --- */
+
+        /** 顶部按钮图标：未播放时叠加斜线；序号显示当前曲目 */
+        function renderToolbarIcon(playing) {
+            icon.querySelectorAll('.audio-icon-overlay').forEach(function (node) {
+                node.remove();
+            });
+
+            if (!playing) {
                 const slash = document.createElementNS(SVG_NAMESPACE, 'path');
                 slash.setAttribute('d', MUTE_SLASH_PATH);
                 slash.setAttribute('stroke', 'white');
@@ -184,28 +231,208 @@
                 slash.setAttribute('fill', 'none');
                 slash.setAttribute('class', 'audio-icon-overlay');
                 icon.appendChild(slash);
+            }
 
-                numberBadge.style.display = 'none';
+            if (currentIndex >= 0) {
+                numberBadge.textContent = String(currentIndex + 1);
+                numberBadge.classList.add('is-visible');
+            } else {
+                numberBadge.classList.remove('is-visible');
+            }
+        }
+
+        /** 同步按钮、面板与曲目列表的视觉状态 */
+        function renderState() {
+            const playing = isPlaying();
+
+            renderToolbarIcon(playing);
+
+            playPauseButton.classList.toggle('is-playing', playing);
+            playPauseButton.setAttribute('aria-label', t(playing ? 'audioPause' : 'audioPlay'));
+
+            nowPlaying.classList.toggle('is-playing', playing);
+            nowPlaying.textContent = currentIndex >= 0
+                ? AUDIO_TRACKS[currentIndex].name
+                : t('audioNothingPlaying');
+
+            trackButtons.forEach(function (button, index) {
+                const selected = index === currentIndex;
+                button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+                button.classList.toggle('is-playing', selected && playing);
+                button.setAttribute('aria-label', AUDIO_TRACKS[index].name);
+            });
+        }
+
+        /** 语言切换后刷新面板内的所有动态文案 */
+        function renderLabels() {
+            panelTitle.textContent = t('audioPanelTitle');
+            panel.setAttribute('aria-label', t('audioPanelTitle'));
+            closeButton.setAttribute('aria-label', t('audioClose'));
+            modeButton.textContent = modeLabel();
+            modeButton.setAttribute('aria-label', t('audioModeAria'));
+            trackList.setAttribute('aria-label', t('audioTracksAria'));
+            toggleButton.setAttribute('aria-label', t('audioPanelTitle'));
+            toggleButton.setAttribute('title', t('audioPanelTitle'));
+            renderState();
+        }
+
+        /* --- 播放控制 --- */
+
+        function pauseAll() {
+            audios.forEach(function (audio) {
+                audio.pause();
+            });
+        }
+
+        /** 应用当前播放模式：单曲循环交给 audio.loop，其余模式在 ended 里切歌 */
+        function applyMode() {
+            audios.forEach(function (audio) {
+                audio.loop = mode === 'single';
+            });
+            saveMode();
+            renderLabels();
+        }
+
+        function playIndex(index, restart) {
+            const audio = audios[index];
+            if (!audio) {
                 return;
             }
 
-            numberBadge.textContent = String(state);
-            numberBadge.style.display = 'inline';
-        }
-
-        // 三态循环：静音 → 曲目一 → 曲目二 → 静音
-        toggleButton.addEventListener('click', function () {
-            state = (state + 1) % AUDIO_STATE_COUNT;
-
-            pauseAll();
-            if (state !== AUDIO_STATE.MUTED) {
-                playTrack(tracks[state]);
+            if (index !== currentIndex) {
+                pauseAll();
+                currentIndex = index;
+                audio.currentTime = 0;
+            } else if (restart) {
+                audio.currentTime = 0;
             }
 
-            renderIcon();
+            audio.loop = mode === 'single';
+            const playback = audio.play();
+            // 浏览器可能因自动播放策略拒绝播放，静默处理即可
+            if (playback && typeof playback.catch === 'function') {
+                playback.catch(function () {});
+            }
+            renderState();
+        }
+
+        function togglePlayback() {
+            const audio = activeAudio();
+
+            if (!audio) {
+                playIndex(0, true);
+                return;
+            }
+
+            if (audio.paused) {
+                audio.loop = mode === 'single';
+                const playback = audio.play();
+                if (playback && typeof playback.catch === 'function') {
+                    playback.catch(function () {});
+                }
+            } else {
+                audio.pause();
+            }
+            renderState();
+        }
+
+        /** 顺序 / 随机模式下计算下一首（随机模式避免立刻重复当前曲目） */
+        function nextIndex(from) {
+            if (mode === 'shuffle' && audios.length > 1) {
+                let next = from;
+                while (next === from) {
+                    next = Math.floor(Math.random() * audios.length);
+                }
+                return next;
+            }
+            return (from + 1) % audios.length;
+        }
+
+        function handleEnded(event) {
+            const endedIndex = audios.indexOf(event.currentTarget);
+            if (endedIndex !== currentIndex) {
+                return;
+            }
+
+            if (mode === 'single') {
+                playIndex(endedIndex, true);
+                return;
+            }
+
+            playIndex(nextIndex(endedIndex), true);
+        }
+
+        /* --- 面板开合 --- */
+
+        function openPanel() {
+            panel.hidden = false;
+            toggleButton.setAttribute('aria-expanded', 'true');
+            renderState();
+        }
+
+        function closePanel() {
+            panel.hidden = true;
+            toggleButton.setAttribute('aria-expanded', 'false');
+        }
+
+        function togglePanel() {
+            if (panel.hidden) {
+                openPanel();
+            } else {
+                closePanel();
+            }
+        }
+
+        /* --- 事件绑定 --- */
+
+        toggleButton.addEventListener('click', togglePanel);
+
+        closeButton.addEventListener('click', function () {
+            closePanel();
+            toggleButton.focus();
         });
 
-        renderIcon();
+        playPauseButton.addEventListener('click', togglePlayback);
+
+        modeButton.addEventListener('click', function () {
+            mode = PLAY_MODES[(PLAY_MODES.indexOf(mode) + 1) % PLAY_MODES.length];
+            applyMode();
+        });
+
+        trackButtons.forEach(function (button, index) {
+            button.addEventListener('click', function () {
+                if (index === currentIndex) {
+                    togglePlayback();
+                } else {
+                    playIndex(index, true);
+                }
+            });
+        });
+
+        audios.forEach(function (audio) {
+            audio.addEventListener('play', renderState);
+            audio.addEventListener('pause', renderState);
+            audio.addEventListener('ended', handleEnded);
+        });
+
+        // 点击面板外部收起；Esc 收起并把焦点还给触发按钮
+        document.addEventListener('click', function (event) {
+            if (!panel.hidden && !root.contains(event.target)) {
+                closePanel();
+            }
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && !panel.hidden) {
+                closePanel();
+                toggleButton.focus();
+            }
+        });
+
+        // 语言切换时同步面板文案
+        document.addEventListener('languagechange', renderLabels);
+
+        applyMode();
     }
 
     /* =========================================================================
@@ -256,6 +483,6 @@
         initLanguageToggle();
         initCountdown();
         initBackToTop();
-        initAudioToggle();
+        initAudioPlayer();
     });
 }());

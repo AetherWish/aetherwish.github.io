@@ -40,13 +40,62 @@
                     </svg>
                     <span id="langToggleText" class="lang-toggle-text">Hello World</span>
                 </button>
-                <button id="audioToggle" class="audio-toggle-btn">
-                    <svg id="audioIcon" t="1763681506664" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5135" width="200" height="200">
-                        <path d="M384 800c-17.6 0-32-14.4-32-32V248c0-48 36.8-89.6 84.8-96l384-48c27.2-1.6 54.4 6.4 75.2 24 20.8 17.6 32 44.8 32 72V704c0 17.6-14.4 32-32 32s-32-14.4-32-32V200c0-9.6-3.2-17.6-11.2-24s-16-9.6-25.6-8l-384 48c-16 1.6-28.8 16-28.8 32V768c1.6 17.6-12.8 32-30.4 32z" fill="#ffffff" p-id="5136"></path>
-                        <path d="M752 864c-97.6 0-176-72-176-160s78.4-160 176-160 176 72 176 160-78.4 160-176 160z m0-256c-62.4 0-112 43.2-112 96s49.6 96 112 96 112-43.2 112-96-49.6-96-112-96zM240 928C142.4 928 64 856 64 768s78.4-160 176-160 176 72 176 160-78.4 160-176 160z m0-256c-62.4 0-112 43.2-112 96s49.6 96 112 96 112-43.2 112-96-49.6-96-112-96zM416 416c-16 0-28.8-11.2-32-27.2-1.6-17.6 9.6-33.6 27.2-35.2l320-43.2c17.6-1.6 33.6 9.6 35.2 27.2 1.6 17.6-9.6 33.6-27.2 35.2l-320 43.2H416z" fill="#ffffff" p-id="5137"></path>
-                    </svg>
-                    <span id="audioNumber" class="audio-number">1</span>
-                </button>
+                <div id="audioPlayer" class="audio-player">
+                    <button id="audioToggle" class="audio-toggle-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="audioPanel" aria-label="音乐播放器" title="音乐播放器">
+                        <svg id="audioIcon" t="1763681506664" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5135" width="200" height="200" aria-hidden="true">
+                            <path d="M384 800c-17.6 0-32-14.4-32-32V248c0-48 36.8-89.6 84.8-96l384-48c27.2-1.6 54.4 6.4 75.2 24 20.8 17.6 32 44.8 32 72V704c0 17.6-14.4 32-32 32s-32-14.4-32-32V200c0-9.6-3.2-17.6-11.2-24s-16-9.6-25.6-8l-384 48c-16 1.6-28.8 16-28.8 32V768c1.6 17.6-12.8 32-30.4 32z" fill="#ffffff" p-id="5136"></path>
+                            <path d="M752 864c-97.6 0-176-72-176-160s78.4-160 176-160 176 72 176 160-78.4 160-176 160z m0-256c-62.4 0-112 43.2-112 96s49.6 96 112 96 112-43.2 112-96-49.6-96-112-96zM240 928C142.4 928 64 856 64 768s78.4-160 176-160 176 72 176 160-78.4 160-176 160z m0-256c-62.4 0-112 43.2-112 96s49.6 96 112 96 112-43.2 112-96-49.6-96-112-96zM416 416c-16 0-28.8-11.2-32-27.2-1.6-17.6 9.6-33.6 27.2-35.2l320-43.2c17.6-1.6 33.6 9.6 35.2 27.2 1.6 17.6-9.6 33.6-27.2 35.2l-320 43.2H416z" fill="#ffffff" p-id="5137"></path>
+                        </svg>
+                        <span id="audioNumber" class="audio-number">1</span>
+                    </button>
+
+                    <!-- 音乐选择与播控面板：点击上方按钮在按钮下方展开 -->
+                    <div id="audioPanel" class="audio-panel" role="dialog" aria-label="音乐播放器" hidden>
+                        <div class="audio-panel-head">
+                            <span id="audioPanelTitle" class="audio-panel-title">音乐播放器</span>
+                            <button id="audioClose" class="audio-close-btn" type="button" aria-label="关闭">
+                                <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                                    <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <p id="audioNowPlaying" class="audio-now-playing">尚未选择曲目</p>
+                        <div class="audio-controls">
+                            <button id="audioPlayPause" class="audio-play-btn" type="button" aria-label="播放">
+                                <svg class="audio-icon-play" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                    <path d="M8 5.2v13.6L19 12z" fill="currentColor"></path>
+                                </svg>
+                                <svg class="audio-icon-pause" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                    <path d="M7 5h3.6v14H7zM13.4 5H17v14h-3.6z" fill="currentColor"></path>
+                                </svg>
+                            </button>
+                            <button id="audioModeBtn" class="audio-mode-btn" type="button" aria-label="播放模式">列表循环</button>
+                        </div>
+                        <ul id="audioTrackList" class="audio-track-list" aria-label="曲目列表">
+                            <li>
+                                <button class="audio-track" type="button" data-track-index="0" aria-pressed="false">
+                                    <span class="audio-track-index">01</span>
+                                    <span class="audio-track-name">心忆 Remembrance</span>
+                                    <span class="audio-track-equalizer" aria-hidden="true"><i></i><i></i><i></i></span>
+                                </button>
+                            </li>
+                            <li>
+                                <button class="audio-track" type="button" data-track-index="1" aria-pressed="false">
+                                    <span class="audio-track-index">02</span>
+                                    <span class="audio-track-name">昔涟 Ripples of Past Reverie</span>
+                                    <span class="audio-track-equalizer" aria-hidden="true"><i></i><i></i><i></i></span>
+                                </button>
+                            </li>
+                            <li>
+                                <button class="audio-track" type="button" data-track-index="2" aria-pressed="false">
+                                    <span class="audio-track-index">03</span>
+                                    <span class="audio-track-name">再度和你 With You Once More</span>
+                                    <span class="audio-track-equalizer" aria-hidden="true"><i></i><i></i><i></i></span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
             <div class="content">
                 <div id="mainContent">
@@ -56,6 +105,7 @@
 
             <div class="countdown-container">
                 <h2 id="countdownMainText">下次见, 「PhiLia093」</h2>
+                <h3 id="countdownSubText">距离2026年11月12日13:00（4.6期间）还有</h3>
                 <div id="countdown" class="countdown">
                     <div class="countdown-item">
                         <span id="days">00</span>
@@ -74,7 +124,6 @@
                         <span id="secondsLabel" class="label">秒</span>
                     </div>
                 </div>
-                <h3 id="countdownSubText">距离2026年11月12日13:00（4.6期间）还有</h3>
             </div>
 
             <div class="video-container">
@@ -116,11 +165,14 @@
     </button>
 
     <!-- Hidden audio elements for background audio -->
-    <audio id="remembrance-audio" preload="auto">
+    <audio id="remembrance-audio" preload="metadata">
         <source src="/audio/remembrance.mp3" type="audio/mpeg">
     </audio>
-    <audio id="reverie-audio" preload="auto">
+    <audio id="reverie-audio" preload="metadata">
         <source src="/audio/reverie.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="withyou-audio" preload="metadata">
+        <source src="/audio/withyou.mp3" type="audio/mpeg">
     </audio>
 
     <script src="/js/translation.js"></script>

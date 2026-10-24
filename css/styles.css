@@ -33,6 +33,22 @@
     --glass-bg-strong: rgba(255, 255, 255, 0.2);
     --glass-blur: 10px;
 
+    /* 播放器面板（深色玻璃，保证面板内白字可读） */
+    --panel-bg: rgba(74, 31, 53, 0.82);
+    --panel-border: rgba(255, 255, 255, 0.14);
+    --panel-hover: rgba(255, 255, 255, 0.1);
+    --panel-active: rgba(235, 126, 163, 0.3);
+
+    /* 背景遮罩：暖玫瑰色半透明渐变。
+       配合新版粉发逆光背景，只做轻度压暗与暖色统一，让新背景的细节透出来，
+       同时保证白字可读（过重会把画面压成一块粉色，过轻则小字对比不足）。 */
+    --mask-deep: rgba(104, 42, 66, 0.46);
+    --mask-rose: rgba(186, 96, 118, 0.34);
+    --mask-apricot: rgba(206, 134, 104, 0.27);
+    --page-mask:
+        radial-gradient(120% 100% at 50% 12%, rgba(255, 214, 222, 0.08), transparent 58%),
+        linear-gradient(135deg, var(--mask-deep), var(--mask-rose) 52%, var(--mask-apricot));
+
     /* 文字与分隔线 */
     --text: #ffffff;
     --text-muted: rgba(255, 255, 255, 0.7);
@@ -119,13 +135,15 @@ body {
     position: relative;
 }
 
-/* 紫粉色渐变遮罩，压暗背景图以突出前景文字 */
+/* 暖玫瑰色渐变遮罩，压暗背景图以突出前景文字。
+   固定在视口上，与 body 的 fixed 背景保持一致，滚动时不会出现接缝。 */
 body::before {
     content: '';
-    position: absolute;
+    position: fixed;
     inset: 0;
-    background: linear-gradient(135deg, rgba(138, 43, 226, 0.4), rgba(235, 126, 163, 0.3));
+    background: var(--page-mask);
     z-index: var(--z-overlay);
+    pointer-events: none;
 }
 
 .container {
@@ -218,14 +236,301 @@ body::before {
     flex-shrink: 0;
 }
 
-/* --- 音频按钮右侧的状态序号（0 静音 / 1 / 2） --- */
+/* --- 音频按钮右侧的状态序号（当前曲目 1 / 2 / 3） --- */
 .audio-number {
+    display: none;
     font-size: 14px;
     font-weight: bold;
     color: var(--text);
     line-height: 1;
-    display: none; /* 默认静音，由 JS 切换为 inline */
     -webkit-font-smoothing: antialiased;
+}
+
+.audio-number.is-visible {
+    display: inline;
+}
+
+/* --- 音乐播放器：按钮 + 下方弹出面板 --- */
+.audio-player {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.audio-panel {
+    position: absolute;
+    top: calc(100% + var(--space-sm));
+    right: 0;
+    width: 292px;
+    max-width: calc(100vw - 50px);
+    padding: var(--space-lg);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--radius-md);
+    background: var(--panel-bg);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.38);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    color: var(--text);
+    text-align: left;
+    transform-origin: top right;
+    animation: audio-panel-in 0.18s ease;
+}
+
+/* hidden 属性优先于上面的布局，确保面板可真正收起 */
+.audio-panel[hidden] {
+    display: none;
+}
+
+@keyframes audio-panel-in {
+    from {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.audio-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-2xs);
+}
+
+.audio-panel-title {
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.04em;
+    color: var(--text-soft);
+}
+
+.audio-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-soft);
+    cursor: pointer;
+    transition: background var(--ease), color var(--ease);
+}
+
+.audio-close-btn:hover {
+    background: var(--panel-hover);
+    color: var(--text);
+}
+
+.audio-now-playing {
+    margin-bottom: var(--space-md);
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-soft);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 播放状态指示点：播放中粉色呼吸 */
+.audio-now-playing::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: var(--space-xs);
+    border-radius: 50%;
+    background: var(--brand-40);
+    vertical-align: middle;
+}
+
+.audio-now-playing.is-playing::before {
+    background: var(--brand);
+    box-shadow: 0 0 0 3px var(--brand-30);
+    animation: audio-dot 1.6s ease-in-out infinite;
+}
+
+@keyframes audio-dot {
+    50% {
+        opacity: 0.35;
+    }
+}
+
+.audio-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.audio-play-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--brand-80);
+    color: var(--text);
+    cursor: pointer;
+    transition: background var(--ease), transform var(--ease);
+}
+
+.audio-play-btn:hover {
+    background: var(--brand);
+    transform: scale(1.04);
+}
+
+/* 播放 / 暂停图标二选一显示 */
+.audio-play-btn .audio-icon-pause {
+    display: none;
+}
+
+.audio-play-btn.is-playing .audio-icon-play {
+    display: none;
+}
+
+.audio-play-btn.is-playing .audio-icon-pause {
+    display: block;
+}
+
+.audio-mode-btn {
+    flex: 1;
+    min-width: 0;
+    height: 32px;
+    padding: 0 var(--space-md);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-soft);
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    transition: background var(--ease), border-color var(--ease), color var(--ease);
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.audio-mode-btn:hover {
+    background: var(--panel-hover);
+    border-color: var(--brand-40);
+    color: var(--text);
+}
+
+.audio-track-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.audio-track {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    width: 100%;
+    padding: var(--space-sm) var(--space-xs);
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-soft);
+    font-family: inherit;
+    font-size: 12.5px;
+    line-height: 1.4;
+    text-align: left;
+    cursor: pointer;
+    transition: background var(--ease), color var(--ease);
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.audio-track:hover {
+    background: var(--panel-hover);
+    color: var(--text);
+}
+
+.audio-track[aria-pressed="true"] {
+    background: var(--panel-active);
+    color: var(--text);
+}
+
+.audio-track-index {
+    flex-shrink: 0;
+    font-size: 11px;
+    opacity: 0.6;
+    font-variant-numeric: tabular-nums;
+}
+
+.audio-track-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 正在播放的曲目右侧显示跳动的均衡器 */
+.audio-track-equalizer {
+    display: none;
+    align-items: flex-end;
+    gap: 2px;
+    width: 14px;
+    height: 12px;
+    flex-shrink: 0;
+}
+
+.audio-track[aria-pressed="true"].is-playing .audio-track-equalizer {
+    display: flex;
+}
+
+.audio-track-equalizer i {
+    display: block;
+    width: 2px;
+    height: 30%;
+    border-radius: 1px;
+    background: var(--text);
+    animation: audio-eq 0.9s ease-in-out infinite;
+}
+
+.audio-track-equalizer i:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.audio-track-equalizer i:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+@keyframes audio-eq {
+    0%,
+    100% {
+        height: 30%;
+    }
+    50% {
+        height: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .audio-panel {
+        animation: none;
+    }
+
+    .audio-track-equalizer i,
+    .audio-now-playing.is-playing::before {
+        animation: none;
+    }
 }
 
 /* ==========================================================================
@@ -264,56 +569,65 @@ main {
 }
 
 #countdownMainText {
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
     font-size: 1.5em;
     color: var(--text);
     text-shadow: var(--text-shadow);
 }
 
+/* 说明文字：位于倒计时正上方 */
 #countdownSubText {
-    margin-top: var(--space-lg);
+    margin: 0 0 var(--space-md);
     font-size: 1em;
     color: var(--text-soft);
     text-shadow: var(--text-shadow);
+    /* 两行时优先在括号前断行，避免把「（4.6期间）」拆开 */
+    text-wrap: balance;
 }
 
+/* 横向排列：各组「数字 + 单位」在同一行内依次排列 */
 .countdown {
     display: flex;
     justify-content: center;
-    gap: var(--space-lg);
+    align-items: baseline;
     flex-wrap: wrap;
+    gap: var(--space-2xs) var(--space-lg);
 }
 
+/* 单个单位内部同样是横向：数字紧接单位，基线对齐 */
 .countdown-item {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 60px;
+    align-items: baseline;
+    gap: 2px;
+    min-width: 0;
 }
 
 .countdown-item span {
     display: block;
 }
 
-/* 时 / 分 / 秒的数字块 */
+/* 时 / 分 / 秒的数字：仅保留字号、字重与投影，不再使用框体 */
 #days,
 #hours,
 #minutes,
 #seconds {
     font-size: 2em;
     font-weight: bold;
-    background: var(--glass-bg-strong);
-    padding: var(--space-md);
-    border-radius: var(--radius-sm);
-    min-width: 60px;
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    min-width: 0;
     text-align: center;
     color: var(--text);
     text-shadow: var(--text-shadow);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
 }
 
 .label {
     font-size: 0.9em;
-    margin-top: var(--space-xs);
+    margin-top: 0;
+    line-height: 1;
 }
 
 /* ==========================================================================
@@ -447,8 +761,11 @@ main {
     #minutes,
     #seconds {
         font-size: 1.5em;
-        min-width: 45px;
-        padding: var(--space-xs);
+    }
+
+    /* 窄屏收紧单位之间的横向间距，保证四组仍能排在一行 */
+    .countdown {
+        gap: var(--space-2xs) var(--space-md);
     }
 
     .back-to-top-btn {
@@ -464,7 +781,8 @@ main {
     .calendar-toggle-text,
     .blog-toggle-text,
     .lang-toggle-text,
-    .audio-number {
+    .audio-number,
+    .audio-number.is-visible {
         display: none;
     }
 
@@ -496,6 +814,23 @@ main {
     main {
         padding-top: 100px;
     }
+
+    /* 手机端面板：占满左右可用宽度并加大触控行高 */
+    .audio-panel {
+        width: calc(100vw - 50px);
+        max-width: none;
+        padding: var(--space-md);
+    }
+
+    .audio-track {
+        padding: 10px var(--space-sm);
+        font-size: 12px;
+    }
+
+    .audio-play-btn {
+        width: 40px;
+        height: 40px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -508,5 +843,15 @@ main {
     main {
         padding-left: var(--space-lg);
         padding-right: var(--space-lg);
+    }
+
+    /* 320px 级窄屏：收紧倒计时卡片内边距与组间距，保证四组仍排在一行 */
+    .countdown-container {
+        padding: var(--space-md);
+        margin: var(--space-xl) 0;
+    }
+
+    .countdown {
+        gap: var(--space-2xs) var(--space-sm);
     }
 }

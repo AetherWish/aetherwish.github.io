@@ -54,6 +54,16 @@
             countdownSub: '距离2026年11月12日13:00（4.6期间）还有',
             countdownLabels: ['天', '时', '分', '秒'],
 
+            /* 音乐播放器面板 */
+            audioPanelTitle: '音乐播放器',
+            audioClose: '关闭',
+            audioPlay: '播放',
+            audioPause: '暂停',
+            audioModeAria: '播放模式',
+            audioTracksAria: '曲目列表',
+            audioNothingPlaying: '尚未选择曲目',
+            audioModes: ['列表循环', '单曲循环', '随机播放'],
+
             copyright: '© 2026 cyrene.icu. <a href="mailto:philia093@cyrene.icu">网站建议与不良信息反馈</a> / <a href="https://blog.cyrene.icu/copyright-notice/" target="_blank" rel="noopener noreferrer">本站版权内容说明</a>',
             fontCredit: '本项目部分源代码由 AI 辅助完成，所有上线内容均已经由人工筛选和审查。',
 
@@ -84,6 +94,16 @@
             countdownMainExpired: 'Hello World!',
             countdownSub: 'Time until Nov 12, 2026 1:00 PM (during ver.4.6)',
             countdownLabels: ['d', 'h', 'm', 's'],
+
+            /* 音乐播放器面板 */
+            audioPanelTitle: 'Music Player',
+            audioClose: 'Close',
+            audioPlay: 'Play',
+            audioPause: 'Pause',
+            audioModeAria: 'Playback mode',
+            audioTracksAria: 'Tracks',
+            audioNothingPlaying: 'No track selected',
+            audioModes: ['Repeat all', 'Repeat one', 'Shuffle'],
 
             copyright: '© 2026 cyrene.icu. <a href="mailto:philia093@cyrene.icu">Website Content Suggestion &amp; Report</a> / <a href="https://blog.cyrene.icu/copyright-notice/" target="_blank" rel="noopener noreferrer">Copyright Notice</a>',
             fontCredit: 'Part of the source code of this project is assisted by AI, and has been screened and reviewed by humans.',
@@ -227,6 +247,10 @@
             this.savePreference(lang);
             document.documentElement.lang = lang;
             this.render();
+
+            // 通知依赖当前语言的其它模块（如播放器面板）刷新动态文案。
+            // 初始化时监听者尚未注册也无妨，各模块初始化时会自行渲染一次。
+            document.dispatchEvent(new CustomEvent('languagechange', { detail: { lang: lang } }));
             return lang;
         }
 
