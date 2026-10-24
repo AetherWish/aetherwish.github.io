@@ -21,7 +21,7 @@
     const STORAGE_KEY = 'language';
 
     /**
-     * 倒计时目标时间：2026-11-12 13:00（《崩坏：星穹铁道》4.6 版本期间）。
+     * 倒计时目标时间：2026-11-12 13:00（《崩坏：星穹铁道》4.7 版本期间）。
      * 这是全站唯一的定义处 —— script.js 会直接复用，不要再硬编码第二份。
      */
     const TARGET_DATE = new Date('2026-11-12T13:00:00');
@@ -51,7 +51,7 @@
             countdownMain: '下次见, 「PhiLia093」',
             countdownMainTomorrow: '明天见，「PhiLia093」',
             countdownMainExpired: '你好，世界！',
-            countdownSub: '距离2026年11月12日13:00（4.6期间）还有',
+            countdownSub: '距离2026年11月12日13:00（4.7版本期间）还有',
             countdownLabels: ['天', '时', '分', '秒'],
 
             /* 音乐播放器面板 */
@@ -98,7 +98,7 @@
             countdownMain: 'See you soon, PhiLia093',
             countdownMainTomorrow: 'See you tomorrow, PhiLia093',
             countdownMainExpired: 'Hello World!',
-            countdownSub: 'Time until Nov 12, 2026 1:00 PM (during ver.4.6)',
+            countdownSub: 'Time until Nov 12, 2026 1:00 PM (during ver.4.7)',
             countdownLabels: ['d', 'h', 'm', 's'],
 
             /* 音乐播放器面板 */
