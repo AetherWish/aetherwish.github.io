@@ -54,6 +54,12 @@
        取背景图整体色调的暗部，与遮罩叠加后仍是同一色系。 */
     --bg-fallback: #4a2333;
 
+    /* 背景插画「上下边缘」的平均色（由 philia093.webp 顶部/底部各 120 行取样）。
+       竖屏时插画按宽度完整放入，上下会多出留白，就用这两个颜色补齐，
+       让留白延续画面本身的色调，而不是一块死色或第二张图。 */
+    --bg-edge-top: #e8a0b3;
+    --bg-edge-bottom: #efd4c6;
+
     /* 文字与分隔线 */
     --text: #ffffff;
     --text-muted: rgba(255, 255, 255, 0.7);
@@ -153,19 +159,7 @@ html {
     background-image: linear-gradient(135deg, var(--bg-fallback), #7c3a4d 52%, #96513f);
 }
 
-/* 氛围底：同一张插画的缩小模糊版（1024px 宽，约 20 KB，放大铺满即可，
-   解码与网络开销都可忽略；横屏时 display:none，根本不会下载）。
-   只在“照片没能铺满屏幕”时露出来补留白，避免出现生硬的纯色条。
-   绘制顺序：图层底色 → 氛围底(-1) → 照片。 */
-.page-background::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    display: none;
-    background: url('/img/philia093-ambience.webp') center / cover no-repeat;
-}
-
+/* 全页只有这一张背景插画：宽屏铺满，竖屏完整放入（见下方自适应段落）。 */
 .page-background img {
     display: block;
     width: 100%;
@@ -178,19 +172,44 @@ html {
 /* --- 自适应构图（竖屏 / 窄窗口）-------------------------------------------
    视口比插画本身更窄更高时，cover 会横向裁掉 40%~70% 的画面 —— 手机竖屏
    甚至只剩一只眼睛的特写。这里改成「整张插画完整放进屏幕」（contain），
-   空出来的上下留白由上面的模糊氛围底补齐，于是：
+   于是：
      · 竖屏手机 / 平板：整图可见，人物不再被裁断；
-     · 桌面 / 平板横屏（宽高比 ≥ 1）：仍走默认的满屏 cover，观感不变。 */
+     · 桌面 / 平板横屏（宽高比 ≥ 1）：仍走默认的满屏 cover，观感不变。
+   插画按宽度放入后高度恒为 100vw / 1.7258 ≈ 57.94vw，即上下各留出
+   (50% - 28.97vw) 的空白；这块空白用取自插画上下边缘的纯色渐变补齐
+   （颜色见 --bg-edge-top / --bg-edge-bottom），画面色调自然延续，
+   而且全页始终只有一张背景图，不会出现「同一张图显示两次」的观感。 */
 @media (max-aspect-ratio: 1/1) {
-    .page-background::before {
-        display: block;
+    .page-background {
+        background-image: linear-gradient(
+            to bottom,
+            var(--bg-edge-top) 0,
+            var(--bg-edge-top) calc(50% - 28.98vw),
+            var(--bg-edge-bottom) calc(50% + 28.98vw),
+            var(--bg-edge-bottom) 100%
+        );
     }
 
     .page-background img {
         object-fit: contain;
-        /* 清晰图的上下边缘淡入模糊氛围底，避免它在玻璃面板后面压出一条硬接缝 */
-        -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 14%, #000 86%, transparent 100%);
-        mask-image: linear-gradient(to bottom, transparent 0, #000 14%, #000 86%, transparent 100%);
+        /* 插画上下边缘淡入同色留白，避免在留白与画面之间压出一条硬边。
+           注意遮罩要按「画面实际区域」来算：img 盒子是整屏，但 contain 后
+           画面只占中间 y ∈ [50% - 28.97vw, 50% + 28.97vw]，所以淡入区必须
+           贴着这两个边界往里收 10vw，否则淡入会落在画面之外、边界依然是硬的。 */
+        -webkit-mask-image: linear-gradient(
+            to bottom,
+            transparent calc(50% - 28.97vw),
+            #000 calc(50% - 18.97vw),
+            #000 calc(50% + 18.97vw),
+            transparent calc(50% + 28.97vw)
+        );
+        mask-image: linear-gradient(
+            to bottom,
+            transparent calc(50% - 28.97vw),
+            #000 calc(50% - 18.97vw),
+            #000 calc(50% + 18.97vw),
+            transparent calc(50% + 28.97vw)
+        );
     }
 }
 
