@@ -153,13 +153,45 @@ html {
     background-image: linear-gradient(135deg, var(--bg-fallback), #7c3a4d 52%, #96513f);
 }
 
+/* 氛围底：同一张插画的缩小模糊版（1024px 宽，约 20 KB，放大铺满即可，
+   解码与网络开销都可忽略；横屏时 display:none，根本不会下载）。
+   只在“照片没能铺满屏幕”时露出来补留白，避免出现生硬的纯色条。
+   绘制顺序：图层底色 → 氛围底(-1) → 照片。 */
+.page-background::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    display: none;
+    background: url('/img/philia093-ambience.webp') center / cover no-repeat;
+}
+
 .page-background img {
     display: block;
     width: 100%;
     height: 100%;
-    /* 等价于原先 body 上的 center / cover */
+    /* 宽屏默认：铺满视口（等价于原先 body 上的 center / cover） */
     object-fit: cover;
     object-position: center;
+}
+
+/* --- 自适应构图（竖屏 / 窄窗口）-------------------------------------------
+   视口比插画本身更窄更高时，cover 会横向裁掉 40%~70% 的画面 —— 手机竖屏
+   甚至只剩一只眼睛的特写。这里改成「整张插画完整放进屏幕」（contain），
+   空出来的上下留白由上面的模糊氛围底补齐，于是：
+     · 竖屏手机 / 平板：整图可见，人物不再被裁断；
+     · 桌面 / 平板横屏（宽高比 ≥ 1）：仍走默认的满屏 cover，观感不变。 */
+@media (max-aspect-ratio: 1/1) {
+    .page-background::before {
+        display: block;
+    }
+
+    .page-background img {
+        object-fit: contain;
+        /* 清晰图的上下边缘淡入模糊氛围底，避免它在玻璃面板后面压出一条硬接缝 */
+        -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 14%, #000 86%, transparent 100%);
+        mask-image: linear-gradient(to bottom, transparent 0, #000 14%, #000 86%, transparent 100%);
+    }
 }
 
 /* 兜底：图片确实加载失败时隐藏失败的 <img>，露出上面的渐变底色 */
