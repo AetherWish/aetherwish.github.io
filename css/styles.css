@@ -4,7 +4,7 @@
    结构：
      1. 设计令牌 (Design Tokens)
      2. 基础重置与字体
-     3. 页面骨架 (body / 遮罩 / 容器)
+     3. 页面骨架 (背景图层 / body / 遮罩 / 容器)
      4. 顶部工具按钮（日历 / 博客 / 语言 / 音频）
      5. 主内容区
      6. 倒计时
@@ -49,6 +49,10 @@
     --page-mask:
         radial-gradient(120% 100% at 50% 12%, rgba(255, 214, 222, 0.08), transparent 58%),
         linear-gradient(135deg, var(--mask-deep), var(--mask-rose) 52%, var(--mask-apricot));
+
+    /* 背景图兜底色：webp 解码完成之前、或图片加载失败时铺底，避免白屏闪烁。
+       取背景图整体色调的暗部，与遮罩叠加后仍是同一色系。 */
+    --bg-fallback: #4a2333;
 
     /* 文字与分隔线 */
     --text: #ffffff;
@@ -125,9 +129,47 @@ button {
    3. 页面骨架
    ========================================================================== */
 
-/* 背景图固定在视口，页面滚动时内容在其上滑动 */
+/* --- 3.1 背景图层 ---------------------------------------------------------
+   背景图固定在视口，页面滚动时内容在其上滑过。
+   这里刻意不用 `background-attachment: fixed`：iOS / iPadOS 的 WebKit
+   并不支持该值（WebKit Bug 196327 / 234779 / 275247 —— 值被忽略，且
+   background-size 等尺寸属性会一并失效，背景被裁切甚至完全不绘制）。
+   “固定背景”本身用一层 position: fixed 的元素即可实现，各浏览器行为一致，
+   所以背景图改由 index.html 里的 <div class="page-background"> 承载。 */
+html {
+    background-color: var(--bg-fallback);
+}
+
+.page-background {
+    position: fixed;
+    inset: 0;
+    /* 压在 body::before 遮罩（z-index: -1）之下、html 底色之上 */
+    z-index: -2;
+    overflow: hidden;
+    /* 纯装饰层：不参与命中测试，不影响正文选中、链接点击与滚动 */
+    pointer-events: none;
+    background-color: var(--bg-fallback);
+    /* 图片取不到时的兜底渐变，图片正常铺满后会被完全遮住 */
+    background-image: linear-gradient(135deg, var(--bg-fallback), #7c3a4d 52%, #96513f);
+}
+
+.page-background img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    /* 等价于原先 body 上的 center / cover */
+    object-fit: cover;
+    object-position: center;
+}
+
+/* 兜底：图片确实加载失败时隐藏失败的 <img>，露出上面的渐变底色 */
+.page-background.is-failed img {
+    visibility: hidden;
+}
+
+/* --- 3.2 页面骨架 ---------------------------------------------------------
+   body 自身不再画背景（改由上面的固定图层承担），否则会盖住负 z-index 的图层。 */
 body {
-    background: url('/img/philia093.webp') center / cover no-repeat fixed;
     color: var(--text);
     min-height: 100vh;
     display: flex;
@@ -138,7 +180,7 @@ body {
 }
 
 /* 暖玫瑰色渐变遮罩，压暗背景图以突出前景文字。
-   固定在视口上，与 body 的 fixed 背景保持一致，滚动时不会出现接缝。 */
+   同样固定在视口上，与 .page-background 图层严丝合缝，滚动时不会出现接缝。 */
 body::before {
     content: '';
     position: fixed;

@@ -7,8 +7,18 @@
     <title>「记忆的幼芽」</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="preload" href="/font/XiaolaiMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- 页面加载时在控制台留下一句题记（两端的「」也算在文字里） -->
+    <script>
+        console.log('「汝将收梢于花开时 一如终结诞下起始」');
+    </script>
 </head>
 <body>
+    <!-- 背景图层：承载原本挂在 body 上的固定背景图。
+         iOS / iPadOS Safari 不支持 background-attachment: fixed，
+         因此改用固定定位图层 + object-fit: cover（详见 css/styles.css 第 3 节）。 -->
+    <div class="page-background" aria-hidden="true">
+        <img src="/img/philia093.webp" alt="" decoding="async">
+    </div>
     <div class="container">
         <main>
             <div class="calendar-switcher">

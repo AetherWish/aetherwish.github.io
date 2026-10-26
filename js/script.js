@@ -7,6 +7,7 @@
  *   3. 背景音频     —— 音乐选择与播控面板（播放 / 暂停 / 选曲 / 播放模式）
  *   4. 全屏模式     —— 全屏 / 退出全屏，全屏时只保留倒计时与播放器按钮
  *   5. 返回顶部     —— 滚动超过阈值后显示浮动按钮
+ *   6. 背景图层     —— 背景图加载失败时降级并在控制台留明确提示
  *
  * 依赖：translation.js（需先于本文件加载）
  * 编码注意：本文件为无 BOM 的 UTF-8。
@@ -613,6 +614,39 @@
     }
 
     /* =========================================================================
+       6. 背景图层
+       -------------------------------------------------------------------------
+       背景图由 <div class="page-background"><img></div> 承载（见 css/styles.css
+       第 3 节：iOS / iPadOS Safari 不支持 background-attachment: fixed，故改为
+       固定定位图层）。CSS 已经备好兜底渐变，这里只补两件事：
+         · 图片确实取不到时给图层加 .is-failed，隐藏失败的 <img>；
+         · 在控制台留一条能直接看懂原因的警告，便于排查（页面本身不会白屏）。
+       ========================================================================== */
+
+    function initPageBackground() {
+        const layer = document.querySelector('.page-background');
+        const image = layer ? layer.querySelector('img') : null;
+        if (!image) {
+            return;
+        }
+
+        function reportFailure() {
+            layer.classList.add('is-failed');
+            console.warn('[背景图层] 背景图加载失败，已回退到渐变底色：' + (image.currentSrc || image.src));
+        }
+
+        // complete 为 true 但 naturalWidth 为 0：请求已结束却没拿到可解码的画面
+        if (image.complete) {
+            if (image.naturalWidth === 0) {
+                reportFailure();
+            }
+            return;
+        }
+
+        image.addEventListener('error', reportFailure);
+    }
+
+    /* =========================================================================
        启动
        ====================================================================== */
 
@@ -623,5 +657,6 @@
         initBackToTop();
         initFullscreen();
         initAudioPlayer();
+        initPageBackground();
     });
 }());
