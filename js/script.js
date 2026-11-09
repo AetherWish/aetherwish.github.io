@@ -7,7 +7,8 @@
  *   3. 背景音频     —— 音乐选择与播控面板（播放 / 暂停 / 选曲 / 播放模式）
  *   4. 全屏模式     —— 全屏 / 退出全屏，全屏时只保留倒计时与播放器按钮
  *   5. 返回顶部     —— 滚动超过阈值后显示浮动按钮
- *   6. 背景图层     —— 背景图加载失败时降级并在控制台留明确提示
+ *   6. 顶部通知     —— 通知条高度同步（body 顶部让位）与关闭
+ *   7. 背景图层     —— 背景图加载失败时降级并在控制台留明确提示
  *
  * 依赖：translation.js（需先于本文件加载）
  * 编码注意：本文件为无 BOM 的 UTF-8。
@@ -614,7 +615,145 @@
     }
 
     /* =========================================================================
-       6. 背景图层
+       6. 顶部通知
+       -------------------------------------------------------------------------
+       通知条是 position: fixed（见 css/styles.css 第 12 节），不占文档流，因此
+       这里负责三件事：
+         · 把卡片实际高度写入 --site-notice-offset，让 body 顶部预留同等空间，
+           避免通知条压住容器与顶部工具按钮；
+         · 语言切换、字体加载、窗口缩放都可能改变换行，用 ResizeObserver 重测；
+         · 点击关闭后淡出收起，仅对本次浏览生效，刷新后重新出现。
+       ========================================================================== */
+
+    /** 通知条与下方内容之间的额外间距（像素） */
+    const SITE_NOTICE_GAP = 8;
+
+    /** 关闭动画时长（毫秒），与 css/styles.css 中 .site-notice-card 的过渡一致 */
+    const SITE_NOTICE_CLOSE_DURATION = 300;
+
+    function initSiteNotice() {
+        const notice = byId('siteNotice');
+        const card = notice ? notice.querySelector('.site-notice-card') : null;
+        const closeButton = byId('siteNoticeClose');
+        if (!notice || !card) {
+            return;
+        }
+
+        const root = document.documentElement;
+        /** 是否已经关闭：关闭后不再测量，也不再写回高度 */
+        let closed = false;
+
+        function applyOffset(offset) {
+            root.style.setProperty('--site-notice-offset', offset + 'px');
+        }
+
+        /** 按卡片当前实际高度刷新 body 顶部预留空间 */
+        function syncOffset() {
+            if (closed) {
+                applyOffset(0);
+                return;
+            }
+            // 卡片已隐藏或尚未布局时高度为 0：此时不预留空间
+            const height = Math.ceil(card.getBoundingClientRect().height);
+            applyOffset(height > 0 ? height + SITE_NOTICE_GAP : 0);
+        }
+
+        function closeNotice() {
+            if (closed) {
+                return;
+            }
+            closed = true;
+            notice.classList.add('is-closing');
+            applyOffset(0); // 内容随过渡平滑上移
+
+            window.setTimeout(function () {
+                notice.hidden = true;
+                notice.classList.remove('is-closing');
+            }, SITE_NOTICE_CLOSE_DURATION);
+        }
+
+        if (closeButton) {
+            closeButton.addEventListener('click', closeNotice);
+        }
+
+        // 关闭通知会把 body 顶部预留空间（--site-notice-offset）归零，刷新后通知条
+        // 重新出现又把它加回来。浏览器恢复滚动位置时以关闭后的布局为基准重新锚定，
+        // 会把这段高度差换算成滚动偏移（实测刷新后 scrollY = 卡片高度 + 间距），固定
+        // 通知条因此压住顶部工具按钮。改为自行接管滚动恢复：离开页面时记录位置，
+        // 加载后按记录恢复，浏览器便不再做这次错误的锚定。
+        const SCROLL_STORAGE_KEY = 'siteNotice:scrollY';
+
+        if ('scrollRestoration' in window.history) {
+            window.history.scrollRestoration = 'manual';
+        }
+
+        window.addEventListener('pagehide', function () {
+            try {
+                window.sessionStorage.setItem(SCROLL_STORAGE_KEY, String(window.scrollY));
+            } catch (error) {
+                // 隐私模式等场景下 sessionStorage 不可写：放弃记录，不影响页面
+            }
+        });
+
+        const body = document.body;
+
+        // 首次同步把 body 顶部内边距从默认值改成通知条高度：直接落位，避免首帧
+        // 出现内边距过渡动画。
+        body.style.transition = 'none';
+        syncOffset();
+        window.requestAnimationFrame(function () {
+            body.style.transition = '';
+        });
+
+        // 记录用户是否已经自己滚动过：恢复滚动位置只对刚打开的页面生效，
+        // 不能在用户操作后再把页面拽走。
+        let userScrolled = false;
+        ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach(function (type) {
+            window.addEventListener(type, function () {
+                userScrolled = true;
+            }, { passive: true });
+        });
+
+        // 页面高度在 load 前后才完全稳定（字体、媒体都会长高），此时恢复滚动位置，
+        // 并在稍后再补一次，避免第一次恢复时被当时的最大滚动范围截断。
+        function restoreScrollPosition() {
+            if (userScrolled) {
+                return;
+            }
+            let saved = 0;
+            try {
+                saved = parseFloat(window.sessionStorage.getItem(SCROLL_STORAGE_KEY) || '0');
+            } catch (error) {
+                saved = 0;
+            }
+            if (saved > 0 && window.scrollY !== saved) {
+                window.scrollTo(0, saved);
+            }
+        }
+
+        window.addEventListener('load', function () {
+            window.requestAnimationFrame(restoreScrollPosition);
+            window.setTimeout(restoreScrollPosition, 500);
+        });
+
+        // ResizeObserver 一并覆盖「语言切换后换行变化」和「字体加载后度量变化」；
+        // requestAnimationFrame 合并同一帧内的多次回调，避免反复写自定义属性。
+        if (typeof window.ResizeObserver === 'function') {
+            const observer = new window.ResizeObserver(function () {
+                window.requestAnimationFrame(syncOffset);
+            });
+            observer.observe(card);
+        }
+
+        window.addEventListener('resize', function () {
+            window.requestAnimationFrame(syncOffset);
+        });
+
+        document.addEventListener('languagechange', syncOffset);
+    }
+
+    /* =========================================================================
+       7. 背景图层
        -------------------------------------------------------------------------
        背景图由 <div class="page-background"><img></div> 承载（见 css/styles.css
        第 3 节：iOS / iPadOS Safari 不支持 background-attachment: fixed，故改为
@@ -651,8 +790,10 @@
        ====================================================================== */
 
     document.addEventListener('DOMContentLoaded', function () {
-        // 语言先初始化：倒计时需要依赖它来输出主标题
+        // 语言先初始化：倒计时需要依赖它来输出主标题，
+        // 通知条也需要在翻译完成后再测量高度
         initLanguageToggle();
+        initSiteNotice();
         initCountdown();
         initBackToTop();
         initFullscreen();

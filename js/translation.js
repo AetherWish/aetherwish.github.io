@@ -81,6 +81,12 @@
             },
 
             videoUnsupported: '当前浏览器不支持视频播放♪',
+
+            /* 顶部通知条 */
+            noticeLabel: '网站通知',
+            noticeClose: '关闭通知',
+            noticeText: '为保证网站合规性，网站将于2026年11月12日后的任意时间点下线维护，恢复上线时间待定。网站源码可以从<a href="https://github.com/AetherWish/aetherwish.github.io/releases/tag/20261109" target="_blank" rel="noopener noreferrer">该GitHub仓库</a>获取。',
+
             backToTop: '返回顶部'
         },
 
@@ -128,6 +134,12 @@
             },
 
             videoUnsupported: 'Your browser does not support video playback♪',
+
+            /* 顶部通知条 */
+            noticeLabel: 'Site notice',
+            noticeClose: 'Dismiss notice',
+            noticeText: 'To ensure the site\'s compliance, the site will be taken offline for maintenance at any time after November 12, 2026; the date it comes back online is yet to be determined. The source code can be obtained from <a href="https://github.com/AetherWish/aetherwish.github.io/releases/tag/20261109" target="_blank" rel="noopener noreferrer">this GitHub repository</a>.',
+
             backToTop: 'Back to top'
         }
     };
@@ -156,14 +168,23 @@
     /** 用 innerHTML 写入的元素（文案本身包含富文本标记） */
     const HTML_TARGETS = [
         { id: 'copyrightNotice', key: 'copyright' },
-        { id: 'fontCredit', key: 'fontCredit' }
+        { id: 'fontCredit', key: 'fontCredit' },
+        { id: 'siteNoticeText', key: 'noticeText' }
     ];
 
     /** 倒计时四个单位标签，与 countdownLabels 数组按序对应 */
     const LABEL_TARGET_IDS = ['daysLabel', 'hoursLabel', 'minutesLabel', 'secondsLabel'];
 
-    /** 返回顶部按钮：文案用于 title 属性而非文本内容 */
-    const BACK_TO_TOP_ID = 'backToTop';
+    /**
+     * 写进元素属性的文案（不显示为文本内容）。
+     * 顶部通知条的无障碍标签也随语言切换，否则读屏软件会中英混读。
+     */
+    const ATTRIBUTE_TARGETS = [
+        { id: 'backToTop', attr: 'title', key: 'backToTop' },
+        { id: 'siteNotice', attr: 'aria-label', key: 'noticeLabel' },
+        { id: 'siteNoticeClose', attr: 'aria-label', key: 'noticeClose' },
+        { id: 'siteNoticeClose', attr: 'title', key: 'noticeClose' }
+    ];
 
     /* =========================================================================
        工具函数
@@ -311,10 +332,12 @@
             this.renderCountdownLabels();
             this.renderMainContent();
 
-            const backToTop = document.getElementById(BACK_TO_TOP_ID);
-            if (backToTop) {
-                backToTop.setAttribute('title', this.t('backToTop'));
-            }
+            ATTRIBUTE_TARGETS.forEach((target) => {
+                const element = document.getElementById(target.id);
+                if (element) {
+                    element.setAttribute(target.attr, this.t(target.key));
+                }
+            });
 
             // 倒计时标题取决于剩余时间，切换完语言需要立刻按新语言重算
             this.updateCountdownText();

@@ -13,6 +13,7 @@
      9. 返回顶部按钮 / 全屏按钮
     10. 响应式断点
     11. 全屏专注模式
+    12. 顶部通知条
    ========================================================================== */
 
 /* ==========================================================================
@@ -95,7 +96,13 @@
     /* 层级：数值越大越靠上。返回顶部按钮需盖过 .container 的玻璃层 */
     --z-overlay: -1;
     --z-toolbar: 100;
+    /* 通知条悬在工具按钮之上，但仍在返回顶部按钮之下 */
+    --z-notice: 200;
     --z-back-to-top: 1000;
+
+    /* 顶部通知条占用的高度：由 js/script.js 实测后写入（0 = 已关闭 / 不存在）。
+       body 顶部会预留同等高度，避免通知条遮住容器与工具按钮。 */
+    --site-notice-offset: 0px;
 
     /* 返回顶部按钮占用的右下角空间，供容器预留滚动余量 */
     --back-to-top-size: 50px;
@@ -118,7 +125,8 @@
 
 @font-face {
     font-family: 'XiaolaiMono';
-    /* 子集字体：仅包含页面实际用到的 645 个码位，由完整字体经 subset-font 生成 */
+    /* 子集字体：仅包含页面实际用到的 653 个码位（含顶部通知条文案），
+       由完整字体经 subset-font 生成 */
     src: url('../font/XiaolaiMono-Regular.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
@@ -226,8 +234,14 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--space-xl);
+    /* 顶部预留：基础内边距 + 通知条实测高度（由 js/script.js 写入，
+       通知条关闭后归零），保证固定定位的通知条不会压住容器与工具按钮。
+       body 高度随内容增长，align-items: center 在空间不足时不会溢出，
+       容器顶部始终 ≥ 这里的内边距。 */
+    padding: calc(var(--space-xl) + var(--site-notice-offset)) var(--space-xl) var(--space-xl);
     position: relative;
+    /* 通知条出现 / 关闭时，内容跟随通知条高度平滑上移或下移 */
+    transition: padding-top var(--ease);
 }
 
 /* 暖玫瑰色渐变遮罩，压暗背景图以突出前景文字。
@@ -1024,7 +1038,8 @@ body.is-fullscreen .calendar-switcher,
 body.is-fullscreen .content,
 body.is-fullscreen .video-container,
 body.is-fullscreen footer,
-body.is-fullscreen #backToTop {
+body.is-fullscreen #backToTop,
+body.is-fullscreen .site-notice {
     display: none;
 }
 
@@ -1067,5 +1082,151 @@ body.is-fullscreen .countdown {
         bottom: var(--space-md);
         max-width: calc(100vw - var(--space-md) * 2);
         padding: var(--space-md);
+    }
+}
+
+/* ==========================================================================
+   12. 顶部通知条
+   --------------------------------------------------------------------------
+   悬在视口顶部的合规通知：固定定位、不参与文档流，因此不会把页面撑高。
+   高度由 js/script.js 实测后写入 --site-notice-offset，body 顶部据此预留
+   内边距（见第 3 节 body），滚动时通知条始终可见，也不会遮住下方内容。
+   关闭只对本次浏览生效（刷新后重新出现），符合「合规信息不可永久关闭」的预期。
+   ========================================================================== */
+
+.site-notice {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: var(--z-notice);
+    display: flex;
+    justify-content: center;
+    /* 顶部间距与 body 的基础内边距对齐，卡片与容器同宽、同一视觉基线 */
+    padding: var(--space-xl) var(--space-xl) 0;
+    /* 外层横栏只负责居中排版，不拦截点击；只有卡片本身可交互 */
+    pointer-events: none;
+    animation: site-notice-in 0.45s ease-out;
+}
+
+/* 上面的 display: flex 会覆盖浏览器对 hidden 属性的默认处理，这里显式补回 */
+.site-notice[hidden] {
+    display: none;
+}
+
+.site-notice-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    width: 100%;
+    max-width: var(--container-max);
+    padding: var(--space-md) var(--space-md) var(--space-md) var(--space-lg);
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(var(--glass-blur));
+    pointer-events: auto;
+    transition: opacity var(--ease), transform var(--ease);
+}
+
+.site-notice-text {
+    flex: 1;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text);
+    text-shadow: var(--text-shadow);
+    /* 断行尽量均分到两行，避免最后一行只剩一两个字（不支持的浏览器自然断行） */
+    text-wrap: balance;
+}
+
+.site-notice-text a {
+    color: var(--brand);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color var(--ease);
+}
+
+.site-notice-text a:hover,
+.site-notice-text a:focus-visible {
+    color: #ffd0df;
+}
+
+.site-notice-close {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    margin-top: 1px;
+    padding: 0;
+    color: var(--text-soft);
+    background: transparent;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background var(--ease), color var(--ease);
+}
+
+.site-notice-close:hover {
+    color: var(--text);
+    background: var(--panel-hover);
+}
+
+.site-notice-close:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+.site-notice-close svg {
+    display: block;
+    width: 14px;
+    height: 14px;
+}
+
+/* 关闭：卡片淡出并轻微上移；不可见后由 js/script.js 设置 hidden 移出渲染树 */
+.site-notice.is-closing .site-notice-card {
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+}
+
+/* 入场动画：不写 fill-mode，结束后回到基础样式，
+   以免动画锁住 opacity / transform 而覆盖上面关闭时的过渡 */
+@keyframes site-notice-in {
+    from {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+}
+
+@media (max-width: 600px) {
+    /* 手机屏幕窄：收紧通知条内边距与字号，尽量少占首屏高度 */
+    .site-notice {
+        padding: var(--space-md) var(--space-md) 0;
+    }
+
+    .site-notice-card {
+        gap: var(--space-sm);
+        padding: var(--space-sm) var(--space-sm) var(--space-sm) var(--space-md);
+    }
+
+    .site-notice-text {
+        font-size: 12px;
+        line-height: 1.65;
+    }
+}
+
+/* 关闭动效与高度过渡对减少动态偏好的用户直接跳过 */
+@media (prefers-reduced-motion: reduce) {
+    body,
+    .site-notice,
+    .site-notice-card,
+    .site-notice-text a,
+    .site-notice-close {
+        animation: none;
+        transition: none;
     }
 }

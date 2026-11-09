@@ -13,6 +13,18 @@
     </script>
 </head>
 <body>
+    <!-- 顶部通知：合规下线说明。关闭只对本次浏览生效（刷新后重新出现），
+         文案与无障碍标签由 js/translation.js 按当前语言注入。 -->
+    <div class="site-notice" id="siteNotice" role="region" aria-label="网站通知">
+        <div class="site-notice-card">
+            <p class="site-notice-text" id="siteNoticeText">为保证网站合规性，网站将于2026年11月12日后的任意时间点下线维护，恢复上线时间待定。网站源码可以从<a href="https://github.com/AetherWish/aetherwish.github.io/releases/tag/20261109" target="_blank" rel="noopener noreferrer">该GitHub仓库</a>获取。</p>
+            <button type="button" class="site-notice-close" id="siteNoticeClose" aria-label="关闭通知" title="关闭通知">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
     <!-- 背景图层：承载原本挂在 body 上的固定背景图。
          iOS / iPadOS Safari 不支持 background-attachment: fixed，
          因此改用固定定位图层 + object-fit: cover（详见 css/styles.css 第 3 节）。 -->
