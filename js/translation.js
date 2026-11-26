@@ -1,181 +1,181 @@
 /**
- * 首页双语翻译系统 ——「记忆的幼芽」
+ * 页面文案与多语言渲染 —— cyrene.icu
  * ---------------------------------------------------------------------------
- * 该模块负责：
- *   1. 维护中英双语的文案字典；
- *   2. 根据语言把文案写入页面（DOM 契约集中在一处，便于维护）；
- *   3. 记住用户的语言偏好（localStorage）；
- *   4. 根据距目标时间的剩余天数，切换倒计时主标题的措辞。
+ * 页面只有一块倒计时面板和一个播放器，文案集中在下面的字典里。
+ * 本文件只负责「把当前语言的静态文案写进 DOM」；倒计时数字、说明文字里的
+ * 时间与模式措辞由 script.js 按语言即时计算（见 updateSubText）。
  *
- * 对外暴露（挂在 window 上供 script.js 使用）：
- *   window.TranslationManager          —— 翻译管理器类
- *   window.TranslationManager.TARGET_DATE —— 倒计时目标时间（唯一来源）
- * ---------------------------------------------------------------------------
- * 编码注意：本文件为无 BOM 的 UTF-8。Windows 下编辑时请勿另存为 GBK，
- * 否则中文文案会变成乱码。
+ * 对外接口：
+ *   window.TranslationManager    构造函数
+ *   window.translationManager    实例（script.js 在 DOMContentLoaded 时创建）
+ *
+ * 编码注意：本文件为无 BOM 的 UTF-8。
  */
 (function (global) {
     'use strict';
 
-    /** 语言偏好写入 localStorage 时使用的键名 */
+    /** localStorage 中保存语言偏好的键名 */
     const STORAGE_KEY = 'language';
 
-    /**
-     * 倒计时目标时间：2026-11-12 13:00（《崩坏：星穹铁道》4.7 版本期间）。
-     * 这是全站唯一的定义处 —— script.js 会直接复用，不要再硬编码第二份。
-     */
-    const TARGET_DATE = new Date('2026-11-12T13:00:00');
-
-    const DAY_MS = 1000 * 60 * 60 * 24;
+    /** 默认语言：站点以中文为主 */
+    const DEFAULT_LANGUAGE = 'zh-CN';
 
     /* =========================================================================
        文案字典
        -------------------------------------------------------------------------
-       单引号文本若包含撇号，统一使用 HTML 实体 &#39;（原实现中大小写不一致，
-       这里统一为小写写法，渲染结果完全相同）。
+       字符串里的 {time} 是占位符，由 script.js 用显式 CST（Asia/Shanghai）
+       格式化后的日期替换。
        ====================================================================== */
+
     const TRANSLATIONS = {
         'zh-CN': {
-            langToggle: 'Hello World',
-            calendarToggle: '翁法罗斯一年历',
-            blogToggle: 'blog.cyrene.icu',
+            langToggle: 'EN',
+            langToggleAria: '切换语言',
 
-            /** 主内容区段落 */
-            mainContent: [
-                '“......昔涟是。哭着诞生的。脆弱的。透明的。像是水晶的。”',
-                '“昔涟是。笑着道别的。柔软的。粉色的。像是花的。”',
-                '「二相乐园」已至，但开拓者们依然思念着被留在「昨天」的她......'
+            /* 主标题：按数组逐行渲染，避免依赖 innerHTML 插入换行 */
+            countdownTitle: [
+                '翁法罗斯，续写「开拓」......',
+                '然后，人们从昨日走向明天。'
             ],
 
-            /** 倒计时主标题的三种措辞 */
-            countdownMain: '下次见, 「PhiLia093」',
-            countdownMainTomorrow: '明天见，「PhiLia093」',
-            countdownMainExpired: '你好，世界！',
-            countdownSub: '距离2026年11月12日13:00（4.7版本期间）还有',
+            /* 时间模式 */
+            modeSwitchAria: '时间显示模式',
+            modeCountdown: '倒计时',
+            modeCountUp: '正计时',
             countdownLabels: ['天', '时', '分', '秒'],
 
-            /* 音乐播放器面板 */
+            /* 说明文字：{time} 由脚本替换为 CST 时间 */
+            subCountdown: '距离 {time}（CST，5.5版本期间）还有',
+            subCountUp: '自 {time}（CST，4.7版本期间）起，已经过',
+            subCountdownArrived: '{time}（CST，5.5版本期间）已经抵达',
+            subCountUpPending: '尚未抵达 {time}（CST，4.7版本期间）',
+
+            /* 计时说明弹窗 */
+            timeInfoToggle: '查看计时说明',
+            timeInfoClose: '关闭',
+            timeInfoTitleCountUp: '为什么是 11 月 12 日',
+            timeInfoTitleCountdown: '为什么是 9 月 3 日',
+            timeInfoCountUp: '<p>在崩铁官方发布的<a href="https://www.miyoushe.com/sr/article/70540559" target="_blank" rel="noopener noreferrer">翁法罗斯一年历</a>中，哀悼月（对应现实11月）的12日被翁法罗斯的∞标志所替代。大家猜想在未来的这一天可能会迎来翁法罗斯的结局。后来在这一天的11时12分，官方也确实发布了动态。</p><blockquote class="info-quote">「我许下心愿，在十一月的第十二天」</blockquote>',
+            timeInfoCountdown: '<p>见<a href="https://www.miyoushe.com/sr/article/79517070" target="_blank" rel="noopener noreferrer">本动态</a>。根据崩铁正常版本演进推算，5.5版本会在2027年8月底9月初开启。此处取9月3日，代表「PhiLia093」中的「真我」。</p><blockquote class="info-quote">「只是守候而已，微不足道的代价，不是吗♪」</blockquote>',
+
+            /* 音乐播放器 */
             audioPanelTitle: '音乐播放器',
             audioClose: '关闭',
             audioPlay: '播放',
             audioPause: '暂停',
+            audioNothingPlaying: '尚未选择曲目',
             audioModeAria: '播放模式',
             audioTracksAria: '曲目列表',
-            audioNothingPlaying: '尚未选择曲目',
             audioModes: ['列表循环', '单曲循环', '随机播放'],
-            /** 曲目名随语言切换：中文设置显示中文名，英文设置显示英文名 */
             audioTrackNames: ['心忆', '昔涟', '再度和你'],
 
             /* 全屏按钮 */
             fullscreenEnter: '全屏',
             fullscreenExit: '退出全屏',
 
-            copyright: '© 2026 cyrene.icu. <a href="mailto:philia093@cyrene.icu">网站建议与不良信息反馈</a> / <a href="https://blog.cyrene.icu/copyright-notice/" target="_blank" rel="noopener noreferrer">本站版权内容说明</a>',
-            fontCredit: '本项目部分源代码由 AI 辅助完成，所有上线内容均已经由人工筛选和审查。',
+            /* 深浅色主题按钮（图标按钮，只有无障碍标签） */
+            themeToggle: '深色模式',
+            themeToDark: '切换到深色模式',
+            themeToLight: '切换到浅色模式',
+
+            /* 页脚 */
+            copyright: '<a href="mailto:philia093@cyrene.icu">网站建议与不良信息反馈</a> / <a href="/content-notice/">本站内容说明</a>',
 
             statistics: {
                 totalViews: '总访问量',
                 individualVisitors: '总访客数',
                 viewsUnit: '次',
                 visitorsUnit: '人'
-            },
-
-            videoUnsupported: '当前浏览器不支持视频播放♪',
-            backToTop: '返回顶部'
+            }
         },
 
-        'en': {
-            langToggle: '你好，世界',
-            calendarToggle: 'Amphoreus calendar',
-            blogToggle: 'blog.cyrene.icu',
+        en: {
+            langToggle: '中文',
+            langToggleAria: 'Switch language',
 
-            mainContent: [
-                '&#39;......Cyrene <b>was</b>, crying when she was born. Fragile. Transparent. Like a crystal.&#39;',
-                '&#39;Cyrene <b>was</b>, smiling when she said goodbye. Soft. Pink. Like a flower.&#39;',
-                '<em>Planarcadia</em> has arrived. Still, Trailblazers will miss HER who was left in YESTERDAY.'
+            countdownTitle: [
+                'Amphoreus, continuing the Trailblaze...',
+                'Then, people walk from yesterday towards tomorrow.'
             ],
 
-            countdownMain: 'See you soon, PhiLia093',
-            countdownMainTomorrow: 'See you tomorrow, PhiLia093',
-            countdownMainExpired: 'Hello World!',
-            countdownSub: 'Time until Nov 12, 2026 1:00 PM (during ver.4.7)',
+            modeSwitchAria: 'Time display mode',
+            modeCountdown: 'Countdown',
+            modeCountUp: 'Count up',
             countdownLabels: ['d', 'h', 'm', 's'],
 
-            /* 音乐播放器面板 */
+            subCountdown: 'Time remaining until {time} (CST, during Ver. 5.5)',
+            subCountUp: 'Time elapsed since {time} (CST, during Ver. 4.7)',
+            subCountdownArrived: '{time} (CST, during Ver. 5.5) has arrived',
+            subCountUpPending: '{time} (CST, during Ver. 4.7) is still ahead',
+
+            /* Date explanation dialog */
+            timeInfoToggle: 'About these dates',
+            timeInfoClose: 'Close',
+            timeInfoTitleCountUp: 'Why November 12?',
+            timeInfoTitleCountdown: 'Why September 3?',
+            timeInfoCountUp: '<p>In the official Amphoreus year-calendar post, the 12th of the Month of Mourning (November) is replaced by the ∞ symbol of Amphoreus. People speculated that this day might bring the ending of Amphoreus. Later, at 11:12 on that day, the official account did publish a post.</p><blockquote class="info-quote">"I made a wish, on the twelfth day of November."</blockquote>',
+            timeInfoCountdown: '<p>See <a href="https://www.miyoushe.com/sr/article/79517070" target="_blank" rel="noopener noreferrer">this post</a>. Based on the normal version progression of Honkai: Star Rail, Version 5.5 should launch in late August or early September 2027. September 3 is chosen here to represent the "true self" in "PhiLia093".</p><blockquote class="info-quote">"Just waiting—a trivial price to pay, isn&#39;t it♪"</blockquote>',
+
             audioPanelTitle: 'Music Player',
             audioClose: 'Close',
             audioPlay: 'Play',
             audioPause: 'Pause',
+            audioNothingPlaying: 'No track selected',
             audioModeAria: 'Playback mode',
             audioTracksAria: 'Tracks',
-            audioNothingPlaying: 'No track selected',
             audioModes: ['Repeat all', 'Repeat one', 'Shuffle'],
-            /** 曲目名随语言切换：中文设置显示中文名，英文设置显示英文名 */
             audioTrackNames: ['Remembrance', 'Ripples of Past Reverie', 'With You Once More'],
 
-            /* 全屏按钮 */
             fullscreenEnter: 'Fullscreen',
             fullscreenExit: 'Exit fullscreen',
 
-            copyright: '© 2026 cyrene.icu. <a href="mailto:philia093@cyrene.icu">Website Content Suggestion &amp; Report</a> / <a href="https://blog.cyrene.icu/copyright-notice/" target="_blank" rel="noopener noreferrer">Copyright Notice</a>',
-            fontCredit: 'Part of the source code of this project is assisted by AI, and has been screened and reviewed by humans.',
+            themeToggle: 'Dark mode',
+            themeToDark: 'Switch to dark mode',
+            themeToLight: 'Switch to light mode',
+
+            copyright: '<a href="mailto:philia093@cyrene.icu">Website feedback</a> / <a href="/content-notice/">Content Notice</a>',
 
             statistics: {
                 totalViews: 'Total Views: ',
                 individualVisitors: 'Individual Visitors: ',
                 viewsUnit: '',
                 visitorsUnit: ''
-            },
-
-            videoUnsupported: 'Your browser does not support video playback♪',
-            backToTop: 'Back to top'
+            }
         }
     };
 
     /* =========================================================================
        DOM 契约
        -------------------------------------------------------------------------
-       把「文案键 → 页面元素」的映射集中在 TARGETS 中，渲染时统一遍历。
-       新增可翻译文案只需：在字典里加键 + 在下面加一行映射。
+       新增可翻译文案时：字典里加键 + 下面加一行映射。
        ====================================================================== */
 
-    /** 用 textContent 写入的元素（纯文本，不会被解析为 HTML） */
+    /** 用 textContent 写入的元素（纯文本） */
     const TEXT_TARGETS = [
-        /* 写入按钮内的文字 span，而非按钮本身——按钮内还含有图标，不能整体覆写 */
         { id: 'langToggleText', key: 'langToggle' },
-        { id: 'calendarToggleText', key: 'calendarToggle' },
-        { id: 'blogToggleText', key: 'blogToggle' },
-        { id: 'countdownSubText', key: 'countdownSub' },
+        { id: 'modeCountdown', key: 'modeCountdown' },
+        { id: 'modeCountUp', key: 'modeCountUp' },
         { id: 'totalViewsLabel', key: ['statistics', 'totalViews'] },
         { id: 'individualVisitorsLabel', key: ['statistics', 'individualVisitors'] },
         { id: 'viewsUnit', key: ['statistics', 'viewsUnit'] },
-        { id: 'visitorsUnit', key: ['statistics', 'visitorsUnit'] },
-        { id: 'videoUnsupportedText', key: 'videoUnsupported' }
+        { id: 'visitorsUnit', key: ['statistics', 'visitorsUnit'] }
     ];
 
-    /** 用 innerHTML 写入的元素（文案本身包含富文本标记） */
+    /** 用 innerHTML 写入的元素（文案包含链接） */
     const HTML_TARGETS = [
-        { id: 'copyrightNotice', key: 'copyright' },
-        { id: 'fontCredit', key: 'fontCredit' }
+        { id: 'copyrightNotice', key: 'copyright' }
     ];
 
     /** 倒计时四个单位标签，与 countdownLabels 数组按序对应 */
     const LABEL_TARGET_IDS = ['daysLabel', 'hoursLabel', 'minutesLabel', 'secondsLabel'];
 
-    /** 返回顶部按钮：文案用于 title 属性而非文本内容 */
-    const BACK_TO_TOP_ID = 'backToTop';
-
     /* =========================================================================
-       工具函数
+       工具
        ====================================================================== */
 
     /**
      * 按「点号路径」或「数组路径」读取嵌套值。
-     * 同时兼容 t('statistics', 'totalViews') 与 t(['statistics', 'totalViews']) 两种写法。
-     *
-     * @param {object} source 数据源对象
-     * @param {string|string[]} path 路径
-     * @returns {*} 命中的值；未命中时返回 undefined
+     * 兼容 t('statistics', 'totalViews') 与 t(['statistics', 'totalViews'])。
      */
     function getByPath(source, path) {
         const segments = Array.isArray(path) ? path : String(path).split('.');
@@ -190,29 +190,18 @@
         return current;
     }
 
-    /**
-     * 计算距目标时间的剩余天数。
-     *
-     * @param {Date} [now] 参照时间，默认取当前时刻（便于测试注入）
-     * @returns {number} 剩余天数；已过期为负数
-     */
-    function daysUntilTarget(now) {
-        const reference = now instanceof Date ? now : new Date();
-        return (TARGET_DATE.getTime() - reference.getTime()) / DAY_MS;
-    }
-
     /* =========================================================================
        翻译管理器
        ====================================================================== */
+
     class TranslationManager {
         /**
          * @param {string} [initialLang] 初始语言；缺省时读取用户偏好，再退回 zh-CN
          */
         constructor(initialLang) {
             this.supportedLanguages = Object.keys(TRANSLATIONS);
-            this.defaultLanguage = 'zh-CN';
+            this.defaultLanguage = DEFAULT_LANGUAGE;
             this.currentLang = this.defaultLanguage;
-
             this.init(initialLang);
         }
 
@@ -223,7 +212,7 @@
             this.setLanguage(lang);
         }
 
-        /** 从 localStorage 读取语言偏好，读取失败时静默退回默认语言 */
+        /** 从 localStorage 读取语言偏好；读取失败或值非法时退回默认语言 */
         readPreference() {
             try {
                 const stored = global.localStorage.getItem(STORAGE_KEY);
@@ -260,7 +249,7 @@
             document.documentElement.lang = lang;
             this.render();
 
-            // 通知依赖当前语言的其它模块（如播放器面板）刷新动态文案。
+            // 通知依赖当前语言的其它模块（倒计时说明、播放器面板、全屏按钮）刷新文案。
             // 初始化时监听者尚未注册也无妨，各模块初始化时会自行渲染一次。
             document.dispatchEvent(new CustomEvent('languagechange', { detail: { lang: lang } }));
             return lang;
@@ -289,10 +278,7 @@
             return value === undefined ? '' : value;
         }
 
-        /**
-         * 把当前语言的文案写入页面。
-         * 遍历三张表：纯文本、富文本、单位标签，最后同步一次倒计时标题。
-         */
+        /** 把当前语言的静态文案写入页面 */
         render() {
             TEXT_TARGETS.forEach((target) => {
                 const element = document.getElementById(target.id);
@@ -309,20 +295,16 @@
             });
 
             this.renderCountdownLabels();
-            this.renderMainContent();
-
-            const backToTop = document.getElementById(BACK_TO_TOP_ID);
-            if (backToTop) {
-                backToTop.setAttribute('title', this.t('backToTop'));
-            }
-
-            // 倒计时标题取决于剩余时间，切换完语言需要立刻按新语言重算
-            this.updateCountdownText();
+            this.renderTitle();
+            this.renderAriaLabels();
         }
 
         /** 渲染倒计时四个单位标签 */
         renderCountdownLabels() {
             const labels = this.t('countdownLabels');
+            if (!Array.isArray(labels)) {
+                return;
+            }
 
             LABEL_TARGET_IDS.forEach((id, index) => {
                 const element = document.getElementById(id);
@@ -332,59 +314,48 @@
             });
         }
 
-        /** 渲染主内容区段落（文案含 <b> / <em> 等标记，使用 innerHTML） */
-        renderMainContent() {
-            const container = document.getElementById('mainContent');
-            if (!container) {
+        /** 逐行渲染主标题，并同步浏览器标签页标题 */
+        renderTitle() {
+            const lines = this.t('countdownTitle');
+            if (!Array.isArray(lines)) {
                 return;
             }
 
-            const paragraphs = this.t('mainContent');
-            if (!Array.isArray(paragraphs)) {
-                return;
-            }
-
-            const fragment = document.createDocumentFragment();
-            paragraphs.forEach((paragraph) => {
-                const p = document.createElement('p');
-                p.innerHTML = paragraph;
-                fragment.appendChild(p);
+            document.querySelectorAll('#countdownTitle .title-line').forEach((element, index) => {
+                element.textContent = lines[index] || '';
             });
 
-            container.textContent = ''; // 清空后一次性替换，避免中间态闪烁
-            container.appendChild(fragment);
+            // 英文两行之间补一个空格，中文按原样拼接
+            document.title = lines.join(this.currentLang === 'en' ? ' ' : '');
         }
 
-        /** 依据当前剩余天数，重算并写入倒计时主标题 */
-        updateCountdownText() {
-            this.updateCountdownMainText(daysUntilTarget());
-        }
-
-        /**
-         * 中英共用的三档倒计时措辞。
-         * @param {number} daysRemaining 剩余天数；负数表示已结束
-         */
-        updateCountdownMainText(daysRemaining) {
-            let key;
-            if (daysRemaining <= 0) {
-                key = 'countdownMainExpired';
-            } else if (daysRemaining < 1) {
-                key = 'countdownMainTomorrow';
-            } else {
-                key = 'countdownMain';
+        /** 按钮 / 分组的无障碍标签 */
+        renderAriaLabels() {
+            const langButton = document.getElementById('langToggle');
+            if (langButton) {
+                const label = this.t('langToggleAria');
+                langButton.setAttribute('title', label);
+                langButton.setAttribute('aria-label', label);
             }
 
-            const element = document.getElementById('countdownMainText');
-            if (element) {
-                element.textContent = this.t(key);
+            const switchGroup = document.getElementById('modeSwitch');
+            if (switchGroup) {
+                switchGroup.setAttribute('aria-label', this.t('modeSwitchAria'));
+            }
+
+            const infoButton = document.getElementById('timeInfoToggle');
+            if (infoButton) {
+                const label = this.t('timeInfoToggle');
+                infoButton.setAttribute('title', label);
+                infoButton.setAttribute('aria-label', label);
+            }
+
+            const infoClose = document.getElementById('timeInfoClose');
+            if (infoClose) {
+                infoClose.setAttribute('aria-label', this.t('timeInfoClose'));
             }
         }
     }
 
-    /* 暴露给 script.js；同时把目标时间与剩余天数计算一并挂上，
-       让页面脚本无需重复定义日期，也便于在控制台自测。 */
-    TranslationManager.TARGET_DATE = TARGET_DATE;
-    TranslationManager.daysUntilTarget = daysUntilTarget;
-
     global.TranslationManager = TranslationManager;
-}(window));
+})(window);

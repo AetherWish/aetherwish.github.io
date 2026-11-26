@@ -1,189 +1,219 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name='description' content='cyrene.icu，《崩坏：星穹铁道》角色「昔涟」纪念站。Made with ❤ in Shanghai.'>
-    <title>「记忆的幼芽」</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="翁法罗斯，续写「开拓」......然后，人们从昨日走向明天。">
+    <meta name="theme-color" content="#4a2333">
+    <title>翁法罗斯，续写「开拓」......然后，人们从昨日走向明天。</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="preload" href="/font/XiaolaiMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- 开场先隐藏控件，避免背景压暗前闪出工具栏与面板；10 秒后兜底显示，防止脚本异常把页面锁死。
+         主题在首帧读取，避免深色用户看到浅色控件闪一下。 -->
+    <script>
+        document.documentElement.classList.add('is-intro');
+        try {
+            var storedTheme = localStorage.getItem('theme');
+            if (storedTheme === 'dark' || storedTheme === 'light') {
+                document.documentElement.setAttribute('data-theme', storedTheme);
+            }
+            if (storedTheme === 'dark') {
+                var themeColor = document.querySelector('meta[name="theme-color"]');
+                if (themeColor) {
+                    themeColor.setAttribute('content', '#2a0d1b');
+                }
+            }
+        } catch (error) {
+            // localStorage 不可用时保持 HTML 上的默认浅色
+        }
+        window.setTimeout(function () {
+            document.documentElement.classList.remove('is-intro', 'is-revealing');
+        }, 10000);
+    </script>
     <!-- 页面加载时在控制台留下一句题记（两端的「」也算在文字里） -->
     <script>
         console.log('「汝将收梢于花开时 一如终结诞下起始」');
     </script>
 </head>
 <body>
-    <!-- 背景图层：承载原本挂在 body 上的固定背景图。
+    <!-- 背景图层：全屏铺满的插画。
          iOS / iPadOS Safari 不支持 background-attachment: fixed，
-         因此改用固定定位图层 + object-fit: cover（详见 css/styles.css 第 3 节）。 -->
+         因此改用固定定位图层 + object-fit: cover（详见 css/styles.css 第 2 节）。 -->
     <div class="page-background" aria-hidden="true">
         <img src="/img/philia093.webp" alt="" decoding="async">
     </div>
-    <div class="container">
-        <main>
-            <div class="calendar-switcher">
-                <a href="/calendar/" class="calendar-toggle-btn">
-                    <svg t="1763637863329" class="calendar-toggle-icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
-                        <path d="M256.8 577.056l512.512 0c17.696 0 32-14.304 32-32s-14.304-32-32-32L256.8 513.056c-17.696 0-32 14.304-32 32S239.136 577.056 256.8 577.056z" fill="white"></path>
-                        <path d="M256.8 769.056l512.512 0c17.696 0 32-14.304 32-32s-14.304-32-32-32L256.8 705.056c-17.696 0-32 14.304-32 32S239.136 769.056 256.8 769.056z" fill="white"></path>
-                        <path d="M448 192l160 0c17.696 0 32-14.304 32-32s-14.304-32-32-32l-160 0c-17.696 0-32 14.304-32 32S430.304 192 448 192z" fill="white"></path>
-                        <path d="M847.008 128 800 128c-17.696 0-32 14.304-32 32s14.304 32 32 32l47.008 0C852.992 192 864 204.16 864 224l0 96L160 320 160 224c0-17.664 14.048-32 31.328-32L256 192c17.696 0 32-14.304 32-32S273.696 128 256 128L191.328 128C138.752 128 96 171.072 96 224l0 640c0 52.928 43.072 96 96 96l640 0c52.928 0 96-43.072 96-96L928 224C928 171.072 891.648 128 847.008 128zM864 864c0 17.664-14.368 32-32 32L192 896c-17.632 0-32-14.336-32-32L160 384l704 0L864 864z" fill="white"></path>
-                        <path d="M704 224c17.696 0 32-14.304 32-32L736 96c0-17.696-14.304-32-32-32s-32 14.304-32 32l0 96C672 209.696 686.304 224 704 224z" fill="white"></path>
-                        <path d="M352 224c17.696 0 32-14.304 32-32L384 96c0-17.696-14.304-32-32-32s-32 14.304-32 32l0 96C320 209.696 334.304 224 352 224z" fill="white"></path>
-                    </svg>
-                    <span id="calendarToggleText" class="calendar-toggle-text">翁法罗斯一年历</span>
-                </a>
-                <a href="https://blog.cyrene.icu/" class="blog-toggle-btn" target="_blank" rel="noopener noreferrer">
-                    <svg class="blog-toggle-icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
-                        <path d="M832 64H192c-52.928 0-96 43.072-96 96v704c0 52.928 43.072 96 96 96h640c52.928 0 96-43.072 96-96V160c0-52.928-43.072-96-96-96z m0 800H192V160h640v704z" fill="white"></path>
-                        <path d="M288 256h448c17.696 0 32-14.304 32-32s-14.304-32-32-32H288c-17.696 0-32 14.304-32 32s14.304 32 32 32z" fill="white"></path>
-                        <path d="M288 352h448c17.696 0 32-14.304 32-32s-14.304-32-32-32H288c-17.696 0-32 14.304-32 32s14.304 32 32 32z" fill="white"></path>
-                        <path d="M288 448h448c17.696 0 32-14.304 32-32s-14.304-32-32-32H288c-17.696 0-32 14.304-32 32s14.304 32 32 32z" fill="white"></path>
-                        <path d="M288 544h288c17.696 0 32-14.304 32-32s-14.304-32-32-32H288c-17.696 0-32 14.304-32 32s14.304 32 32 32z" fill="white"></path>
-                    </svg>
-                    <span id="blogToggleText" class="blog-toggle-text">blog.cyrene.icu</span>
-                </a>
-            </div>
-            <div class="language-switcher">
-                <button id="langToggle" class="lang-toggle-btn" title="切换语言">
-                    <svg class="lang-toggle-icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" aria-hidden="true">
-                        <path d="M938.666667 981.333333c-17.066667 0-29.866667-8.533333-38.4-25.6l-59.733334-119.466666h-277.333333l-59.733333 119.466666c-8.533333 21.333333-34.133333 29.866667-55.466667 17.066667-25.6-8.533333-34.133333-34.133333-21.333333-51.2l72.533333-140.8 145.066667-290.133333c12.8-21.333333 34.133333-38.4 59.733333-38.4s46.933333 12.8 59.733333 38.4l145.066667 290.133333 72.533333 140.8c8.533333 21.333333 0 46.933333-17.066666 55.466667-12.8 4.266667-17.066667 4.266667-25.6 4.266666z m-332.8-226.133333h192l-98.133334-192-93.866666 192zM85.333333 844.8c-17.066667 0-29.866667-8.533333-38.4-25.6-8.533333-21.333333 0-46.933333 21.333334-55.466667 93.866667-46.933333 179.2-110.933333 247.466666-187.733333-46.933333-64-85.333333-128-110.933333-192-8.533333-21.333333 4.266667-46.933333 25.6-55.466667 21.333333-8.533333 46.933333 4.266667 55.466667 25.6 21.333333 51.2 46.933333 102.4 81.066666 149.333334 59.733333-85.333333 102.4-179.2 128-281.6H85.333333c-25.6 0-42.666667-17.066667-42.666666-42.666667s17.066667-42.666667 42.666666-42.666667h243.2V85.333333c0-25.6 17.066667-42.666667 42.666667-42.666666s42.666667 17.066667 42.666667 42.666666v51.2h238.933333c25.6 0 42.666667 17.066667 42.666667 42.666667s-17.066667 42.666667-42.666667 42.666667h-68.266667c-25.6 128-85.333333 247.466667-162.133333 349.866666l25.6 25.6c17.066667 17.066667 17.066667 42.666667 0 59.733334-17.066667 17.066667-42.666667 17.066667-59.733333 0l-17.066667-17.066667c-72.533333 81.066667-162.133333 149.333333-264.533333 200.533333-8.533333 0-17.066667 4.266667-21.333334 4.266667z" fill="currentColor"></path>
-                    </svg>
-                    <span id="langToggleText" class="lang-toggle-text">Hello World</span>
-                </button>
-                <div id="audioPlayer" class="audio-player">
-                    <button id="audioToggle" class="audio-toggle-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="audioPanel" aria-label="音乐播放器" title="音乐播放器">
-                        <svg id="audioIcon" t="1763681506664" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5135" width="200" height="200" aria-hidden="true">
-                            <path d="M384 800c-17.6 0-32-14.4-32-32V248c0-48 36.8-89.6 84.8-96l384-48c27.2-1.6 54.4 6.4 75.2 24 20.8 17.6 32 44.8 32 72V704c0 17.6-14.4 32-32 32s-32-14.4-32-32V200c0-9.6-3.2-17.6-11.2-24s-16-9.6-25.6-8l-384 48c-16 1.6-28.8 16-28.8 32V768c1.6 17.6-12.8 32-30.4 32z" fill="#ffffff" p-id="5136"></path>
-                            <path d="M752 864c-97.6 0-176-72-176-160s78.4-160 176-160 176 72 176 160-78.4 160-176 160z m0-256c-62.4 0-112 43.2-112 96s49.6 96 112 96 112-43.2 112-96-49.6-96-112-96zM240 928C142.4 928 64 856 64 768s78.4-160 176-160 176 72 176 160-78.4 160-176 160z m0-256c-62.4 0-112 43.2-112 96s49.6 96 112 96 112-43.2 112-96-49.6-96-112-96zM416 416c-16 0-28.8-11.2-32-27.2-1.6-17.6 9.6-33.6 27.2-35.2l320-43.2c17.6-1.6 33.6 9.6 35.2 27.2 1.6 17.6-9.6 33.6-27.2 35.2l-320 43.2H416z" fill="#ffffff" p-id="5137"></path>
+
+    <!-- 右上角工具组：语言 / 深浅色 / 音乐 / 全屏。开场结束后常驻。 -->
+    <header class="toolbar">
+        <button id="langToggle" class="tool-btn" type="button" aria-label="切换语言" title="切换语言">
+            <svg class="tool-icon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                <circle cx="12" cy="12" r="8.6"></circle>
+                <path d="M3.4 12h17.2M12 3.4c2.4 2.5 3.6 5.4 3.6 8.6S14.4 18.1 12 20.6c-2.4-2.5-3.6-5.4-3.6-8.6S9.6 5.9 12 3.4z"></path>
+            </svg>
+            <span id="langToggleText" class="lang-text">EN</span>
+        </button>
+
+        <button id="themeToggle" class="tool-btn tool-btn--icon" type="button" aria-label="深色模式" title="切换到深色模式" aria-pressed="false">
+            <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                <path d="M20.4 14.4A8.4 8.4 0 0 1 9.6 3.6a8.4 8.4 0 1 0 10.8 10.8z" stroke-linejoin="round"></path>
+            </svg>
+            <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                <circle cx="12" cy="12" r="4.1"></circle>
+                <path d="M12 2.3v2.2M12 19.5v2.2M2.3 12h2.2M19.5 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6" stroke-linecap="round"></path>
+            </svg>
+        </button>
+
+        <div id="audioPlayer" class="audio-player">
+            <button id="audioToggle" class="tool-btn tool-btn--icon" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="audioPanel" aria-label="音乐播放器" title="音乐播放器">
+                <svg id="audioIcon" class="icon" viewBox="0 0 1024 1024" width="19" height="19" fill="currentColor" aria-hidden="true">
+                    <path d="M384 800c-17.6 0-32-14.4-32-32V248c0-48 36.8-89.6 84.8-96l384-48c27.2-1.6 54.4 6.4 75.2 24 20.8 17.6 32 44.8 32 72V704c0 17.6-14.4 32-32 32s-32-14.4-32-32V200c0-9.6-3.2-17.6-11.2-24s-16-9.6-25.6-8l-384 48c-16 1.6-28.8 16-28.8 32V768c1.6 17.6-12.8 32-30.4 32z"></path>
+                    <path d="M752 864c-97.6 0-176-72-176-160s78.4-160 176-160 176 72 176 160-78.4 160-176 160z m0-256c-62.4 0-112 43.2-112 96s49.6 96 112 96 112-43.2 112-96-49.6-96-112-96zM240 928C142.4 928 64 856 64 768s78.4-160 176-160 176 72 176 160-78.4 160-176 160z m0-256c-62.4 0-112 43.2-112 96s49.6 96 112 96 112-43.2 112-96-49.6-96-112-96zM416 416c-16 0-28.8-11.2-32-27.2-1.6-17.6 9.6-33.6 27.2-35.2l320-43.2c17.6-1.6 33.6 9.6 35.2 27.2 1.6 17.6-9.6 33.6-27.2 35.2l-320 43.2H416z"></path>
+                </svg>
+                <span id="audioNumber" class="audio-number" aria-hidden="true">1</span>
+            </button>
+
+            <!-- 音乐选择与播控面板：点击上方按钮在按钮下方展开 -->
+            <div id="audioPanel" class="audio-panel" role="dialog" aria-label="音乐播放器" hidden>
+                <div class="audio-panel-head">
+                    <span id="audioPanelTitle" class="audio-panel-title">音乐播放器</span>
+                    <button id="audioClose" class="audio-close-btn" type="button" aria-label="关闭">
+                        <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
                         </svg>
-                        <span id="audioNumber" class="audio-number">1</span>
                     </button>
-
-                    <!-- 音乐选择与播控面板：点击上方按钮在按钮下方展开 -->
-                    <div id="audioPanel" class="audio-panel" role="dialog" aria-label="音乐播放器" hidden>
-                        <div class="audio-panel-head">
-                            <span id="audioPanelTitle" class="audio-panel-title">音乐播放器</span>
-                            <button id="audioClose" class="audio-close-btn" type="button" aria-label="关闭">
-                                <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-                                    <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-                                </svg>
-                            </button>
-                        </div>
-                        <p id="audioNowPlaying" class="audio-now-playing">尚未选择曲目</p>
-                        <div class="audio-controls">
-                            <button id="audioPlayPause" class="audio-play-btn" type="button" aria-label="播放">
-                                <svg class="audio-icon-play" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-                                    <path d="M8 5.2v13.6L19 12z" fill="currentColor"></path>
-                                </svg>
-                                <svg class="audio-icon-pause" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-                                    <path d="M7 5h3.6v14H7zM13.4 5H17v14h-3.6z" fill="currentColor"></path>
-                                </svg>
-                            </button>
-                            <button id="audioModeBtn" class="audio-mode-btn" type="button" aria-label="播放模式">列表循环</button>
-                        </div>
-                        <ul id="audioTrackList" class="audio-track-list" aria-label="曲目列表">
-                            <li>
-                                <button class="audio-track" type="button" data-track-index="0" aria-pressed="false">
-                                    <span class="audio-track-index">01</span>
-                                    <span class="audio-track-name">心忆</span>
-                                    <span class="audio-track-equalizer" aria-hidden="true"><i></i><i></i><i></i></span>
-                                </button>
-                            </li>
-                            <li>
-                                <button class="audio-track" type="button" data-track-index="1" aria-pressed="false">
-                                    <span class="audio-track-index">02</span>
-                                    <span class="audio-track-name">昔涟</span>
-                                    <span class="audio-track-equalizer" aria-hidden="true"><i></i><i></i><i></i></span>
-                                </button>
-                            </li>
-                            <li>
-                                <button class="audio-track" type="button" data-track-index="2" aria-pressed="false">
-                                    <span class="audio-track-index">03</span>
-                                    <span class="audio-track-name">再度和你</span>
-                                    <span class="audio-track-equalizer" aria-hidden="true"><i></i><i></i><i></i></span>
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
                 </div>
-            </div>
-            <div class="content">
-                <div id="mainContent">
-                    <!-- 内容将由translation.js动态填充 -->
+                <p id="audioNowPlaying" class="audio-now-playing">尚未选择曲目</p>
+                <div class="audio-controls">
+                    <button id="audioPlayPause" class="audio-play-btn" type="button" aria-label="播放">
+                        <svg class="audio-icon-play" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                            <path d="M8 5.2v13.6L19 12z" fill="currentColor"></path>
+                        </svg>
+                        <svg class="audio-icon-pause" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                            <path d="M7 5h3.6v14H7zM13.4 5H17v14h-3.6z" fill="currentColor"></path>
+                        </svg>
+                    </button>
+                    <button id="audioModeBtn" class="audio-mode-btn" type="button" aria-label="播放模式">列表循环</button>
                 </div>
+                <ul id="audioTrackList" class="audio-track-list" aria-label="曲目列表">
+                    <li>
+                        <button class="audio-track" type="button" data-track-index="0" aria-pressed="false">
+                            <span class="audio-track-index">01</span>
+                            <span class="audio-track-name">心忆</span>
+                            <span class="audio-track-equalizer" aria-hidden="true"><i></i><i></i><i></i></span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="audio-track" type="button" data-track-index="1" aria-pressed="false">
+                            <span class="audio-track-index">02</span>
+                            <span class="audio-track-name">昔涟</span>
+                            <span class="audio-track-equalizer" aria-hidden="true"><i></i><i></i><i></i></span>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="audio-track" type="button" data-track-index="2" aria-pressed="false">
+                            <span class="audio-track-index">03</span>
+                            <span class="audio-track-name">再度和你</span>
+                            <span class="audio-track-equalizer" aria-hidden="true"><i></i><i></i><i></i></span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <button id="fullscreenToggle" class="tool-btn tool-btn--icon" type="button" title="全屏" aria-label="全屏" aria-pressed="false">
+            <svg class="fullscreen-icon-enter" width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M16 21h3a2 2 0 0 0 2-2v-3M8 21H5a2 2 0 0 1-2-2v-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            <svg class="fullscreen-icon-exit" width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M8 3v3a2 2 0 0 1-2 2H3M16 3v3a2 2 0 0 0 2 2h3M16 21v-3a2 2 0 0 1 2-2h3M8 21v-3a2 2 0 0 0-2-2H3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+        </button>
+    </header>
+
+    <main class="stage">
+        <section id="countdownPanel" class="countdown-panel" data-mode="countdown" aria-labelledby="countdownTitle">
+            <h1 id="countdownTitle" class="countdown-title">
+                <span class="title-line">翁法罗斯，续写「开拓」......</span>
+                <span class="title-line">然后，人们从昨日走向明天。</span>
+            </h1>
+
+            <!-- 时间模式：默认倒计时到 5.5 版本期间，可切换为从 4.7 版本起点的正计时 -->
+            <div id="modeSwitch" class="mode-switch" role="group" aria-label="时间显示模式">
+                <button id="modeCountdown" class="mode-btn is-active" type="button" data-mode="countdown" aria-pressed="true">倒计时</button>
+                <button id="modeCountUp" class="mode-btn" type="button" data-mode="countup" aria-pressed="false">正计时</button>
             </div>
 
-            <div class="countdown-container">
-                <h2 id="countdownMainText">下次见, 「PhiLia093」</h2>
-                <h3 id="countdownSubText">距离2026年11月12日13:00（4.7版本期间）还有</h3>
-                <div id="countdown" class="countdown">
-                    <div class="countdown-item">
-                        <span id="days">00</span>
-                        <span id="daysLabel" class="label">天</span>
-                    </div>
-                    <div class="countdown-item">
-                        <span id="hours">00</span>
-                        <span id="hoursLabel" class="label">时</span>
-                    </div>
-                    <div class="countdown-item">
-                        <span id="minutes">00</span>
-                        <span id="minutesLabel" class="label">分</span>
-                    </div>
-                    <div class="countdown-item">
-                        <span id="seconds">00</span>
-                        <span id="secondsLabel" class="label">秒</span>
-                    </div>
-                </div>
-            </div>
+            <p id="countdownSubText" class="countdown-sub">距离 2027年9月3日 09:03（CST，5.5 版本期间）还有</p>
 
-            <div class="video-container">
-                <video controls width="100%" preload="metadata">
-                    <source src="https://fastcdn.mihoyo.com/content-v2/hkrpg/160743/cb5f8aa92adc45ac2300a328a15453b1_4468579145965178971.mp4" type="video/mp4">
-                    <span id="videoUnsupportedText">当前浏览器不支持视频播放♪</span>
-                </video>
-            </div>
-        </main>
-        <footer class="font-credit">
-            <p id="copyrightNotice">
-                © 2026 cyrene.icu. <a href="mailto:philia093@cyrene.icu">网站建议与不良信息反馈</a> / <a href="https://blog.cyrene.icu/copyright-notice/" target="_blank" rel="noopener noreferrer">本站版权内容说明</a>
-            </p>
-            <p id="fontCredit">
-                本项目部分源代码由 AI 辅助完成，所有上线内容均已经由人工筛选和审查。
-            </p>
-
-            <!-- Website statistics using Busuanzi from calendar service -->
-            <div class="statistics-container">
-                <span class="statistics-item">
-                    <span id="totalViewsLabel">总访问量</span>
-                    <span id="busuanzi_value_site_pv"></span>
-                    <span id="viewsUnit">次</span>
+            <div id="countdown" class="countdown" aria-live="off">
+                <span class="countdown-unit">
+                    <span id="days" class="countdown-value">000</span>
+                    <span id="daysLabel" class="countdown-label">天</span>
                 </span>
-                <span class="separator">|</span>
-                <span class="statistics-item">
-                    <span id="individualVisitorsLabel">总访客数</span>
-                    <span id="busuanzi_value_site_uv"></span>
-                    <span id="visitorsUnit">人</span>
+                <span class="countdown-unit">
+                    <span id="hours" class="countdown-value">00</span>
+                    <span id="hoursLabel" class="countdown-label">时</span>
                 </span>
+                <span class="countdown-unit">
+                    <span id="minutes" class="countdown-value">00</span>
+                    <span id="minutesLabel" class="countdown-label">分</span>
+                </span>
+                <span class="countdown-unit">
+                    <span id="seconds" class="countdown-value">00</span>
+                    <span id="secondsLabel" class="countdown-label">秒</span>
+                </span>
+
+                <!-- 计时说明：问号按钮，打开后按当前模式显示对应说明 -->
+                <button id="timeInfoToggle" class="countdown-info" type="button"
+                        aria-haspopup="dialog" aria-controls="timeInfoDialog" aria-expanded="false"
+                        title="查看计时说明" aria-label="查看计时说明">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M9.4 8.9a2.7 2.7 0 1 1 4.1 2.4c-.8.5-1.5 1.1-1.5 2.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                        <circle cx="12" cy="17.4" r="1.1" fill="currentColor"></circle>
+                    </svg>
+                </button>
             </div>
-        </footer>
+
+            <footer class="panel-meta">
+                <p id="copyrightNotice" class="meta-line">
+                    <a href="mailto:philia093@cyrene.icu">网站建议与不良信息反馈</a> / <a href="/content-notice/">本站内容说明</a>
+                </p>
+
+                <!-- Website statistics using Busuanzi -->
+                <div class="statistics-container">
+                    <span class="statistics-item">
+                        <span id="totalViewsLabel">总访问量</span>
+                        <span id="busuanzi_value_site_pv">--</span>
+                        <span id="viewsUnit">次</span>
+                    </span>
+                    <span class="separator" aria-hidden="true">|</span>
+                    <span class="statistics-item">
+                        <span id="individualVisitorsLabel">总访客数</span>
+                        <span id="busuanzi_value_site_uv">--</span>
+                        <span id="visitorsUnit">人</span>
+                    </span>
+                </div>
+            </footer>
+        </section>
+    </main>
+
+    <!-- 开场：背景压暗，标题居中逐字出现；结束后淡出，交还倒计时面板与工具组 -->
+    <div id="intro" class="intro">
+        <p id="introTitle" class="intro-title"></p>
     </div>
 
-    <button id="backToTop" class="back-to-top-btn" title="返回顶部">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M7 14L12 9L17 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-    </button>
-
-    <!-- 全屏 / 退出全屏：非全屏时占用返回顶部按钮的位置，返回顶部出现后左移 -->
-    <button id="fullscreenToggle" class="fullscreen-btn" type="button" title="全屏" aria-label="全屏" aria-pressed="false">
-        <svg class="fullscreen-icon-enter" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M16 21h3a2 2 0 0 0 2-2v-3M8 21H5a2 2 0 0 1-2-2v-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <svg class="fullscreen-icon-exit" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M8 3v3a2 2 0 0 1-2 2H3M16 3v3a2 2 0 0 0 2 2h3M16 21v-3a2 2 0 0 1 2-2h3M8 21v-3a2 2 0 0 0-2-2H3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-    </button>
+    <!-- 计时说明弹窗：内容由 js/script.js 按当前模式与语言填充 -->
+    <dialog id="timeInfoDialog" class="info-dialog" aria-labelledby="timeInfoTitle" aria-describedby="timeInfoBody">
+        <div class="info-card">
+            <button id="timeInfoClose" class="info-close" type="button" aria-label="关闭">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                </svg>
+            </button>
+            <h2 id="timeInfoTitle" class="info-title"></h2>
+            <div id="timeInfoBody" class="info-body"></div>
+        </div>
+    </dialog>
 
     <!-- Hidden audio elements for background audio -->
     <audio id="remembrance-audio" preload="metadata">
@@ -199,7 +229,7 @@
     <script src="/js/translation.js"></script>
     <script src="/js/script.js"></script>
 
-    <!-- Website statistics using Busuanzi from calendar service -->
+    <!-- Website statistics using Busuanzi -->
     <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 </body>
 </html>

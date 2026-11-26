@@ -1,114 +1,83 @@
 /* ==========================================================================
-   首页样式 ——「记忆的幼芽」 (cyrene.icu)
+   cyrene.icu ——「翁法罗斯，续写『开拓』」
    --------------------------------------------------------------------------
+   整站就是原来的「全屏模式」：一张铺满视口的插画、右上角一组玻璃工具按钮、
+   左下角一块玻璃倒计时面板，没有卡片、没有正文、没有滚动。
+
    结构：
-     1. 设计令牌 (Design Tokens)
-     2. 基础重置与字体
-     3. 页面骨架 (背景图层 / body / 遮罩 / 容器)
-     4. 顶部工具按钮（日历 / 博客 / 语言 / 音频）
-     5. 主内容区
-     6. 倒计时
-     7. 视频
-     8. 页脚
-     9. 返回顶部按钮 / 全屏按钮
-    10. 响应式断点
-    11. 全屏专注模式
+     1. 设计令牌
+     2. 基础重置与背景
+     3. 右上角工具组
+     3.5 开场（压暗背景 + 打字机标题）
+     4. 倒计时面板
+     5. 音乐播放器
+     6. 响应式（窄屏 / 矮屏 / 竖屏）
+     7. 动效与可访问性
+     8. 内容说明页（/content-notice/）
+     9. 深浅色主题
    ========================================================================== */
 
 /* ==========================================================================
    1. 设计令牌
-   --------------------------------------------------------------------------
-   所有颜色、圆角、间距、层级集中在此维护；组件内不再出现魔法数字。
    ========================================================================== */
 :root {
-    /* 主题色（粉紫） */
+    /* 主题色（粉玫瑰） */
     --brand: rgb(235, 126, 163);
-    --brand-80: rgba(235, 126, 163, 0.8);
-    --brand-60: rgba(235, 126, 163, 0.6);
-    --brand-40: rgba(235, 126, 163, 0.4);
-    --brand-30: rgba(235, 126, 163, 0.3);
+    --brand-deep: rgb(206, 88, 128);
+    --brand-soft: rgba(235, 126, 163, 0.32);
 
-    /* 玻璃态面板 */
-    --glass-bg: rgba(255, 255, 255, 0.15);
-    --glass-bg-soft: rgba(255, 255, 255, 0.1);
-    --glass-bg-strong: rgba(255, 255, 255, 0.2);
-    --glass-blur: 10px;
+    /* 文字 */
+    --text: #ffffff;
+    --text-soft: rgba(255, 255, 255, 0.8);
+    --text-muted: rgba(255, 255, 255, 0.66);
+    --text-faint: rgba(255, 255, 255, 0.5);
+
+    /* 浅色面板上的深玫瑰文字（倒计时面板是浅色玻璃，白字会糊在插画上） */
+    --ink: #4a2333;
+    --ink-soft: rgba(74, 35, 51, 0.78);
+    --ink-muted: rgba(74, 35, 51, 0.7);
+    --ink-line: rgba(74, 35, 51, 0.16);
+    --ink-link: #8d3a56;
+
+    /* 玻璃 */
+    --glass-bg: rgba(255, 255, 255, 0.22);
+    --glass-bg-hover: rgba(255, 255, 255, 0.32);
+    --glass-border: rgba(255, 255, 255, 0.48);
+    --glass-blur: 18px;
 
     /* 播放器面板（深色玻璃，保证面板内白字可读） */
-    --panel-bg: rgba(72, 30, 52, 0.9);
+    --panel-bg: rgba(66, 26, 46, 0.92);
     --panel-border: rgba(255, 255, 255, 0.14);
     --panel-hover: rgba(255, 255, 255, 0.1);
     --panel-active: rgba(235, 126, 163, 0.3);
 
-    /* 背景遮罩：暖玫瑰色半透明渐变。
-       配合新版粉发逆光背景，只做轻度压暗与暖色统一，让新背景的细节透出来，
-       同时保证白字可读（过重会把画面压成一块粉色，过轻则小字对比不足）。 */
-    --mask-deep: rgba(104, 42, 66, 0.46);
-    --mask-rose: rgba(186, 96, 118, 0.34);
-    --mask-apricot: rgba(206, 134, 104, 0.27);
+    /* 背景遮罩：暖玫瑰色半透明渐变，压暗插画、统一色调，同时保留画面细节 */
+    --mask-deep: rgba(104, 42, 66, 0.4);
+    --mask-rose: rgba(186, 96, 118, 0.3);
+    --mask-apricot: rgba(206, 134, 104, 0.24);
     --page-mask:
         radial-gradient(120% 100% at 50% 12%, rgba(255, 214, 222, 0.08), transparent 58%),
         linear-gradient(135deg, var(--mask-deep), var(--mask-rose) 52%, var(--mask-apricot));
 
-    /* 背景图兜底色：webp 解码完成之前、或图片加载失败时铺底，避免白屏闪烁。
-       取背景图整体色调的暗部，与遮罩叠加后仍是同一色系。 */
+    /* 背景图兜底色：webp 解码完成前、或图片加载失败时铺底，避免白屏闪烁 */
     --bg-fallback: #4a2333;
 
-    /* 背景插画「上下边缘」的平均色（由 philia093.webp 顶部/底部各 120 行取样）。
-       竖屏时插画按宽度完整放入，上下会多出留白，就用这两个颜色补齐，
-       让留白延续画面本身的色调，而不是一块死色或第二张图。 */
+    /* 竖屏时插画按宽度完整放入，上下留白用插画边缘的平均色补齐 */
     --bg-edge-top: #e8a0b3;
     --bg-edge-bottom: #efd4c6;
 
-    /* 文字与分隔线 */
-    --text: #ffffff;
-    --text-muted: rgba(255, 255, 255, 0.7);
-    --text-soft: rgba(255, 255, 255, 0.8);
-    --text-strong: rgba(255, 255, 255, 0.9);
-    --divider: rgba(255, 255, 255, 0.3);
-    --divider-soft: rgba(255, 255, 255, 0.5);
-
-    /* 文本投影：保证图片背景上的可读性 */
-    --text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
-
-    /* 尺寸与形状 */
-    --radius-pill: 20px;
-    --radius-lg: 15px;
-    --radius-md: 10px;
-    --radius-sm: 5px;
-    --control-height: 36px;
-    --container-max: 800px;
-
-    /* 间距 */
-    --space-2xs: 4px;
-    --space-xs: 6px;
-    --space-sm: 8px;
-    --space-md: 10px;
-    --space-lg: 15px;
-    --space-xl: 20px;
-    --space-2xl: 30px;
-    --space-3xl: 60px;
-
-    /* 圆角按钮的内边距 */
-    --pill-padding: 8px 12px;
-
-    /* 层级：数值越大越靠上。返回顶部按钮需盖过 .container 的玻璃层 */
-    --z-overlay: -1;
-    --z-toolbar: 100;
-    --z-back-to-top: 1000;
-
-    /* 返回顶部按钮占用的右下角空间，供容器预留滚动余量 */
-    --back-to-top-size: 50px;
-    --back-to-top-gap: var(--space-xl);
-    /* 容器底部需预留的总高度：按钮本体 + 与视口下沿的间距 + 一点呼吸空间 */
-    --back-to-top-reserve: calc(var(--back-to-top-size) + var(--back-to-top-gap) + var(--space-sm));
+    /* 尺寸 */
+    --edge: clamp(16px, 3.2vw, 44px);
+    --radius-panel: 24px;
+    --radius-pill: 999px;
+    --control-size: 44px;
 
     /* 动效 */
-    --ease: 0.3s ease;
+    --ease: 0.22s ease;
 }
 
 /* ==========================================================================
-   2. 基础重置与字体
+   2. 基础重置与背景
    ========================================================================== */
 * {
     margin: 0;
@@ -118,67 +87,73 @@
 
 @font-face {
     font-family: 'XiaolaiMono';
-    /* 子集字体：仅包含页面实际用到的 645 个码位，由完整字体经 subset-font 生成 */
+    /* 子集字体：仅包含页面实际用到的码位，由完整字体经 fontTools 子集化生成 */
     src: url('../font/XiaolaiMono-Regular.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
-    font-display: swap; /* 字体加载期间先用回退字体渲染，避免文字不可见 */
+    font-display: swap;
 }
 
-/* 页面统一使用等宽字体；按钮等表单元素不会自动继承，故单独声明 */
-body,
-button {
-    font-family: 'XiaolaiMono', Arial, sans-serif;
-}
-
-/* ==========================================================================
-   3. 页面骨架
-   ========================================================================== */
-
-/* --- 3.1 背景图层 ---------------------------------------------------------
-   背景图固定在视口，页面滚动时内容在其上滑过。
-   这里刻意不用 `background-attachment: fixed`：iOS / iPadOS 的 WebKit
-   并不支持该值（WebKit Bug 196327 / 234779 / 275247 —— 值被忽略，且
-   background-size 等尺寸属性会一并失效，背景被裁切甚至完全不绘制）。
-   “固定背景”本身用一层 position: fixed 的元素即可实现，各浏览器行为一致，
-   所以背景图改由 index.html 里的 <div class="page-background"> 承载。 */
 html {
+    height: 100%;
     background-color: var(--bg-fallback);
 }
 
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: hidden;
+    color: var(--text);
+    font-family: 'XiaolaiMono', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 表单元素不会自动继承字体，单独声明一次 */
+button {
+    font-family: inherit;
+}
+
+/* --- 2.1 背景图层 ---------------------------------------------------------
+   背景图固定在视口。这里刻意不用 background-attachment: fixed：
+   iOS / iPadOS 的 WebKit 并不支持该值，改用固定定位图层即可，各端一致。 */
 .page-background {
     position: fixed;
     inset: 0;
-    /* 压在 body::before 遮罩（z-index: -1）之下、html 底色之上 */
     z-index: -2;
     overflow: hidden;
-    /* 纯装饰层：不参与命中测试，不影响正文选中、链接点击与滚动 */
     pointer-events: none;
     background-color: var(--bg-fallback);
-    /* 图片取不到时的兜底渐变，图片正常铺满后会被完全遮住 */
     background-image: linear-gradient(135deg, var(--bg-fallback), #7c3a4d 52%, #96513f);
 }
 
-/* 全页只有这一张背景插画：宽屏铺满，竖屏完整放入（见下方自适应段落）。 */
 .page-background img {
     display: block;
     width: 100%;
     height: 100%;
-    /* 宽屏默认：铺满视口（等价于原先 body 上的 center / cover） */
     object-fit: cover;
     object-position: center;
 }
 
-/* --- 自适应构图（竖屏 / 窄窗口）-------------------------------------------
-   视口比插画本身更窄更高时，cover 会横向裁掉 40%~70% 的画面 —— 手机竖屏
-   甚至只剩一只眼睛的特写。这里改成「整张插画完整放进屏幕」（contain），
-   于是：
-     · 竖屏手机 / 平板：整图可见，人物不再被裁断；
-     · 桌面 / 平板横屏（宽高比 ≥ 1）：仍走默认的满屏 cover，观感不变。
-   插画按宽度放入后高度恒为 100vw / 1.7258 ≈ 57.94vw，即上下各留出
-   (50% - 28.97vw) 的空白；这块空白用取自插画上下边缘的纯色渐变补齐
-   （颜色见 --bg-edge-top / --bg-edge-bottom），画面色调自然延续，
-   而且全页始终只有一张背景图，不会出现「同一张图显示两次」的观感。 */
+/* 遮罩层：压在背景之上、内容之下 */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: var(--page-mask);
+}
+
+/* 图片确实加载失败时隐藏失败的 <img>，露出渐变底色 */
+.page-background.is-failed img {
+    visibility: hidden;
+}
+
+/* --- 2.2 竖屏构图 ---------------------------------------------------------
+   视口比插画更窄更高时，cover 会把画面裁得只剩局部。改为 contain
+   完整放入，上下留白用插画边缘色补齐，并让画面上下边缘淡入留白。 */
 @media (max-aspect-ratio: 1/1) {
     .page-background {
         background-image: linear-gradient(
@@ -192,10 +167,6 @@ html {
 
     .page-background img {
         object-fit: contain;
-        /* 插画上下边缘淡入同色留白，避免在留白与画面之间压出一条硬边。
-           注意遮罩要按「画面实际区域」来算：img 盒子是整屏，但 contain 后
-           画面只占中间 y ∈ [50% - 28.97vw, 50% + 28.97vw]，所以淡入区必须
-           贴着这两个边界往里收 10vw，否则淡入会落在画面之外、边界依然是硬的。 */
         -webkit-mask-image: linear-gradient(
             to bottom,
             transparent calc(50% - 28.97vw),
@@ -213,139 +184,444 @@ html {
     }
 }
 
-/* 兜底：图片确实加载失败时隐藏失败的 <img>，露出上面的渐变底色 */
-.page-background.is-failed img {
-    visibility: hidden;
-}
-
-/* --- 3.2 页面骨架 ---------------------------------------------------------
-   body 自身不再画背景（改由上面的固定图层承担），否则会盖住负 z-index 的图层。 */
-body {
-    color: var(--text);
-    min-height: 100vh;
+/* ==========================================================================
+   3. 右上角工具组
+   ========================================================================== */
+.toolbar {
+    position: fixed;
+    top: max(var(--edge), env(safe-area-inset-top));
+    right: max(var(--edge), env(safe-area-inset-right));
+    z-index: 50;
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: var(--space-xl);
+    gap: 8px;
+}
+
+.tool-btn {
     position: relative;
-}
-
-/* 暖玫瑰色渐变遮罩，压暗背景图以突出前景文字。
-   同样固定在视口上，与 .page-background 图层严丝合缝，滚动时不会出现接缝。 */
-body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: var(--page-mask);
-    z-index: var(--z-overlay);
-    pointer-events: none;
-}
-
-.container {
-    max-width: var(--container-max);
-    width: 100%;
-    background: var(--glass-bg);
-    border-radius: var(--radius-lg);
-    padding: var(--space-2xl);
-    /* 底部额外留出返回顶部按钮的高度，避免其遮挡页脚文字 */
-    padding-bottom: calc(var(--space-2xl) + var(--back-to-top-reserve));
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    backdrop-filter: blur(var(--glass-blur));
-    position: relative;
-}
-
-/* ==========================================================================
-   4. 顶部工具按钮
-   --------------------------------------------------------------------------
-   左组 .calendar-switcher（日历 / 博客），右组 .language-switcher（语言 / 音频）。
-   四类按钮共享 .tool-btn 的外观，尺寸差异在各自的修饰规则中覆盖。
-   ========================================================================== */
-
-/* --- 分组定位：两组按钮分别固定在容器左上角与右上角 --- */
-.calendar-switcher,
-.language-switcher {
-    position: absolute;
-    top: var(--space-xl);
-    z-index: var(--z-toolbar);
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    gap: var(--space-md);
-}
-
-.calendar-switcher {
-    left: var(--space-xl);
-}
-
-.language-switcher {
-    right: var(--space-xl);
-}
-
-/* --- 共享外观：胶囊形玻璃按钮 --- */
-.calendar-toggle-btn,
-.blog-toggle-btn,
-.lang-toggle-btn,
-.audio-toggle-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    gap: var(--space-2xs);
-    height: var(--control-height);
-    padding: var(--pill-padding);
-    border: none;
+    gap: 7px;
+    height: var(--control-size);
+    min-width: var(--control-size);
+    padding: 0 15px;
+    border: 1px solid var(--glass-border);
     border-radius: var(--radius-pill);
-    background: var(--brand-80);
+    background: var(--glass-bg);
     color: var(--text);
-    font-size: 14px;
-    font-weight: bold;
-    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    text-shadow: 0 1px 3px rgba(58, 18, 36, 0.35);
     cursor: pointer;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    transition: background var(--ease);
-    -webkit-appearance: none;
-    appearance: none;
+    box-shadow: 0 8px 24px rgba(58, 18, 36, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
     -webkit-user-select: none;
     user-select: none;
-    outline: none;
+    transition: background var(--ease), border-color var(--ease), transform var(--ease);
+    -webkit-appearance: none;
+    appearance: none;
 }
 
-.calendar-toggle-btn:hover,
-.blog-toggle-btn:hover,
-.lang-toggle-btn:hover,
-.audio-toggle-btn:hover {
-    background: var(--brand);
+.tool-btn:hover {
+    background: var(--glass-bg-hover);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-1px);
 }
 
-/* --- 图标：不再需要单独的间距（间距由基类的 gap 统一负责） --- */
-.calendar-toggle-icon,
-.blog-toggle-icon,
-.lang-toggle-icon {
+.tool-btn:active {
+    transform: translateY(0) scale(0.97);
+}
+
+.tool-btn--icon {
+    width: var(--control-size);
+    padding: 0;
+}
+
+.tool-icon {
     flex-shrink: 0;
 }
 
-.audio-toggle-btn svg {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
+.tool-btn svg {
+    filter: drop-shadow(0 1px 2px rgba(58, 18, 36, 0.28));
 }
 
-/* --- 音频按钮右侧的状态序号（当前曲目 1 / 2 / 3） --- */
-.audio-number {
+/* 深浅色按钮的两个图标：浅色显示月亮（点击去深色），深色显示太阳 */
+.theme-icon {
     display: none;
-    font-size: 14px;
-    font-weight: bold;
+}
+
+.theme-icon-moon {
+    display: block;
+}
+
+html[data-theme="dark"] .theme-icon-moon {
+    display: none;
+}
+
+html[data-theme="dark"] .theme-icon-sun {
+    display: block;
+}
+
+/* 音频按钮上的曲目序号角标 */
+.audio-number {
+    position: absolute;
+    right: -1px;
+    bottom: -1px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 17px;
+    height: 17px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    background: var(--brand-deep);
     color: var(--text);
+    font-size: 10px;
+    font-weight: 700;
     line-height: 1;
-    -webkit-font-smoothing: antialiased;
+    box-shadow: 0 2px 6px rgba(58, 18, 36, 0.3);
 }
 
 .audio-number.is-visible {
-    display: inline;
+    display: flex;
 }
 
-/* --- 音乐播放器：按钮 + 下方弹出面板 --- */
+/* 全屏图标二选一 */
+.fullscreen-icon-exit {
+    display: none;
+}
+
+#fullscreenToggle.is-active .fullscreen-icon-enter {
+    display: none;
+}
+
+#fullscreenToggle.is-active .fullscreen-icon-exit {
+    display: block;
+}
+
+#fullscreenToggle[hidden] {
+    display: none;
+}
+
+/* ==========================================================================
+   3.5 开场：压暗背景 + 居中打字机标题
+   ========================================================================== */
+
+/* 工具组与倒计时面板在开场时隐藏，标题结束后一起淡入 */
+.toolbar,
+.countdown-panel {
+    transform: translateY(0);
+    transition:
+        opacity 0.85s cubic-bezier(0.22, 0.61, 0.36, 1),
+        transform 0.85s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+html.is-intro:not(.is-revealing) .toolbar,
+html.is-intro:not(.is-revealing) .countdown-panel {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(14px);
+    pointer-events: none;
+}
+
+.intro {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding:
+        max(24px, env(safe-area-inset-top))
+        max(24px, env(safe-area-inset-right))
+        max(24px, env(safe-area-inset-bottom))
+        max(24px, env(safe-area-inset-left));
+    background: rgba(28, 9, 20, 0.64);
+    -webkit-backdrop-filter: blur(3px) saturate(0.92);
+    backdrop-filter: blur(3px) saturate(0.92);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+html.is-intro .intro {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+html.is-intro .intro.is-leaving {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.intro[hidden] {
+    display: none;
+}
+
+.intro-title {
+    width: min(1000px, 100%);
+    min-height: 3.35em;
+    color: #fff8fa;
+    font-size: clamp(24px, 3.1vw, 42px);
+    font-weight: 700;
+    line-height: 1.65;
+    letter-spacing: 0.02em;
+    text-align: center;
+    text-wrap: balance;
+    text-shadow: 0 2px 28px rgba(58, 18, 36, 0.55), 0 1px 2px rgba(58, 18, 36, 0.4);
+    white-space: pre-line;
+}
+
+.intro-title::after {
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 0.95em;
+    margin-left: 6px;
+    background: var(--brand);
+    box-shadow: 0 0 12px rgba(235, 126, 163, 0.7);
+    vertical-align: -0.12em;
+    animation: intro-caret 1.05s steps(1) infinite;
+}
+
+@keyframes intro-caret {
+    50% {
+        opacity: 0;
+    }
+}
+
+html[lang="en"] .intro-title {
+    font-size: clamp(20px, 2.5vw, 34px);
+}
+
+/* ==========================================================================
+   4. 倒计时面板
+   ========================================================================== */
+.stage {
+    position: static;
+}
+
+.countdown-panel {
+    position: fixed;
+    left: max(var(--edge), env(safe-area-inset-left));
+    bottom: max(var(--edge), env(safe-area-inset-bottom));
+    z-index: 10;
+    width: min(620px, calc(100vw - var(--edge) * 2));
+    max-height: calc(100dvh - var(--edge) * 2);
+    padding: 24px 28px 20px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: var(--radius-panel);
+    color: var(--ink);
+    background:
+        linear-gradient(158deg, rgba(255, 248, 249, 0.86), rgba(255, 232, 236, 0.72) 55%, rgba(255, 216, 224, 0.66));
+    box-shadow:
+        0 26px 60px rgba(58, 18, 36, 0.32),
+        0 2px 10px rgba(58, 18, 36, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    -webkit-backdrop-filter: blur(22px) saturate(1.15);
+    backdrop-filter: blur(22px) saturate(1.15);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(74, 35, 51, 0.28) transparent;
+}
+
+.countdown-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.countdown-panel::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+    background: rgba(74, 35, 51, 0.22);
+}
+
+/* 英文第二行更长：面板略加宽，让指定的两行标题在桌面端保持两行 */
+html[lang="en"] .countdown-panel {
+    width: min(700px, calc(100vw - var(--edge) * 2));
+}
+
+/* --- 4.1 标题 ------------------------------------------------------------ */
+.countdown-title {
+    font-size: clamp(17px, 2vw, 24px);
+    font-weight: 700;
+    line-height: 1.55;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+    text-wrap: balance;
+}
+
+.title-line {
+    display: block;
+}
+
+/* --- 4.2 倒计时 / 正计时切换 -------------------------------------------- */
+.mode-switch {
+    display: inline-flex;
+    gap: 2px;
+    margin: 18px 0 14px;
+    padding: 3px;
+    border: 1px solid var(--ink-line);
+    border-radius: var(--radius-pill);
+    background: rgba(74, 35, 51, 0.1);
+}
+
+.mode-btn {
+    padding: 6px 16px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: background var(--ease), color var(--ease), box-shadow var(--ease);
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.mode-btn:hover {
+    background: rgba(74, 35, 51, 0.08);
+    color: var(--ink);
+}
+
+.mode-btn.is-active {
+    background: linear-gradient(135deg, #bd4a72, #9d3559);
+    color: var(--text);
+    box-shadow: 0 4px 14px rgba(120, 30, 60, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* --- 4.3 说明与数字 ------------------------------------------------------ */
+.countdown-sub {
+    margin-bottom: 10px;
+    color: var(--ink-soft);
+    font-size: clamp(11.5px, 1.1vw, 13px);
+    line-height: 1.7;
+    text-wrap: balance;
+}
+
+.countdown {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: clamp(12px, 2.2vw, 26px);
+    row-gap: 4px;
+}
+
+.countdown-unit {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 3px;
+    white-space: nowrap;
+}
+
+.countdown-value {
+    font-size: clamp(22px, 4.2vw, 40px);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+}
+
+.countdown-label {
+    font-size: clamp(11px, 1.1vw, 13px);
+    letter-spacing: 0.08em;
+    color: var(--ink);
+    opacity: 0.72;
+}
+
+/* 计时说明入口：放在数字行最右侧，用圆形问号而不是 emoji */
+.countdown-info {
+    position: relative;
+    flex: 0 0 auto;
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin-left: auto;
+    padding: 0;
+    border: 1px solid var(--ink-line);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.42);
+    color: rgba(74, 35, 51, 0.78);
+    cursor: pointer;
+    transition: background var(--ease), color var(--ease), border-color var(--ease), transform var(--ease);
+}
+
+/* 视觉上仍是 32px，触控热区扩到约 42px */
+.countdown-info::after {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border-radius: 50%;
+}
+
+.countdown-info:hover {
+    border-color: rgba(74, 35, 51, 0.3);
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--ink);
+}
+
+.countdown-info:active {
+    transform: scale(0.96);
+}
+
+/* --- 4.4 页脚：版权与访问统计 ------------------------------------------- */
+.panel-meta {
+    margin-top: 18px;
+    padding-top: 13px;
+    border-top: 1px solid var(--ink-line);
+    color: var(--ink-muted);
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+.meta-line + .meta-line {
+    margin-top: 2px;
+}
+
+.panel-meta a {
+    color: var(--ink-link);
+    text-decoration-color: rgba(141, 58, 86, 0.4);
+    text-underline-offset: 2px;
+}
+
+.panel-meta a:hover {
+    color: var(--ink);
+    text-decoration-color: var(--ink);
+}
+
+.statistics-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+    margin-top: 6px;
+}
+
+.statistics-item {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.separator {
+    opacity: 0.4;
+}
+
+/* ==========================================================================
+   5. 音乐播放器
+   ========================================================================== */
 .audio-player {
     position: relative;
     flex-shrink: 0;
@@ -353,24 +629,28 @@ body::before {
 
 .audio-panel {
     position: absolute;
-    top: calc(100% + var(--space-sm));
+    top: calc(100% + 10px);
     right: 0;
-    width: 292px;
-    max-width: calc(100vw - 50px);
-    padding: var(--space-lg);
+    width: 300px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100dvh - 120px);
+    padding: 16px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     border: 1px solid var(--panel-border);
-    border-radius: var(--radius-md);
+    border-radius: 14px;
     background: var(--panel-bg);
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.38);
-    -webkit-backdrop-filter: blur(16px);
-    backdrop-filter: blur(16px);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
     color: var(--text);
     text-align: left;
     transform-origin: top right;
     animation: audio-panel-in 0.18s ease;
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 }
 
-/* hidden 属性优先于上面的布局，确保面板可真正收起 */
 .audio-panel[hidden] {
     display: none;
 }
@@ -390,15 +670,15 @@ body::before {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-2xs);
+    gap: 8px;
+    margin-bottom: 2px;
 }
 
 .audio-panel-title {
-    font-size: 13px;
-    font-weight: bold;
-    letter-spacing: 0.04em;
     color: var(--text-soft);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
 }
 
 .audio-close-btn {
@@ -408,7 +688,7 @@ body::before {
     width: 24px;
     height: 24px;
     padding: 0;
-    border: none;
+    border: 0;
     border-radius: 50%;
     background: transparent;
     color: var(--text-soft);
@@ -422,30 +702,30 @@ body::before {
 }
 
 .audio-now-playing {
-    margin-bottom: var(--space-md);
+    margin-bottom: 10px;
+    overflow: hidden;
+    color: var(--text-soft);
     font-size: 13px;
     line-height: 1.5;
-    color: var(--text-soft);
-    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-/* 播放状态指示点：播放中粉色呼吸 */
+/* 播放状态指示点：播放中粉红呼吸 */
 .audio-now-playing::before {
     content: '';
     display: inline-block;
     width: 6px;
     height: 6px;
-    margin-right: var(--space-xs);
+    margin-right: 6px;
     border-radius: 50%;
-    background: var(--brand-40);
+    background: var(--brand-soft);
     vertical-align: middle;
 }
 
 .audio-now-playing.is-playing::before {
     background: var(--brand);
-    box-shadow: 0 0 0 3px var(--brand-30);
+    box-shadow: 0 0 0 3px var(--brand-soft);
     animation: audio-dot 1.6s ease-in-out infinite;
 }
 
@@ -458,32 +738,31 @@ body::before {
 .audio-controls {
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-md);
+    gap: 8px;
+    margin-bottom: 10px;
 }
 
 .audio-play-btn {
     display: inline-flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
     width: 38px;
     height: 38px;
-    flex-shrink: 0;
     padding: 0;
-    border: none;
+    border: 0;
     border-radius: 50%;
-    background: var(--brand-80);
+    background: var(--brand-deep);
     color: var(--text);
     cursor: pointer;
     transition: background var(--ease), transform var(--ease);
 }
 
 .audio-play-btn:hover {
-    background: var(--brand);
+    background: #a63a61;
     transform: scale(1.04);
 }
 
-/* 播放 / 暂停图标二选一显示 */
 .audio-play-btn .audio-icon-pause {
     display: none;
 }
@@ -500,16 +779,16 @@ body::before {
     flex: 1;
     min-width: 0;
     height: 32px;
-    padding: 0 var(--space-md);
+    padding: 0 10px;
+    overflow: hidden;
     border: 1px solid var(--panel-border);
     border-radius: var(--radius-pill);
     background: rgba(255, 255, 255, 0.06);
     color: var(--text-soft);
     font-size: 12px;
-    font-weight: bold;
-    white-space: nowrap;
-    overflow: hidden;
+    font-weight: 700;
     text-overflow: ellipsis;
+    white-space: nowrap;
     cursor: pointer;
     transition: background var(--ease), border-color var(--ease), color var(--ease);
     -webkit-appearance: none;
@@ -517,8 +796,8 @@ body::before {
 }
 
 .audio-mode-btn:hover {
+    border-color: var(--brand-soft);
     background: var(--panel-hover);
-    border-color: var(--brand-40);
     color: var(--text);
 }
 
@@ -526,19 +805,19 @@ body::before {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    list-style: none;
     margin: 0;
     padding: 0;
+    list-style: none;
 }
 
 .audio-track {
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
+    gap: 8px;
     width: 100%;
-    padding: var(--space-sm) var(--space-xs);
-    border: none;
-    border-radius: var(--radius-sm);
+    padding: 8px 6px;
+    border: 0;
+    border-radius: 5px;
     background: transparent;
     color: var(--text-soft);
     font-family: inherit;
@@ -579,11 +858,11 @@ body::before {
 /* 正在播放的曲目右侧显示跳动的均衡器 */
 .audio-track-equalizer {
     display: none;
+    flex-shrink: 0;
     align-items: flex-end;
     gap: 2px;
     width: 14px;
     height: 12px;
-    flex-shrink: 0;
 }
 
 .audio-track[aria-pressed="true"].is-playing .audio-track-equalizer {
@@ -617,455 +896,714 @@ body::before {
     }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .audio-panel {
-        animation: none;
-    }
+/* ==========================================================================
+   5.5 计时说明弹窗
+   ========================================================================== */
+.info-dialog {
+    width: min(600px, calc(100vw - var(--edge) * 2));
+    max-width: none;
+    max-height: calc(100dvh - var(--edge) * 2);
+    margin: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    overflow: visible;
+}
 
-    .audio-track-equalizer i,
-    .audio-now-playing.is-playing::before {
-        animation: none;
+.info-dialog::backdrop {
+    background: rgba(58, 18, 36, 0.44);
+    -webkit-backdrop-filter: blur(6px) saturate(0.92);
+    backdrop-filter: blur(6px) saturate(0.92);
+}
+
+.info-dialog[open] {
+    animation: info-dialog-in 0.2s cubic-bezier(0.22, 0.8, 0.28, 1);
+}
+
+@keyframes info-dialog-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.985);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }
 }
 
-/* ==========================================================================
-   5. 主内容区
-   ========================================================================== */
-main {
-    display: flex;
-    flex-direction: column;
+.info-card {
+    position: relative;
+    max-height: calc(100dvh - var(--edge) * 2);
+    padding: 26px 28px 24px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    border-radius: 20px;
+    background:
+        linear-gradient(158deg, rgba(255, 250, 251, 0.97), rgba(255, 236, 240, 0.95) 58%, rgba(255, 226, 232, 0.93));
+    box-shadow:
+        0 34px 80px rgba(58, 18, 36, 0.38),
+        0 2px 12px rgba(58, 18, 36, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(74, 35, 51, 0.28) transparent;
+}
+
+.info-card::-webkit-scrollbar {
+    width: 6px;
+}
+
+.info-card::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+    background: rgba(74, 35, 51, 0.22);
+}
+
+.info-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: inline-flex;
     align-items: center;
-    padding: 45px var(--space-3xl) 0; /* 顶部留出工具按钮的空间 */
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    background: rgba(74, 35, 51, 0.07);
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: background var(--ease), color var(--ease), border-color var(--ease);
 }
 
-.content {
-    text-align: center;
-    margin-bottom: var(--space-2xl);
-    line-height: 1.8;
-    font-size: 1.2em;
-    color: var(--text);
-    text-shadow: var(--text-shadow);
+.info-close:hover {
+    border-color: var(--ink-line);
+    background: rgba(74, 35, 51, 0.13);
+    color: var(--ink);
 }
 
-.content p {
-    margin: var(--space-md) 0;
-}
-
-/* ==========================================================================
-   6. 倒计时
-   ========================================================================== */
-.countdown-container {
-    text-align: center;
-    margin: var(--space-2xl) 0;
-    padding: var(--space-xl);
-    background: var(--glass-bg-soft);
-    border-radius: var(--radius-md);
-    width: 100%;
-}
-
-#countdownMainText {
-    margin-bottom: var(--space-md);
-    font-size: 1.5em;
-    color: var(--text);
-    text-shadow: var(--text-shadow);
-}
-
-/* 说明文字：位于倒计时正上方 */
-#countdownSubText {
-    margin: 0 0 var(--space-md);
-    font-size: 1em;
-    color: var(--text-soft);
-    text-shadow: var(--text-shadow);
-    /* 两行时优先在括号前断行，避免把「（4.6期间）」拆开 */
+.info-title {
+    padding-right: 42px;
+    font-size: clamp(19px, 2.2vw, 22px);
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+    color: var(--ink);
     text-wrap: balance;
 }
 
-/* 横向排列：各组「数字 + 单位」在同一行内依次排列 */
-.countdown {
-    display: flex;
-    justify-content: center;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: var(--space-2xs) var(--space-lg);
+.info-body {
+    margin-top: 14px;
+    color: var(--ink-soft);
+    font-size: 15px;
+    line-height: 1.9;
 }
 
-/* 单个单位内部同样是横向：数字紧接单位，基线对齐 */
-.countdown-item {
-    display: flex;
-    align-items: baseline;
-    gap: 2px;
-    min-width: 0;
+.info-body p {
+    margin: 0;
 }
 
-.countdown-item span {
-    display: block;
+.info-body p + p {
+    margin-top: 12px;
 }
 
-/* 时 / 分 / 秒的数字：仅保留字号、字重与投影，不再使用框体 */
-#days,
-#hours,
-#minutes,
-#seconds {
-    font-size: 2em;
-    font-weight: bold;
-    background: none;
-    padding: 0;
-    border-radius: 0;
-    min-width: 0;
-    text-align: center;
-    color: var(--text);
-    text-shadow: var(--text-shadow);
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
+.info-body a {
+    color: var(--ink-link);
+    text-decoration-color: rgba(141, 58, 86, 0.4);
+    text-underline-offset: 3px;
 }
 
-.label {
-    font-size: 0.9em;
-    margin-top: 0;
-    line-height: 1;
+.info-body a:hover {
+    color: var(--ink);
+    text-decoration-color: var(--ink);
+}
+
+.info-quote {
+    margin: 16px 0 0;
+    padding: 2px 0 2px 14px;
+    border-left: 2px solid rgba(189, 74, 114, 0.5);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.85;
+}
+
+.info-card :focus-visible {
+    outline-color: var(--ink);
+}
+
+/* 浏览器不支持 backdrop-filter 时，用更实的底色保证文字可读 */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .countdown-panel {
+        background: linear-gradient(155deg, rgba(255, 246, 248, 0.97), rgba(255, 226, 232, 0.95));
+    }
+
+    .info-card {
+        background: #fff5f7;
+    }
+
+    .info-dialog::backdrop {
+        background: rgba(58, 18, 36, 0.56);
+    }
+
+    .tool-btn {
+        background: rgba(104, 42, 66, 0.62);
+    }
 }
 
 /* ==========================================================================
-   7. 视频
+   6. 响应式
    ========================================================================== */
-.video-container {
-    width: 100%;
-    margin-top: var(--space-xl);
-}
 
-.video-container video {
-    width: 100%;
-    border-radius: var(--radius-md);
-}
-
-/* ==========================================================================
-   8. 页脚（版权声明 + 访问统计）
-   ========================================================================== */
-.font-credit {
-    text-align: center;
-    margin-top: var(--space-xl);
-    padding-top: var(--space-md);
-    border-top: 1px solid var(--divider);
-    font-size: 0.85em;
-    color: var(--text-muted);
-}
-
-.font-credit p {
-    margin: var(--space-xs) 0;
-}
-
-.font-credit a {
-    color: var(--text-strong);
-    text-decoration: underline;
-}
-
-.font-credit a:hover {
-    color: var(--text);
-}
-
-.statistics-container {
-    margin-top: var(--space-md);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: var(--space-lg);
-    flex-wrap: wrap;
-    font-size: 0.85em;
-    color: var(--text-muted);
-}
-
-.statistics-item {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-}
-
-.separator {
-    color: var(--divider-soft);
-}
-
-/* ==========================================================================
-   9. 返回顶部按钮 / 全屏按钮
-   --------------------------------------------------------------------------
-   两个按钮共用右下角的圆形样式与层级；全屏按钮常驻，返回顶部按钮按滚动显隐。
-   ========================================================================== */
-.back-to-top-btn,
-.fullscreen-btn {
-    position: fixed; /* 相对视口定位，始终贴在右下角 */
-    bottom: var(--back-to-top-gap);
-    right: var(--back-to-top-gap);
-    width: var(--back-to-top-size);
-    height: var(--back-to-top-size);
-    border-radius: 50%;
-    background: var(--brand-80);
-    border: none;
-    color: var(--text);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    z-index: var(--z-back-to-top);
-    /* 独立层叠上下文：避免被祖先元素的 backdrop-filter / transform 影响层级 */
-    isolation: isolate;
-    -webkit-appearance: none;
-    appearance: none;
-    transition: right var(--ease), background var(--ease), transform var(--ease);
-}
-
-.back-to-top-btn:hover,
-.fullscreen-btn:hover {
-    background: var(--brand);
-    transform: translateY(-2px);
-}
-
-/* 返回顶部：默认隐藏，滚动后由 JS 添加 .show 淡入 */
-.back-to-top-btn {
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(10px);
-    transition: opacity var(--ease), visibility var(--ease), transform var(--ease), background var(--ease);
-}
-
-.back-to-top-btn.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
-/* --- 全屏按钮 ---
-   非全屏时占用返回顶部按钮的位置；返回顶部显示后（.is-shifted）左移让位。
-   全屏状态下只保留退出按钮，故始终停在默认位置。 */
-.fullscreen-btn.is-shifted {
-    right: calc(var(--back-to-top-gap) + var(--back-to-top-size) + var(--space-sm));
-}
-
-.fullscreen-btn:focus-visible,
-.back-to-top-btn:focus-visible {
-    outline: 2px solid var(--text);
-    outline-offset: 3px;
-}
-
-/* 进入 / 退出全屏图标二选一显示 */
-.fullscreen-btn .fullscreen-icon-exit {
-    display: none;
-}
-
-.fullscreen-btn.is-active .fullscreen-icon-enter {
-    display: none;
-}
-
-.fullscreen-btn.is-active .fullscreen-icon-exit {
-    display: block;
-}
-
-/* ==========================================================================
-   10. 响应式断点
-   --------------------------------------------------------------------------
-   768px：平板 / 小屏笔记本，收紧容器与主内容内边距
-   600px：进入窄屏，顶部按钮收为纯图标（四个按钮一同切换）
-   480px：手机上进一步收紧容器与主内容内边距
-   ========================================================================== */
-@media (max-width: 768px) {
-    /* 按钮在窄屏略小，同步收窄容器为其预留的底部空间 */
-    body {
-        --back-to-top-size: 45px;
-        --back-to-top-gap: var(--space-lg);
-        --back-to-top-reserve: calc(var(--back-to-top-size) + var(--back-to-top-gap) + var(--space-sm));
-    }
-
-    .container {
-        padding: var(--space-xl);
-        padding-bottom: calc(var(--space-xl) + var(--back-to-top-reserve));
-    }
-
-    main {
-        padding: 90px var(--space-xl) 0; /* 工具按钮改为绝对定位后需要更多顶部空间 */
-    }
-
-    .content {
-        font-size: 1em;
-    }
-
-    #days,
-    #hours,
-    #minutes,
-    #seconds {
-        font-size: 1.5em;
-    }
-
-    /* 窄屏收紧单位之间的横向间距，保证四组仍能排在一行 */
-    .countdown {
-        gap: var(--space-2xs) var(--space-md);
-    }
-
-    .back-to-top-btn {
-        bottom: var(--space-lg);
-        right: var(--space-lg);
-        width: 45px;
-        height: 45px;
-    }
-}
-
+/* --- 6.1 窄屏（手机）---------------------------------------------------- */
 @media (max-width: 600px) {
-    /* 窄屏下按钮只保留图标，因此文字统一隐藏、取消图标间距 */
-    .calendar-toggle-text,
-    .blog-toggle-text,
-    .lang-toggle-text,
-    .audio-number,
-    .audio-number.is-visible {
-        display: none;
+    :root {
+        --edge: 14px;
+        --control-size: 42px;
+        --radius-panel: 20px;
     }
 
-    .calendar-switcher,
-    .language-switcher {
-        top: var(--space-md);
-        gap: var(--space-sm);
+    .toolbar {
+        gap: 6px;
     }
 
-    .calendar-switcher {
-        left: var(--space-md);
-    }
-
-    .language-switcher {
-        right: var(--space-md);
-    }
-
-    /* 统一为正方形图标按钮 */
-    .calendar-toggle-btn,
-    .blog-toggle-btn,
-    .lang-toggle-btn,
-    .audio-toggle-btn {
-        width: 40px;
-        min-width: 40px;
-        height: 40px;
-        padding: var(--space-sm);
-    }
-
-    main {
-        padding-top: 100px;
-    }
-
-    /* 手机端面板：占满左右可用宽度并加大触控行高 */
-    .audio-panel {
-        width: calc(100vw - 50px);
-        max-width: none;
-        padding: var(--space-md);
-    }
-
-    .audio-track {
-        padding: 10px var(--space-sm);
+    /* 手机上都变成图标按钮；语言按钮保留「EN / 中文」文字更易辨认 */
+    .tool-btn {
+        padding: 0 12px;
         font-size: 12px;
     }
 
-    .audio-play-btn {
-        width: 40px;
-        height: 40px;
-    }
-}
-
-@media (max-width: 480px) {
-    .container {
-        padding: var(--space-md);
-        /* 覆盖上面的 padding 简写后，需重新补回返回顶部按钮的预留空间 */
-        padding-bottom: calc(var(--space-md) + var(--back-to-top-reserve));
+    .tool-btn--icon {
+        width: var(--control-size);
+        padding: 0;
     }
 
-    main {
-        padding-left: var(--space-lg);
-        padding-right: var(--space-lg);
+    .lang-text {
+        letter-spacing: 0.02em;
     }
 
-    /* 320px 级窄屏：收紧倒计时卡片内边距与组间距，保证四组仍排在一行 */
-    .countdown-container {
-        padding: var(--space-md);
-        margin: var(--space-xl) 0;
+    .countdown-panel {
+        right: max(var(--edge), env(safe-area-inset-right));
+        width: auto;
+        padding: 20px 20px 16px;
+    }
+
+    .countdown-title {
+        font-size: clamp(16px, 4.4vw, 21px);
+        line-height: 1.5;
+    }
+
+    .mode-switch {
+        margin: 14px 0 11px;
+    }
+
+    .mode-btn {
+        padding: 5px 14px;
+        font-size: 12px;
+    }
+
+    .countdown-sub {
+        margin-bottom: 8px;
+        font-size: 11.5px;
     }
 
     .countdown {
-        gap: var(--space-2xs) var(--space-sm);
+        column-gap: clamp(8px, 3vw, 16px);
+    }
+
+    .countdown-value {
+        font-size: clamp(21px, 7.2vw, 30px);
+    }
+
+    .countdown-info {
+        width: 30px;
+        height: 30px;
+    }
+
+    .info-card {
+        padding: 22px 20px 20px;
+        border-radius: 16px;
+    }
+
+    .info-title {
+        padding-right: 38px;
+        font-size: 18px;
+    }
+
+    .info-body,
+    .info-quote {
+        font-size: 13.5px;
+        line-height: 1.85;
+    }
+
+    .panel-meta {
+        margin-top: 14px;
+        padding-top: 10px;
+        font-size: 10px;
+        line-height: 1.65;
+    }
+
+    /* 面板脱离音频按钮定位，避免贴边时超出视口 */
+    .audio-panel {
+        position: fixed;
+        top: calc(max(var(--edge), env(safe-area-inset-top)) + var(--control-size) + 10px);
+        right: max(var(--edge), env(safe-area-inset-right));
+        width: min(340px, calc(100vw - 2 * max(var(--edge), env(safe-area-inset-right))));
+        max-width: none;
+    }
+}
+
+/* --- 6.2 窄且矮的屏幕：进一步压缩字号 --------------------------------- */
+@media (max-width: 380px) {
+    .countdown-panel {
+        padding: 16px 16px 14px;
+    }
+
+    .countdown-title {
+        font-size: 15.5px;
+    }
+
+    .countdown-value {
+        font-size: 22px;
+    }
+}
+
+/* --- 6.3 矮屏（手机横屏）------------------------------------------------
+   竖向空间不足时收起页脚说明，避免面板顶到右上角工具组。 */
+@media (max-height: 620px) {
+    .countdown-panel {
+        padding: 16px 20px 14px;
+    }
+
+    .panel-meta {
+        display: none;
+    }
+
+    .countdown-title {
+        font-size: clamp(15px, 2.4vw, 20px);
+        line-height: 1.45;
+    }
+
+    .mode-switch {
+        margin: 10px 0 8px;
+    }
+
+    .countdown-sub {
+        margin-bottom: 6px;
+    }
+
+    .countdown-value {
+        font-size: clamp(20px, 4vw, 32px);
     }
 }
 
 /* ==========================================================================
-   11. 全屏专注模式
-   --------------------------------------------------------------------------
-   全屏时只保留两块内容：
-     · 倒计时区域（.countdown-container）固定在左下角，文本左对齐
-     · 音乐播放器按钮固定在右上角
-   页面其余部分（日历 / 博客、语言按钮、正文、视频、页脚、返回顶部）隐藏。
+   7. 动效与可访问性
    ========================================================================== */
-body.is-fullscreen {
-    padding: 0;
-    display: block;
-    overflow: hidden;
+:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.92);
+    outline-offset: 3px;
 }
 
-body.is-fullscreen .container {
-    max-width: none;
-    width: 100%;
-    min-height: 100vh;
-    margin: 0;
-    padding: 0;
-    background: transparent;
-    border-radius: 0;
-    box-shadow: none;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
+/* 浅色面板上用深色焦点环，白环会看不见 */
+.countdown-panel :focus-visible {
+    outline-color: var(--ink);
 }
 
-body.is-fullscreen main {
-    display: block;
-    min-height: 100vh;
-    padding: 0;
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+    }
 }
 
-body.is-fullscreen .calendar-switcher,
-body.is-fullscreen .content,
-body.is-fullscreen .video-container,
-body.is-fullscreen footer,
-body.is-fullscreen #backToTop {
-    display: none;
+/* ==========================================================================
+   8. 内容说明页（/content-notice/）
+   ========================================================================== */
+body.notice-page {
+    overflow-x: hidden;
+    overflow-y: auto;
+    color: var(--ink);
 }
 
-/* 语言切换按钮隐藏，音乐播放器按钮留在右上角 */
-body.is-fullscreen #langToggle {
-    display: none;
+/* 返回首页：放在卡片顶部，随内容滚动，不会在滚动时压住标题 */
+.notice-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: clamp(18px, 3vw, 26px);
+    color: var(--ink-link);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    text-underline-offset: 3px;
+    transition: color var(--ease);
 }
 
-body.is-fullscreen .language-switcher {
-    position: fixed;
-    top: var(--space-xl);
-    right: var(--space-xl);
-    z-index: var(--z-toolbar);
+.notice-back svg {
+    flex-shrink: 0;
 }
 
-/* 倒计时区域移到左下角并改成左对齐 */
-body.is-fullscreen .countdown-container {
-    position: fixed;
-    left: var(--space-xl);
-    bottom: var(--space-xl);
-    margin: 0;
-    width: auto;
-    max-width: calc(100vw - var(--space-xl) * 2);
-    padding: var(--space-lg) var(--space-xl);
-    text-align: left;
+.notice-back:hover {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--ink-line);
 }
 
-body.is-fullscreen .countdown {
-    justify-content: flex-start;
+.notice-main {
+    position: relative;
+    z-index: 1;
+    width: min(780px, calc(100vw - 2 * var(--edge)));
+    margin: 0 auto;
+    padding: clamp(96px, 15vh, 150px) 0 clamp(48px, 8vh, 90px);
+}
+
+.notice-card {
+    padding: clamp(26px, 4vw, 46px);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: var(--radius-panel);
+    background: linear-gradient(
+        158deg,
+        rgba(255, 248, 249, 0.88),
+        rgba(255, 232, 236, 0.76) 55%,
+        rgba(255, 216, 224, 0.7)
+    );
+    box-shadow: 0 24px 60px rgba(58, 18, 36, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    -webkit-backdrop-filter: blur(22px) saturate(1.15);
+    backdrop-filter: blur(22px) saturate(1.15);
+}
+
+.notice-eyebrow {
+    color: var(--ink-muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+}
+
+.notice-title {
+    margin-top: 7px;
+    color: var(--ink);
+    font-size: clamp(26px, 3.6vw, 38px);
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+}
+
+.notice-list {
+    margin-top: clamp(22px, 3.2vw, 32px);
+    list-style: none;
+    counter-reset: notice-item;
+}
+
+.notice-list li {
+    position: relative;
+    padding-left: 40px;
+    counter-increment: notice-item;
+}
+
+.notice-list li + li {
+    margin-top: 20px;
+}
+
+.notice-list li::before {
+    content: counter(notice-item);
+    position: absolute;
+    top: 1px;
+    left: 0;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: var(--brand-deep);
+    box-shadow: 0 2px 6px rgba(141, 58, 86, 0.25);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 25px;
+    text-align: center;
+}
+
+.notice-list p {
+    color: rgba(74, 35, 51, 0.84);
+    font-size: clamp(14px, 1.25vw, 15px);
+    line-height: 1.95;
+}
+
+.notice-list a {
+    color: var(--ink-link);
+    text-decoration: underline;
+    text-decoration-color: rgba(141, 58, 86, 0.38);
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+}
+
+.notice-list a:hover {
+    color: var(--ink);
+    text-decoration-color: currentColor;
+}
+
+.notice-list code {
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: rgba(74, 35, 51, 0.08);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 0.94em;
+}
+
+.notice-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 16px;
+    margin-top: clamp(26px, 3.4vw, 34px);
+    padding-top: 14px;
+    border-top: 1px solid var(--ink-line);
+    color: var(--ink-muted);
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+.notice-card :focus-visible {
+    outline-color: var(--ink);
+}
+
+.notice-back:focus-visible {
+    outline-color: var(--ink);
 }
 
 @media (max-width: 600px) {
-    body.is-fullscreen .language-switcher {
-        top: var(--space-md);
-        right: var(--space-md);
+    .notice-main {
+        padding-top: 86px;
     }
 
-    body.is-fullscreen .countdown-container {
-        left: var(--space-md);
-        bottom: var(--space-md);
-        max-width: calc(100vw - var(--space-md) * 2);
-        padding: var(--space-md);
+    .notice-card {
+        padding: 24px 20px 22px;
     }
+
+    .notice-list li {
+        padding-left: 34px;
+    }
+
+    .notice-list li::before {
+        width: 23px;
+        height: 23px;
+        line-height: 23px;
+    }
+
+    .notice-meta {
+        flex-direction: column;
+        gap: 2px;
+    }
+}
+
+/* 不支持毛玻璃时退回近实底，避免文字压在插画上 */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .notice-card {
+        background: linear-gradient(155deg, rgba(255, 248, 249, 0.97), rgba(255, 226, 232, 0.95));
+    }
+}
+
+/* 开场：窄屏字号与安全边距 */
+@media (max-width: 600px) {
+    .intro {
+        padding:
+            max(22px, env(safe-area-inset-top))
+            max(22px, env(safe-area-inset-right))
+            max(22px, env(safe-area-inset-bottom))
+            max(22px, env(safe-area-inset-left));
+    }
+
+    .intro-title {
+        min-height: 3.3em;
+        font-size: clamp(20px, 6vw, 30px);
+        line-height: 1.6;
+        letter-spacing: 0.01em;
+    }
+
+    html[lang="en"] .intro-title {
+        font-size: clamp(18px, 5vw, 24px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .intro-title::after {
+        animation: none;
+    }
+}
+
+/* ==========================================================================
+   9. 深浅色主题
+   --------------------------------------------------------------------------
+   浅色是默认值，接近原来的纸感面板；深色把面板、弹窗与工具栏换成深玫瑰玻璃。
+   所有规则都挂在 data-theme 上，内容说明页不受影响。
+   ========================================================================== */
+
+html[data-theme="light"] {
+    color-scheme: light;
+}
+
+html[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+/* --- 9.1 右上角工具组 ---------------------------------------------------- */
+html[data-theme="light"] .tool-btn {
+    border-color: rgba(255, 255, 255, 0.78);
+    background: rgba(255, 249, 251, 0.66);
+    color: var(--ink);
+    text-shadow: none;
+    box-shadow:
+        0 8px 24px rgba(58, 18, 36, 0.16),
+        inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+html[data-theme="light"] .tool-btn:hover {
+    border-color: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.84);
+}
+
+html[data-theme="light"] .tool-btn svg {
+    filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.45));
+}
+
+/* 浅色按钮上的白焦点环会消失，改用深玫瑰 */
+html[data-theme="light"] .tool-btn:focus-visible,
+html[data-theme="light"] .audio-panel :focus-visible {
+    outline-color: var(--ink);
+}
+
+html[data-theme="dark"] .tool-btn {
+    border-color: rgba(255, 232, 240, 0.26);
+    background: rgba(42, 14, 27, 0.58);
+    color: #fff8fa;
+    text-shadow: 0 1px 3px rgba(20, 4, 12, 0.45);
+    box-shadow:
+        0 8px 24px rgba(10, 2, 6, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+html[data-theme="dark"] .tool-btn:hover {
+    border-color: rgba(255, 232, 240, 0.38);
+    background: rgba(64, 22, 40, 0.72);
+}
+
+/* --- 9.2 倒计时面板 ------------------------------------------------------ */
+html[data-theme="dark"] .countdown-panel {
+    --ink: #fff5f8;
+    --ink-soft: rgba(255, 245, 248, 0.8);
+    --ink-muted: rgba(255, 245, 248, 0.67);
+    --ink-line: rgba(255, 245, 248, 0.22);
+    --ink-link: #ffc3d7;
+
+    border-color: rgba(255, 232, 240, 0.26);
+    background:
+        linear-gradient(158deg, rgba(40, 13, 26, 0.92), rgba(63, 23, 41, 0.85) 55%, rgba(83, 31, 52, 0.8));
+    box-shadow:
+        0 26px 60px rgba(8, 2, 5, 0.5),
+        0 2px 10px rgba(8, 2, 5, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    scrollbar-color: rgba(255, 245, 248, 0.3) transparent;
+}
+
+html[data-theme="dark"] .countdown-panel::-webkit-scrollbar-thumb {
+    background: rgba(255, 245, 248, 0.24);
+}
+
+html[data-theme="dark"] .mode-switch {
+    background: rgba(255, 245, 248, 0.08);
+}
+
+html[data-theme="dark"] .mode-btn:hover {
+    background: rgba(255, 245, 248, 0.08);
+}
+
+html[data-theme="dark"] .countdown-info {
+    border-color: rgba(255, 245, 248, 0.24);
+    background: rgba(255, 245, 248, 0.1);
+    color: rgba(255, 245, 248, 0.8);
+}
+
+html[data-theme="dark"] .countdown-info:hover {
+    border-color: rgba(255, 245, 248, 0.4);
+    background: rgba(255, 245, 248, 0.18);
+    color: var(--ink);
+}
+
+html[data-theme="dark"] .panel-meta a {
+    text-decoration-color: rgba(255, 195, 215, 0.45);
+}
+
+/* --- 9.3 计时说明弹窗 ---------------------------------------------------- */
+html[data-theme="dark"] .info-card {
+    --ink: #fff5f8;
+    --ink-soft: rgba(255, 245, 248, 0.8);
+    --ink-muted: rgba(255, 245, 248, 0.67);
+    --ink-line: rgba(255, 245, 248, 0.22);
+    --ink-link: #ffc3d7;
+
+    color: var(--ink);
+    border-color: rgba(255, 232, 240, 0.26);
+    background:
+        linear-gradient(158deg, rgba(40, 13, 26, 0.98), rgba(63, 23, 41, 0.97) 58%, rgba(83, 31, 52, 0.96));
+    box-shadow:
+        0 34px 80px rgba(8, 2, 5, 0.55),
+        0 2px 12px rgba(8, 2, 5, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    scrollbar-color: rgba(255, 245, 248, 0.3) transparent;
+}
+
+html[data-theme="dark"] .info-card::-webkit-scrollbar-thumb {
+    background: rgba(255, 245, 248, 0.24);
+}
+
+html[data-theme="dark"] .info-close {
+    color: rgba(255, 245, 248, 0.72);
+    background: rgba(255, 245, 248, 0.08);
+}
+
+html[data-theme="dark"] .info-close:hover {
+    border-color: var(--ink-line);
+    background: rgba(255, 245, 248, 0.16);
+    color: var(--ink);
+}
+
+html[data-theme="dark"] .info-dialog::backdrop {
+    background: rgba(8, 2, 5, 0.62);
+}
+
+html[data-theme="dark"] .info-body a {
+    text-decoration-color: rgba(255, 195, 215, 0.4);
+}
+
+/* --- 9.4 浅色播放器面板 -------------------------------------------------- */
+html[data-theme="light"] .audio-panel {
+    --panel-bg: rgba(255, 249, 251, 0.96);
+    --panel-border: rgba(74, 35, 51, 0.16);
+    --panel-hover: rgba(74, 35, 51, 0.07);
+    --panel-active: rgba(235, 126, 163, 0.2);
+    --text: #4a2333;
+    --text-soft: rgba(74, 35, 51, 0.88);
+    --text-muted: rgba(74, 35, 51, 0.72);
+    --text-faint: rgba(74, 35, 51, 0.52);
+
+    color: var(--text);
+    box-shadow: 0 18px 40px rgba(58, 18, 36, 0.24);
+}
+
+/* 播放键仍用白图标压住玫红底；均衡器改用深玫红，浅色面板上才看得清 */
+html[data-theme="light"] .audio-panel .audio-play-btn {
+    color: #fff;
+}
+
+html[data-theme="light"] .audio-panel .audio-mode-btn {
+    background: rgba(74, 35, 51, 0.05);
+}
+
+html[data-theme="light"] .audio-panel .audio-track-equalizer i {
+    background: var(--brand-deep);
 }
