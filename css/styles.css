@@ -51,7 +51,7 @@
     --panel-hover: rgba(255, 255, 255, 0.1);
     --panel-active: rgba(235, 126, 163, 0.3);
 
-    /* 背景遮罩：暖玫瑰色半透明渐变，压暗插画、统一色调，同时保留画面细节 */
+    /* 背景遮罩：默认暖玫瑰色；script.js 会按当前背景主色重写这三个颜色 */
     --mask-deep: rgba(104, 42, 66, 0.4);
     --mask-rose: rgba(186, 96, 118, 0.3);
     --mask-apricot: rgba(206, 134, 104, 0.24);
@@ -76,6 +76,26 @@
     --ease: 0.22s ease;
 }
 
+/* 把遮罩颜色注册成 <color>，这样 JS 换色时可以由浏览器平滑插值；
+   不支持 @property 的浏览器会直接跳到新颜色，不影响功能。 */
+@property --mask-deep {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: rgba(104, 42, 66, 0.4);
+}
+
+@property --mask-rose {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: rgba(186, 96, 118, 0.3);
+}
+
+@property --mask-apricot {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: rgba(206, 134, 104, 0.24);
+}
+
 /* ==========================================================================
    2. 基础重置与背景
    ========================================================================== */
@@ -97,6 +117,7 @@
 html {
     height: 100%;
     background-color: var(--bg-fallback);
+    transition: --mask-deep 700ms ease, --mask-rose 700ms ease, --mask-apricot 700ms ease;
 }
 
 body {

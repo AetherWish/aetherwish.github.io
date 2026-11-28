@@ -793,6 +793,7 @@
             saveTheme(next);
         }
         updateThemeButton();
+        document.dispatchEvent(new CustomEvent('themechange', { detail: { theme: next } }));
     }
 
     function initTheme() {
@@ -942,6 +943,13 @@
        背景图库
        ====================================================================== */
 
+    /** 遮罩取色：先缩到 32x32，避免为了统计颜色去读整张 4K 图 */
+    const BACKGROUND_TINT_SIZE = 32;
+    const BACKGROUND_TINT_BRAND_HUE = 340; // 站点原本的玫瑰色，混合后保留品牌感
+    const BACKGROUND_TINT_HUE_MIX = 0.62;
+    const BACKGROUND_TINT_KEYS = ['--mask-deep', '--mask-rose', '--mask-apricot'];
+    const backgroundTintCache = new Map();
+
     /** 从路径里取文件名，兼容绝对 / 相对 src */
     function backgroundFileName(src) {
         if (!src) {
@@ -963,6 +971,178 @@
             file.indexOf('/') === -1 &&
             file.indexOf('\\') === -1 &&
             BACKGROUND_EXTENSIONS.test(file);
+    }
+
+    /** 把色相规整到 [0, 360) */
+    function normalizeHue(hue) {
+        return ((hue % 360) + 360) % 360;
+    }
+
+    /** 从品牌玫瑰色向背景主色按最短弧混合；amount 越大越贴近背景 */
+    function blendHue(base, target, amount) {
+        const delta = ((target - base + 540) % 360) - 180;
+        return normalizeHue(base + delta * amount);
+    }
+
+    function clampNumber(value, min, max) {
+        return Math.min(max, Math.max(min, value));
+    }
+
+    /** RGB（0-1）转 HSL，h 用角度，s/l 用 0-1 */
+    function rgbToHsl(red, green, blue) {
+        const max = Math.max(red, green, blue);
+        const min = Math.min(red, green, blue);
+        const lightness = (max + min) / 2;
+
+        if (max === min) {
+            return [0, 0, lightness];
+        }
+
+        const delta = max - min;
+        const saturation = lightness > 0.5
+            ? delta / (2 - max - min)
+            : delta / (max + min);
+        let hue;
+
+        if (max === red) {
+            hue = (green - blue) / delta + (green < blue ? 6 : 0);
+        } else if (max === green) {
+            hue = (blue - red) / delta + 2;
+        } else {
+            hue = (red - green) / delta + 4;
+        }
+
+        return [normalizeHue(hue * 60), saturation, lightness];
+    }
+
+    function formatTint(hue, saturation, lightness, alpha) {
+        return 'hsla(' + Math.round(normalizeHue(hue)) + ', ' +
+            (saturation * 100).toFixed(1) + '%, ' +
+            (lightness * 100).toFixed(1) + '%, ' +
+            alpha.toFixed(3) + ')';
+    }
+
+    /**
+     * 统计背景图的主色，生成一组与它同色系的半透明遮罩色。
+     * 用饱和度做权重、色相做圆周平均，避免大面积灰白背景把颜色拉灰；
+     * 再与品牌玫瑰色混合，保证换成冷色背景时也不会突然变成另一种风格。
+     */
+    function analyzeBackgroundTint(image) {
+        const canvas = document.createElement('canvas');
+        canvas.width = BACKGROUND_TINT_SIZE;
+        canvas.height = BACKGROUND_TINT_SIZE;
+
+        const context = canvas.getContext('2d', { willReadFrequently: true });
+        if (!context) {
+            return null;
+        }
+
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        const data = context.getImageData(0, 0, canvas.width, canvas.height).data;
+        let hueX = 0;
+        let hueY = 0;
+        let totalWeight = 0;
+        let saturationSum = 0;
+        let lightnessSum = 0;
+
+        for (let index = 0; index < data.length; index += 4) {
+            const hsl = rgbToHsl(
+                data[index] / 255,
+                data[index + 1] / 255,
+                data[index + 2] / 255
+            );
+            const hue = hsl[0];
+            const saturation = hsl[1];
+            const lightness = hsl[2];
+
+            // 低饱和与极亮/极暗像素权重更低，让画面里的主色而非白底决定结果
+            const weight = Math.pow(saturation, 1.7) *
+                Math.max(0.2, 1 - Math.abs(lightness - 0.5) * 1.1);
+            if (weight <= 0) {
+                continue;
+            }
+
+            const angle = hue * Math.PI / 180;
+            hueX += Math.cos(angle) * weight;
+            hueY += Math.sin(angle) * weight;
+            totalWeight += weight;
+            saturationSum += saturation * weight;
+            lightnessSum += lightness * weight;
+        }
+
+        if (totalWeight < 0.5) {
+            return null;
+        }
+
+        const averageSaturation = saturationSum / totalWeight;
+        if (averageSaturation < 0.12) {
+            // 近灰阶图片不强行上色，继续使用默认玫瑰遮罩
+            return null;
+        }
+
+        const averageHue = normalizeHue(Math.atan2(hueY, hueX) * 180 / Math.PI);
+        const averageLightness = lightnessSum / totalWeight;
+        const hue = blendHue(BACKGROUND_TINT_BRAND_HUE, averageHue, BACKGROUND_TINT_HUE_MIX);
+        const saturation = clampNumber(0.24 + (averageSaturation - 0.25) * 0.16, 0.24, 0.38);
+
+        // 亮图稍加强遮罩，暗图略微收一点，保证压暗程度大致稳定
+        const alphaBoost = clampNumber((averageLightness - 0.55) * 0.12, -0.02, 0.04);
+        const deepAlpha = clampNumber(0.4 + alphaBoost, 0.34, 0.46);
+
+        function makeTintSet(baseLightness) {
+            return {
+                '--mask-deep': formatTint(hue, saturation, baseLightness, deepAlpha),
+                '--mask-rose': formatTint(hue + 8, saturation * 0.96, baseLightness + 0.1, deepAlpha * 0.78),
+                '--mask-apricot': formatTint(hue + 28, saturation * 0.88, baseLightness + 0.2, deepAlpha * 0.6)
+            };
+        }
+
+        // 浅色模式用更亮的遮罩，避免整页被压得过沉；深色模式保持原来的暗度
+        return {
+            light: makeTintSet(0.34),
+            dark: makeTintSet(0.26)
+        };
+    }
+
+    /** 写入 / 清除遮罩变量；传入 null 时回退到 CSS 里的默认玫瑰色 */
+    function applyBackgroundTint(tint) {
+        const root = document.documentElement;
+        const theme = currentTheme();
+        const palette = tint && (tint[theme] || tint.dark);
+
+        BACKGROUND_TINT_KEYS.forEach(function (key) {
+            if (palette && palette[key]) {
+                root.style.setProperty(key, palette[key]);
+            } else {
+                root.style.removeProperty(key);
+            }
+        });
+    }
+
+    function updateBackgroundTint(image, file) {
+        if (!image || !image.naturalWidth || !file) {
+            return;
+        }
+
+        if (backgroundTintCache.has(file)) {
+            applyBackgroundTint(backgroundTintCache.get(file));
+            return;
+        }
+
+        let tint = null;
+        try {
+            tint = analyzeBackgroundTint(image);
+        } catch (error) {
+            console.warn('[background] 无法从背景图提取遮罩颜色，使用默认色。', error);
+        }
+
+        if (!tint) {
+            applyBackgroundTint(null);
+            return;
+        }
+
+        backgroundTintCache.set(file, tint);
+        applyBackgroundTint(tint);
     }
 
     function initPageBackground() {
@@ -993,6 +1173,11 @@
         const list = byId('bgList');
         const empty = byId('bgEmpty');
 
+        // 同一张背景在浅色 / 深色模式下使用两套亮度的遮罩
+        document.addEventListener('themechange', function () {
+            updateBackgroundTint(activeLayer, currentFile);
+        });
+
         function backgroundSource(file) {
             return '/img/bg/' + encodeURIComponent(file);
         }
@@ -1016,6 +1201,24 @@
         activeLayer.addEventListener('load', function () {
             container.classList.remove('is-failed');
         });
+
+        const initialLayer = activeLayer;
+
+        function applyInitialTint() {
+            if (activeLayer !== initialLayer) {
+                return;
+            }
+            updateBackgroundTint(
+                initialLayer,
+                backgroundFileName(initialLayer.getAttribute('src')) || currentFile
+            );
+        }
+
+        if (initialLayer.complete && initialLayer.naturalWidth > 0) {
+            applyInitialTint();
+        } else {
+            initialLayer.addEventListener('load', applyInitialTint, { once: true });
+        }
 
         function readStoredBackground() {
             try {
@@ -1092,6 +1295,7 @@
                 container.classList.remove('is-failed');
                 activeLayer = incoming;
                 currentFile = file;
+                updateBackgroundTint(incoming, file);
 
                 if (typeof settings.onShown === 'function') {
                     settings.onShown();
