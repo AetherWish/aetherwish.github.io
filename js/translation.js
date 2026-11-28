@@ -32,11 +32,18 @@
             langToggle: 'EN',
             langToggleAria: '切换语言',
 
-            /* 主标题：按数组逐行渲染，避免依赖 innerHTML 插入换行 */
-            countdownTitle: [
-                '翁法罗斯，续写「开拓」......',
-                '然后，人们从昨日走向明天。'
-            ],
+            /* 主标题：第一行固定，第二行按倒计时 / 正计时取 modeQuote，由 script.js 渲染 */
+            titleLead: '翁法罗斯，续写「开拓」......',
+            modeQuote: {
+                countdown: '「然后，人们从昨日走向明天。」',
+                countup: '「成为昨日的明天」'
+            },
+
+            /* 背景图库 */
+            backgroundTitle: '背景图库',
+            backgroundToggle: '切换背景',
+            backgroundClose: '关闭',
+            backgroundEmpty: '暂无可用背景',
 
             /* 时间模式 */
             modeSwitchAria: '时间显示模式',
@@ -93,10 +100,16 @@
             langToggle: '中文',
             langToggleAria: 'Switch language',
 
-            countdownTitle: [
-                'Amphoreus, continuing the Trailblaze...',
-                'Then, people walk from yesterday towards tomorrow.'
-            ],
+            titleLead: 'Amphoreus, continuing the Trailblaze...',
+            modeQuote: {
+                countdown: '"Then, people walk from yesterday towards tomorrow."',
+                countup: '"As Tomorrow Became Yesterday"'
+            },
+
+            backgroundTitle: 'Backgrounds',
+            backgroundToggle: 'Change background',
+            backgroundClose: 'Close',
+            backgroundEmpty: 'No backgrounds available.',
 
             modeSwitchAria: 'Time display mode',
             modeCountdown: 'Countdown',
@@ -155,6 +168,8 @@
         { id: 'langToggleText', key: 'langToggle' },
         { id: 'modeCountdown', key: 'modeCountdown' },
         { id: 'modeCountUp', key: 'modeCountUp' },
+        { id: 'bgPanelTitle', key: 'backgroundTitle' },
+        { id: 'bgEmpty', key: 'backgroundEmpty' },
         { id: 'totalViewsLabel', key: ['statistics', 'totalViews'] },
         { id: 'individualVisitorsLabel', key: ['statistics', 'individualVisitors'] },
         { id: 'viewsUnit', key: ['statistics', 'viewsUnit'] },
@@ -249,7 +264,7 @@
             document.documentElement.lang = lang;
             this.render();
 
-            // 通知依赖当前语言的其它模块（倒计时说明、播放器面板、全屏按钮）刷新文案。
+            // 通知依赖当前语言的其它模块（主标题、倒计时说明、播放器面板、全屏按钮）刷新文案。
             // 初始化时监听者尚未注册也无妨，各模块初始化时会自行渲染一次。
             document.dispatchEvent(new CustomEvent('languagechange', { detail: { lang: lang } }));
             return lang;
@@ -295,7 +310,6 @@
             });
 
             this.renderCountdownLabels();
-            this.renderTitle();
             this.renderAriaLabels();
         }
 
@@ -314,21 +328,6 @@
             });
         }
 
-        /** 逐行渲染主标题，并同步浏览器标签页标题 */
-        renderTitle() {
-            const lines = this.t('countdownTitle');
-            if (!Array.isArray(lines)) {
-                return;
-            }
-
-            document.querySelectorAll('#countdownTitle .title-line').forEach((element, index) => {
-                element.textContent = lines[index] || '';
-            });
-
-            // 英文两行之间补一个空格，中文按原样拼接
-            document.title = lines.join(this.currentLang === 'en' ? ' ' : '');
-        }
-
         /** 按钮 / 分组的无障碍标签 */
         renderAriaLabels() {
             const langButton = document.getElementById('langToggle');
@@ -336,6 +335,23 @@
                 const label = this.t('langToggleAria');
                 langButton.setAttribute('title', label);
                 langButton.setAttribute('aria-label', label);
+            }
+
+            const bgButton = document.getElementById('bgToggle');
+            if (bgButton) {
+                const label = this.t('backgroundToggle');
+                bgButton.setAttribute('title', label);
+                bgButton.setAttribute('aria-label', label);
+            }
+
+            const bgClose = document.getElementById('bgClose');
+            if (bgClose) {
+                bgClose.setAttribute('aria-label', this.t('backgroundClose'));
+            }
+
+            const bgList = document.getElementById('bgList');
+            if (bgList) {
+                bgList.setAttribute('aria-label', this.t('backgroundTitle'));
             }
 
             const switchGroup = document.getElementById('modeSwitch');

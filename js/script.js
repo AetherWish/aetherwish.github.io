@@ -42,6 +42,15 @@
     const PLAY_MODES = ['list', 'single', 'shuffle'];
     const PLAY_MODE_STORAGE_KEY = 'audioPlayMode';
 
+    /** 背景图库：清单由 scripts/build-backgrounds.mjs 扫描 img/bg/ 生成 */
+    const BACKGROUND_MANIFEST = '/img/bg/manifest.json';
+    const DEFAULT_BACKGROUND = 'philia093.webp';
+    const BACKGROUND_STORAGE_KEY = 'background';
+    const BACKGROUND_EXTENSIONS = /\.(?:avif|jpe?g|png|webp)$/i;
+
+    /** 与 css/styles.css 中 .bg-layer 的 opacity 过渡时长保持一致 */
+    const BACKGROUND_FADE_MS = 550;
+
     /** 暂停时叠加在音符图标上的斜线（viewBox 0 0 1024 1024） */
     const MUTE_SLASH_PATH = 'M768 128L128 864';
 
@@ -146,6 +155,28 @@
         return now >= COUNTDOWN_TARGET.getTime() ? 'countdown-arrived' : 'countdown';
     }
 
+    /** 标题两行：第一行固定，第二行随倒计时 / 正计时切换 */
+    function titleLines() {
+        const lead = t('titleLead');
+        const quote = t('modeQuote', currentMode);
+        return [lead, quote].filter(function (line) {
+            return Boolean(line);
+        });
+    }
+
+    /** 把标题写进页面与浏览器标签页；开场打字机也复用 titleLines() */
+    function renderTitle() {
+        const lines = titleLines();
+
+        document.querySelectorAll('#countdownTitle .title-line').forEach(function (element, index) {
+            element.textContent = lines[index] || '';
+        });
+
+        // 英文两行之间补一个空格，中文按原样拼接
+        const separator = translationManager && translationManager.currentLang === 'en' ? ' ' : '';
+        document.title = lines.join(separator);
+    }
+
     function updateSubText() {
         const element = byId('countdownSubText');
         if (!element) {
@@ -195,6 +226,7 @@
             panel.dataset.mode = currentMode;
         }
 
+        renderTitle();
         updateSubText();
         tick();
 
@@ -218,8 +250,11 @@
             }
         });
 
-        // 语言切换后说明文字需要重新拼接（时间格式化也跟着语言走）
-        document.addEventListener('languagechange', updateSubText);
+        // 语言切换后主标题与说明文字都需要重新拼接（时间格式化也跟着语言走）
+        document.addEventListener('languagechange', function () {
+            renderTitle();
+            updateSubText();
+        });
 
         window.setInterval(tick, COUNTDOWN_INTERVAL);
         setMode(DEFAULT_MODE);
@@ -796,13 +831,9 @@
     /** @type {number|null} */
     let introTimer = null;
 
-    /** 取当前语言的两行标题，用换行连接；translation 模块异常时返回空串 */
+    /** 取当前语言 + 当前模式的两行标题，用换行连接；translation 模块异常时返回空串 */
     function introTitleText() {
-        const lines = t('countdownTitle');
-        if (Array.isArray(lines)) {
-            return lines.join('\n');
-        }
-        return typeof lines === 'string' ? lines : '';
+        return titleLines().join('\n');
     }
 
     function prefersReducedMotion() {
@@ -908,29 +939,408 @@
     }
 
     /* =========================================================================
-       背景图兜底
+       背景图库
        ====================================================================== */
 
+    /** 从路径里取文件名，兼容绝对 / 相对 src */
+    function backgroundFileName(src) {
+        if (!src) {
+            return '';
+        }
+        try {
+            const path = new URL(src, document.baseURI).pathname;
+            return decodeURIComponent(path.split('/').pop() || '');
+        } catch (error) {
+            return src.split('/').pop() || '';
+        }
+    }
+
+    /** 只接受 img/bg/ 下的普通文件名，避免清单里混进 ../ 之类的路径 */
+    function isBackgroundFile(file) {
+        return typeof file === 'string' &&
+            file.length > 0 &&
+            file.length <= 160 &&
+            file.indexOf('/') === -1 &&
+            file.indexOf('\\') === -1 &&
+            BACKGROUND_EXTENSIONS.test(file);
+    }
+
     function initPageBackground() {
-        const image = document.querySelector('.page-background img');
-        if (!image) {
+        const container = document.querySelector('.page-background');
+        if (!container) {
             return;
         }
 
-        const layer = image.closest('.page-background');
+        const layers = Array.prototype.slice.call(container.querySelectorAll('.bg-layer'));
+        if (!layers.length) {
+            return;
+        }
 
-        function markFailed() {
-            if (layer) {
-                layer.classList.add('is-failed');
+        let activeLayer = layers.filter(function (image) {
+            return image.classList.contains('is-active');
+        })[0] || layers[0];
+        activeLayer.classList.add('is-active');
+
+        let currentFile = backgroundFileName(activeLayer.getAttribute('src')) || DEFAULT_BACKGROUND;
+        let backgrounds = [];
+        let listRendered = false;
+        let panelOpen = false;
+        let switchToken = 0;
+
+        const toggle = byId('bgToggle');
+        const panel = byId('bgPanel');
+        const closeButton = byId('bgClose');
+        const list = byId('bgList');
+        const empty = byId('bgEmpty');
+
+        function backgroundSource(file) {
+            return '/img/bg/' + encodeURIComponent(file);
+        }
+
+        function markFailed(image) {
+            if (image === activeLayer) {
+                container.classList.add('is-failed');
+                console.warn('[background] 背景图加载失败，已回退到纯色背景。');
             }
-            console.warn('[background] 背景图加载失败，已回退到纯色背景。');
         }
 
-        if (image.complete && image.naturalWidth === 0) {
-            markFailed();
+        // 首屏图片加载失败时保留原有的纯色兜底
+        if (activeLayer.complete && activeLayer.naturalWidth === 0) {
+            markFailed(activeLayer);
         } else {
-            image.addEventListener('error', markFailed, { once: true });
+            activeLayer.addEventListener('error', function () {
+                markFailed(activeLayer);
+            }, { once: true });
         }
+
+        activeLayer.addEventListener('load', function () {
+            container.classList.remove('is-failed');
+        });
+
+        function readStoredBackground() {
+            try {
+                return window.localStorage.getItem(BACKGROUND_STORAGE_KEY) || '';
+            } catch (error) {
+                return '';
+            }
+        }
+
+        function storeBackground(file) {
+            try {
+                window.localStorage.setItem(BACKGROUND_STORAGE_KEY, file);
+            } catch (error) {
+                // 隐私模式下写入失败不影响本次切换
+            }
+        }
+
+        function updateSelection(file) {
+            if (!list) {
+                return;
+            }
+            list.querySelectorAll('.bg-thumb').forEach(function (button) {
+                button.setAttribute('aria-pressed', String(button.dataset.file === file));
+            });
+        }
+
+        /**
+         * 交叉淡入：等新图解码完成后再切换 is-active，旧图在新图淡入结束后退场。
+         * 快速连点时用 token 作废较早的回调，避免两层状态互相打架。
+         */
+        function showBackground(file, options) {
+            const settings = options || {};
+
+            if (file === currentFile) {
+                if (typeof settings.onShown === 'function') {
+                    settings.onShown();
+                }
+                return;
+            }
+
+            const token = ++switchToken;
+            const outgoing = activeLayer;
+            const incoming = layers.filter(function (image) {
+                return image !== outgoing;
+            })[0];
+
+            if (!incoming) {
+                // HTML 固定两层，这里只是防御性兜底
+                outgoing.src = backgroundSource(file);
+                currentFile = file;
+                if (typeof settings.onShown === 'function') {
+                    settings.onShown();
+                }
+                return;
+            }
+
+            // 上一次淡入尚未收尾时，先把它残留的旧层清掉
+            layers.forEach(function (image) {
+                if (image !== outgoing) {
+                    image.classList.remove('is-active');
+                }
+            });
+            outgoing.style.zIndex = '1';
+            incoming.classList.remove('is-active');
+            incoming.style.zIndex = '';
+
+            function reveal() {
+                if (token !== switchToken) {
+                    return;
+                }
+
+                incoming.style.zIndex = '2';
+                incoming.classList.add('is-active');
+                container.classList.remove('is-failed');
+                activeLayer = incoming;
+                currentFile = file;
+
+                if (typeof settings.onShown === 'function') {
+                    settings.onShown();
+                }
+
+                window.setTimeout(function () {
+                    if (token !== switchToken) {
+                        return;
+                    }
+                    outgoing.classList.remove('is-active');
+                    outgoing.style.zIndex = '';
+                    incoming.style.zIndex = '';
+                }, BACKGROUND_FADE_MS + 80);
+            }
+
+            function fail() {
+                if (token !== switchToken) {
+                    return;
+                }
+                console.warn('[background] 背景图加载失败：' + file);
+                if (typeof settings.onError === 'function') {
+                    settings.onError();
+                }
+            }
+
+            incoming.onload = function () {
+                incoming.onload = null;
+                incoming.onerror = null;
+                reveal();
+            };
+            incoming.onerror = function () {
+                incoming.onload = null;
+                incoming.onerror = null;
+                fail();
+            };
+            incoming.src = backgroundSource(file);
+
+            if (incoming.complete && incoming.naturalWidth > 0) {
+                incoming.onload = null;
+                incoming.onerror = null;
+                window.requestAnimationFrame(reveal);
+            } else if (incoming.complete && incoming.naturalWidth === 0) {
+                incoming.onerror = null;
+                fail();
+            }
+        }
+
+        function parseManifest(data) {
+            const raw = Array.isArray(data) ? data : (data && Array.isArray(data.backgrounds) ? data.backgrounds : []);
+            const seen = Object.create(null);
+            const items = [];
+
+            raw.forEach(function (item) {
+                const file = item && item.file;
+                if (!isBackgroundFile(file) || seen[file]) {
+                    return;
+                }
+                seen[file] = true;
+
+                const label = item && typeof item.label === 'string' && item.label.trim()
+                    ? item.label.trim()
+                    : file.replace(BACKGROUND_EXTENSIONS, '').replace(/[_-]+/g, ' ');
+
+                items.push({ file: file, label: label });
+            });
+
+            return items;
+        }
+
+        function renderList() {
+            if (!list || !empty) {
+                return;
+            }
+
+            list.textContent = '';
+
+            backgrounds.forEach(function (background) {
+                const item = document.createElement('li');
+                const button = document.createElement('button');
+                const frame = document.createElement('span');
+                const image = document.createElement('img');
+                const label = document.createElement('span');
+
+                button.type = 'button';
+                button.className = 'bg-thumb';
+                button.dataset.file = background.file;
+                button.setAttribute('aria-pressed', String(background.file === currentFile));
+                button.setAttribute('aria-label', background.label);
+
+                frame.className = 'bg-thumb-frame';
+                image.src = backgroundSource(background.file);
+                image.alt = '';
+                image.decoding = 'async';
+                image.loading = 'lazy';
+
+                label.className = 'bg-thumb-label';
+                label.textContent = background.label;
+                label.setAttribute('aria-hidden', 'true');
+
+                frame.appendChild(image);
+                button.appendChild(frame);
+                button.appendChild(label);
+                button.addEventListener('click', function () {
+                    selectBackground(background.file);
+                });
+
+                item.appendChild(button);
+                list.appendChild(item);
+            });
+
+            list.hidden = backgrounds.length === 0;
+            empty.hidden = backgrounds.length > 0;
+            listRendered = true;
+        }
+
+        function selectBackground(file) {
+            updateSelection(file);
+            showBackground(file, {
+                onShown: function () {
+                    storeBackground(file);
+                    updateSelection(file);
+                },
+                onError: function () {
+                    updateSelection(currentFile);
+                }
+            });
+            closePanel();
+        }
+
+        function onDocumentPointerDown(event) {
+            if (!panel || !toggle) {
+                return;
+            }
+            if (panel.contains(event.target) || toggle.contains(event.target)) {
+                return;
+            }
+            closePanel();
+        }
+
+        function onDocumentKeyDown(event) {
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                closePanel();
+            }
+        }
+
+        function openPanel() {
+            if (!panel || !toggle || panelOpen) {
+                return;
+            }
+
+            panelOpen = true;
+            panel.hidden = false;
+            toggle.setAttribute('aria-expanded', 'true');
+
+            if (!listRendered) {
+                renderList();
+            }
+
+            document.addEventListener('pointerdown', onDocumentPointerDown, true);
+            document.addEventListener('keydown', onDocumentKeyDown);
+
+            if (closeButton) {
+                closeButton.focus({ preventScroll: true });
+            }
+        }
+
+        function closePanel() {
+            if (!panel || !toggle || !panelOpen) {
+                return;
+            }
+
+            panelOpen = false;
+            panel.hidden = true;
+            toggle.setAttribute('aria-expanded', 'false');
+
+            document.removeEventListener('pointerdown', onDocumentPointerDown, true);
+            document.removeEventListener('keydown', onDocumentKeyDown);
+
+            toggle.focus({ preventScroll: true });
+        }
+
+        if (toggle && panel) {
+            toggle.addEventListener('click', function () {
+                if (panel.hidden) {
+                    openPanel();
+                } else {
+                    closePanel();
+                }
+            });
+        }
+
+        if (closeButton) {
+            closeButton.addEventListener('click', closePanel);
+        }
+
+        function loadBackgrounds() {
+            return fetch(BACKGROUND_MANIFEST, { cache: 'no-cache' })
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error('HTTP ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(parseManifest)
+                .catch(function (error) {
+                    console.warn('[background] 无法读取背景清单，使用当前背景。', error);
+                    return [];
+                });
+        }
+
+        loadBackgrounds().then(function (items) {
+            backgrounds = items;
+
+            // 清单不可用时仍让面板显示当前背景，避免打开后一片空白
+            if (!backgrounds.length) {
+                backgrounds = [{
+                    file: currentFile,
+                    label: currentFile.replace(BACKGROUND_EXTENSIONS, '').replace(/[_-]+/g, ' ')
+                }];
+            }
+
+            if (listRendered) {
+                renderList();
+            }
+
+            const stored = readStoredBackground();
+            const storedItem = backgrounds.filter(function (item) {
+                return item.file === stored;
+            })[0];
+
+            if (storedItem && stored !== currentFile) {
+                updateSelection(stored);
+                showBackground(stored, {
+                    onShown: function () {
+                        updateSelection(stored);
+                    },
+                    onError: function () {
+                        storeBackground(currentFile);
+                        updateSelection(currentFile);
+                    }
+                });
+            } else {
+                if (stored && !storedItem) {
+                    storeBackground(currentFile);
+                }
+                updateSelection(currentFile);
+            }
+        });
     }
 
     /* =========================================================================

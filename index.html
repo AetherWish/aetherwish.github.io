@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="翁法罗斯，续写「开拓」......然后，人们从昨日走向明天。">
+    <meta name="description" content="翁法罗斯，续写「开拓」......「然后，人们从昨日走向明天。」">
     <meta name="theme-color" content="#4a2333">
-    <title>翁法罗斯，续写「开拓」......然后，人们从昨日走向明天。</title>
+    <title>翁法罗斯，续写「开拓」......「然后，人们从昨日走向明天。」</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="preload" href="/font/XiaolaiMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
     <!-- 开场先隐藏控件，避免背景压暗前闪出工具栏与面板；10 秒后兜底显示，防止脚本异常把页面锁死。
@@ -38,12 +38,14 @@
 <body>
     <!-- 背景图层：全屏铺满的插画。
          iOS / iPadOS Safari 不支持 background-attachment: fixed，
-         因此改用固定定位图层 + object-fit: cover（详见 css/styles.css 第 2 节）。 -->
+         因此改用固定定位图层 + object-fit: cover（详见 css/styles.css 第 2 节）。
+         两层 .bg-layer 用于切换背景时交叉淡入，脚本只负责换 src 与 is-active。 -->
     <div class="page-background" aria-hidden="true">
-        <img src="/img/philia093.webp" alt="" decoding="async">
+        <img class="bg-layer is-active" src="/img/bg/philia093.webp" alt="" decoding="async" fetchpriority="high">
+        <img class="bg-layer" alt="" decoding="async">
     </div>
 
-    <!-- 右上角工具组：语言 / 深浅色 / 音乐 / 全屏。开场结束后常驻。 -->
+    <!-- 右上角工具组：语言 / 背景 / 深浅色 / 音乐 / 全屏。开场结束后常驻。 -->
     <header class="toolbar">
         <button id="langToggle" class="tool-btn" type="button" aria-label="切换语言" title="切换语言">
             <svg class="tool-icon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
@@ -52,6 +54,31 @@
             </svg>
             <span id="langToggleText" class="lang-text">EN</span>
         </button>
+
+        <!-- 背景图库：点击按钮在下方展开缩略图，选择结果记在 localStorage。
+             图片清单由 scripts/build-backgrounds.mjs 扫描 img/bg/ 生成。 -->
+        <div id="bgPicker" class="bg-picker">
+            <button id="bgToggle" class="tool-btn tool-btn--icon" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="bgPanel" aria-label="切换背景" title="切换背景">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                    <rect x="3.2" y="4.6" width="17.6" height="14.8" rx="2.2"></rect>
+                    <circle cx="8.4" cy="9.6" r="1.5"></circle>
+                    <path d="m4.4 17.4 5-5 3.6 3.6 3.2-3.2 3.4 3.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+            </button>
+
+            <div id="bgPanel" class="bg-panel" role="dialog" aria-labelledby="bgPanelTitle" hidden>
+                <div class="bg-panel-head">
+                    <span id="bgPanelTitle" class="bg-panel-title">背景图库</span>
+                    <button id="bgClose" class="bg-close-btn" type="button" aria-label="关闭">
+                        <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                        </svg>
+                    </button>
+                </div>
+                <ul id="bgList" class="bg-list" aria-label="背景图库"></ul>
+                <p id="bgEmpty" class="bg-empty" hidden>暂无可用背景</p>
+            </div>
+        </div>
 
         <button id="themeToggle" class="tool-btn tool-btn--icon" type="button" aria-label="深色模式" title="切换到深色模式" aria-pressed="false">
             <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
@@ -134,7 +161,7 @@
         <section id="countdownPanel" class="countdown-panel" data-mode="countdown" aria-labelledby="countdownTitle">
             <h1 id="countdownTitle" class="countdown-title">
                 <span class="title-line">翁法罗斯，续写「开拓」......</span>
-                <span class="title-line">然后，人们从昨日走向明天。</span>
+                <span class="title-line">「然后，人们从昨日走向明天。」</span>
             </h1>
 
             <!-- 时间模式：默认倒计时到 5.5 版本期间，可切换为从 4.7 版本起点的正计时 -->
