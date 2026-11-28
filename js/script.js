@@ -155,26 +155,22 @@
         return now >= COUNTDOWN_TARGET.getTime() ? 'countdown-arrived' : 'countdown';
     }
 
-    /** 标题两行：第一行固定，第二行随倒计时 / 正计时切换 */
+    /** 页面只显示一行题记，随倒计时 / 正计时切换 */
     function titleLines() {
-        const lead = t('titleLead');
         const quote = t('modeQuote', currentMode);
-        return [lead, quote].filter(function (line) {
-            return Boolean(line);
-        });
+        return quote ? [quote] : [];
     }
 
-    /** 把标题写进页面与浏览器标签页；开场打字机也复用 titleLines() */
+    /** 页面题记写入 h1；浏览器标签页保持最初的完整标题 */
     function renderTitle() {
         const lines = titleLines();
+        const title = t('pageTitle') || lines[0] || '';
 
-        document.querySelectorAll('#countdownTitle .title-line').forEach(function (element, index) {
-            element.textContent = lines[index] || '';
+        document.querySelectorAll('#countdownTitle .title-line').forEach(function (element) {
+            element.textContent = lines[0] || '';
         });
 
-        // 英文两行之间补一个空格，中文按原样拼接
-        const separator = translationManager && translationManager.currentLang === 'en' ? ' ' : '';
-        document.title = lines.join(separator);
+        document.title = title;
     }
 
     function updateSubText() {
@@ -833,6 +829,10 @@
 
     /** 取当前语言 + 当前模式的两行标题，用换行连接；translation 模块异常时返回空串 */
     function introTitleText() {
+        const lines = t('introTitle');
+        if (Array.isArray(lines) && lines.length) {
+            return lines.join('\n');
+        }
         return titleLines().join('\n');
     }
 
@@ -1102,8 +1102,8 @@
                         return;
                     }
                     outgoing.classList.remove('is-active');
-                    outgoing.style.zIndex = '';
-                    incoming.style.zIndex = '';
+                    // 保留两层的 z-index：旧图在新图下方淡出，若此时把 z-index 清空，
+                    // DOM 中靠后的旧图会盖到新图上方，出现一次旧背景闪回。
                 }, BACKGROUND_FADE_MS + 80);
             }
 
@@ -1173,7 +1173,6 @@
                 const button = document.createElement('button');
                 const frame = document.createElement('span');
                 const image = document.createElement('img');
-                const label = document.createElement('span');
 
                 button.type = 'button';
                 button.className = 'bg-thumb';
@@ -1187,13 +1186,8 @@
                 image.decoding = 'async';
                 image.loading = 'lazy';
 
-                label.className = 'bg-thumb-label';
-                label.textContent = background.label;
-                label.setAttribute('aria-hidden', 'true');
-
                 frame.appendChild(image);
                 button.appendChild(frame);
-                button.appendChild(label);
                 button.addEventListener('click', function () {
                     selectBackground(background.file);
                 });

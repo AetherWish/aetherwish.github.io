@@ -32,8 +32,13 @@
             langToggle: 'EN',
             langToggleAria: '切换语言',
 
-            /* 主标题：第一行固定，第二行按倒计时 / 正计时取 modeQuote，由 script.js 渲染 */
-            titleLead: '翁法罗斯，续写「开拓」......',
+            /* 页面主标题只显示当前模式的题记；浏览器标签页仍用最初的完整标题 */
+            pageTitle: '翁法罗斯，续写「开拓」......然后，人们从昨日走向明天。',
+            /* 开场打字机保留最初的两行文案 */
+            introTitle: [
+                '翁法罗斯，续写「开拓」......',
+                '然后，人们从昨日走向明天。'
+            ],
             modeQuote: {
                 countdown: '「然后，人们从昨日走向明天。」',
                 countup: '「成为昨日的明天」'
@@ -100,7 +105,11 @@
             langToggle: '中文',
             langToggleAria: 'Switch language',
 
-            titleLead: 'Amphoreus, continuing the Trailblaze...',
+            pageTitle: 'Amphoreus, continuing the Trailblaze... Then, people walk from yesterday towards tomorrow.',
+            introTitle: [
+                'Amphoreus, continuing the Trailblaze...',
+                'Then, people walk from yesterday towards tomorrow.'
+            ],
             modeQuote: {
                 countdown: '"Then, people walk from yesterday towards tomorrow."',
                 countup: '"As Tomorrow Became Yesterday"'
